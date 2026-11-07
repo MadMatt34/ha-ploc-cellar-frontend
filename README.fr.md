@@ -55,6 +55,8 @@ Consultez le [contrat backend](docs/CONTRAT_BACKEND.fr.md) pour la requête WebS
 
 Le frontend dépend du service WebSocket Home Assistant `ploc_cellar.get_inventory` fourni par l'intégration. Le contrat du service et le modèle d'inventaire sont maintenus dans le [dépôt backend](https://github.com/MadMatt34/ha-ploc-cellar). Toute évolution de la réponse doit rester compatible avec les interfaces TypeScript de `src/types.ts`.
 
+Le champ facultatif `Wine.meals` contient les indicateurs d'accords mets-vins PLOUD sous forme de masque de bits brut. La [documentation du contrat backend](docs/CONTRAT_BACKEND.fr.md) présente la correspondance complète entre les bits et les catégories, les règles de combinaison et le traitement des indicateurs inconnus.
+
 ## Langues
 
 Le français et l'anglais sont pris en charge.
