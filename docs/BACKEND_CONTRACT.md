@@ -60,6 +60,7 @@ Top-level response fields:
 - `Wine.ploud_bottles` is the raw PLOUD stock value and is informational only.
 - Wine location coordinates (`row`, `column`) may be `null`; consumers must handle missing coordinates.
 - Wine characteristics can be `null`; the frontend must not assume that appellation, color, region, vintage or bottle format is always present.
+- `Wine.meals` is the optional raw PLOUD `ml` integer bitmask for food-pairing associations. Known flags are decoded by the frontend; unknown bits are retained by the backend and ignored for display. The field is optional in the frontend type so older backend versions remain usable.
 - Unresolved wine references on occupied positions remain part of physical totals even when the corresponding wine record is unavailable.
 - Backend filters must not change global totals.
 
@@ -80,6 +81,10 @@ An additive response field is still added to both the backend's exact contract t
 Preserve the physical-position versus reconstructed-stock distinction. New nullable fields must be handled as nullable in the UI. Do not change the service domain, service name, response mode or request shape without coordinating a frontend release.
 
 The compile-time contract assertions and frontend CI type-check verify the declared TypeScript shape; they do not execute the backend or replace an integration test against a running Home Assistant instance.
+
+### Food pairings
+
+The PLOUD `ml` field is stored on each Wine record as the `Meals` flags enum. The current public enum defines flags from `1` (Aperitif) through `4096` (Dessert); multiple associations are combined as a bitmask. The backend exposes the raw integer without dropping unknown bits. The frontend displays the known categories in the wine detail dialog using the Home Assistant language (English or French). The APK contains a `foodtype8192` resource, but `8192` is not in the public server enum and is intentionally not given a label.
 
 ### Wine image
 
