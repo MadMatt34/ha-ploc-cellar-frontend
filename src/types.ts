@@ -1,6 +1,7 @@
 export interface HomeAssistant {
   language: string;
   callWS<T>(message: Record<string, unknown>): Promise<T>;
+  fetchWithAuth(url: string, init?: RequestInit): Promise<Response>;
 }
 
 export interface PlocCellarCardConfig {
@@ -60,6 +61,7 @@ export interface Wine {
   bottle_format: string | null;
   bottle_volume_l: number | null;
   ploud_pid: string | null;
+  image_url?: string | null;
   locations: Array<{
     rack: string;
     rack_id: string;
