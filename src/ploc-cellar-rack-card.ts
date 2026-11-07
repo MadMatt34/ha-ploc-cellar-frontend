@@ -302,7 +302,7 @@ export class PlocCellarRackCard extends LitElement {
                     <div class=${occupied ? "slot occupied" : "slot empty"}
                       style=${`grid-row: ${row}; grid-column: ${column};`}
                       aria-label=${label}
-                      role=${wine ? "button" : nothing}
+                      role=${wine ? "button" : occupied ? "img" : nothing}
                       aria-haspopup=${wine ? "dialog" : nothing}
                       tabindex=${occupied ? "0" : nothing}
                       @click=${wine ? () => { this.selectedWine = wine; } : nothing}
