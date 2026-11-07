@@ -196,7 +196,7 @@ export class PlocCellarInventoryCard extends LitElement {
       translate(this.hass?.language ?? "en", key);
     const locationLabels = wine.locations.map((location) => {
       const coordinates = location.row !== null && location.column !== null
-        ? ` · ${t("row")} ${location.row}, ${t("column")} ${location.column}`
+        ? ` · ${t("row")} ${location.row + 1}, ${t("column")} ${location.column + 1}`
         : "";
       return `${location.rack}${coordinates}`;
     });
