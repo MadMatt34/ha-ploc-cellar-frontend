@@ -6,7 +6,7 @@
   "scripts": {
     "check": "tsc --noEmit",
     "build": "vite build",
-    "test": "tsc -p tsconfig.test.json && node --test tests/*.test.mjs"
+    "test": "tsc -p tsconfig.test.json && node --experimental-test-coverage --test tests/*.test.mjs"
   },
   "dependencies": {
     "lit": "^3.3.1",

@@ -6,5 +6,8 @@
     "outDir": ".test-dist",
     "declaration": false
   },
-  "include": ["src/rack-grid.ts"]
+  "include": [
+    "src/rack-grid.ts",
+    "src/wine-image.ts"
+  ]
 }
