@@ -80,3 +80,14 @@ An additive response field is still added to both the backend's exact contract t
 Preserve the physical-position versus reconstructed-stock distinction. New nullable fields must be handled as nullable in the UI. Do not change the service domain, service name, response mode or request shape without coordinating a frontend release.
 
 The compile-time contract assertions and frontend CI type-check verify the declared TypeScript shape; they do not execute the backend or replace an integration test against a running Home Assistant instance.
+
+### Wine image
+
+The `Wine` response may include the optional field `image_url: string | null`.
+
+- A non-null value is a local Home Assistant endpoint for the cached primary wine image, or the cached cover image when the primary image is unavailable.
+- The endpoint requires Home Assistant authentication. Consumers must fetch it with `hass.fetchWithAuth(image_url)`; assigning the endpoint directly to an unauthenticated remote image request is not supported.
+- The URL may include a version query component. A changed URL signals that the cached document version changed and the image should be fetched again, even if the PLOUD document identifier did not change.
+- The field may be null or absent for older backend versions, wines without image references, documents not yet downloaded, or unavailable images. The UI must treat it as optional and must not make the wine detail view depend on it.
+
+The card displays the fetched blob through an object URL. It revokes the previous object URL when the image is replaced and releases the active URL when the component disconnects. A failed image request must not prevent the inventory or wine details from being displayed.
