@@ -60,6 +60,7 @@ Principaux champs de la réponse :
 - `Wine.ploud_bottles` est la valeur brute du stock PLOUD et n'est fournie qu'à titre informatif.
 - Les coordonnées d'un emplacement (`row`, `column`) peuvent être à `null` ; l'interface doit gérer leur absence.
 - Les caractéristiques d'un vin peuvent être à `null` ; l'interface ne doit pas supposer que l'appellation, la couleur, la région, le millésime ou le format est toujours renseigné.
+- `Wine.meals` est le masque de bits entier brut et facultatif du champ PLOUD `ml`, qui représente les accords mets-vins. Le frontend décode les indicateurs connus ; le backend conserve les bits inconnus et l'interface ne les affiche pas. Le champ est facultatif dans le type frontend afin de rester compatible avec les anciennes versions du backend.
 - Les emplacements occupés dont la référence vin n'est pas résolue restent inclus dans les totaux physiques, même si la fiche vin correspondante est indisponible.
 - Les filtres backend ne doivent pas modifier les totaux globaux.
 
@@ -80,6 +81,10 @@ Même un nouveau champ additif doit être ajouté au test de contrat exact du ba
 Préserver la distinction entre emplacements physiques et stock reconstitué. Les nouveaux champs nullable doivent être traités comme tels dans l'interface. Ne pas modifier le domaine du service, son nom, son mode de réponse ou la forme de la requête sans coordonner une version du frontend.
 
 Les assertions de contrat à la compilation et la vérification TypeScript de la CI contrôlent la structure TypeScript déclarée ; elles n'exécutent pas le backend et ne remplacent pas un test d'intégration sur une instance Home Assistant en fonctionnement.
+
+### Accords mets et vins
+
+Le champ PLOUD `ml` est enregistré sur chaque fiche Wine sous forme de l'énumération de bits `Meals`. L'énumération publique actuelle définit les indicateurs de `1` (apéritif) à `4096` (dessert) ; plusieurs accords sont combinés dans un masque de bits. Le backend expose l'entier brut sans supprimer les bits inconnus. Le frontend affiche les catégories connues dans la fenêtre de détail du vin, dans la langue de Home Assistant (français ou anglais). L'APK contient une ressource `foodtype8192`, mais `8192` ne figure pas dans l'énumération publique du serveur : aucun libellé ne lui est donc attribué.
 
 ### Image du vin
 
