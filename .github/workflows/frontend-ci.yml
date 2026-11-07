@@ -30,14 +30,16 @@ jobs:
         run: npm run check
       - name: Build standalone dashboard module
         run: npm run build
-      - name: Verify distributable
-        run: test -s dist/ploc-cellar-card.js
+      - name: Prepare HACS distributable
+        run: cp dist/ploc-cellar-card.js ploc-cellar-card.js
+      - name: Verify distributables
+        run: test -s dist/ploc-cellar-card.js && test -s ploc-cellar-card.js
       - name: Commit distributable
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dist/ploc-cellar-card.js
+          git add dist/ploc-cellar-card.js ploc-cellar-card.js
           if ! git diff --cached --quiet; then
             git commit -m "Build Ploc Cellar Cards [skip ci]"
             git push
