@@ -1,4 +1,5 @@
 import { LitElement, css, html, nothing, type PropertyValues } from "lit";
+import "./fonts.css";
 import { customElement, property, state } from "lit/decorators.js";
 
 import type { HomeAssistant, Wine } from "./types";
@@ -20,7 +21,9 @@ export class PlocCellarWineDetail extends LitElement {
       --mdc-dialog-min-width: min(560px, calc(100vw - 32px));
       --mdc-dialog-max-width: min(760px, calc(100vw - 32px));
     }
+    :host { --ploc-wine-font-family: "Cormorant Garamond", Georgia, serif; }
     .content { display: grid; gap: 20px; min-width: 0; }
+    .wine-dialog-title { font-family: var(--ploc-wine-font-family); font-size: 1.45rem; font-weight: 500; line-height: 1.2; white-space: normal; }
     .wine-image-container { display: flex; justify-content: center; min-width: 0; max-height: 320px; overflow: hidden; }
     .wine-image { display: block; max-width: 100%; max-height: 320px; object-fit: contain; border-radius: 10px; }
     .identity { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
@@ -248,7 +251,8 @@ export class PlocCellarWineDetail extends LitElement {
       : null;
 
     return html`
-      <ha-dialog .open=${true} header-title=${wine.name} @closed=${() => this.onDialogClosed()}>
+      <ha-dialog .open=${true} .accessibleLabel=${wine.name} @closed=${() => this.onDialogClosed()}>
+        <span slot="headerTitle" class="wine-dialog-title">${wine.name}</span>
         <div class="content">
           ${this.imageUrl ? html`
             <div class="wine-image-container">

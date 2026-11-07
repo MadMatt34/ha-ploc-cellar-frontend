@@ -50,7 +50,7 @@ export class PlocCellarInventoryCard extends LitElement {
     .wine-list { display: grid; gap: 8px; }
     .wine { border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; min-width: 0; }
     .wine-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .wine-name { font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+    .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.12rem; font-weight: 500; line-height: 1.25; overflow-wrap: anywhere; }
     .wine-name-button { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: inherit; line-height: inherit; text-align: left; cursor: pointer; }
     .wine-name-button:hover { color: var(--primary-color); text-decoration: underline; }
     .wine-name-button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 2px; }

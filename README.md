@@ -66,3 +66,7 @@ The wine detail dialog displays the cached PLOUD wine image when the backend pro
 Images are served by an authenticated Home Assistant endpoint. The card retrieves them with `hass.fetchWithAuth()`; it does not contact PLOUD directly and does not store PLOUD credentials. The returned blob is displayed through a browser object URL. Object URLs are revoked when replaced or when the dialog element is disconnected. If the backend changes `image_url` (including its version query when the same PLOUD document is updated), the card fetches the new image and releases the previous object URL.
 
 The field is optional for compatibility with older backend responses. When it is absent or null, the wine dialog remains usable and simply displays no photo.
+
+## Wine-name typography
+
+Wine names use the locally bundled Cormorant Garamond typeface (SIL Open Font License) in the inventory, rack positions, wine tooltips, diagnostic wine links and wine-detail dialog title. Other interface text retains Home Assistant's normal typography. The font is bundled with the card, so no external font service or network request is needed at runtime.

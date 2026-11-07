@@ -66,3 +66,7 @@ La fenêtre de détail d'un vin affiche la photo PLOUD mise en cache lorsque le 
 Les images sont servies par une route Home Assistant authentifiée. La carte les récupère avec `hass.fetchWithAuth()` ; elle ne contacte jamais directement PLOUD et ne stocke aucun identifiant PLOUD. Le contenu reçu sous forme de blob est affiché au moyen d'une URL d'objet du navigateur. Cette URL est révoquée lorsqu'elle est remplacée ou lorsque l'élément de la fenêtre modale est déconnecté. Si le backend modifie `image_url` (y compris son paramètre de version lorsque le document PLOUD conserve le même identifiant), la carte télécharge la nouvelle image et libère l'ancienne URL d'objet.
 
 Le champ est facultatif afin de rester compatible avec les réponses d'anciennes versions du backend. S'il est absent ou nul, la fenêtre de détail reste utilisable et n'affiche simplement aucune photo.
+
+## Typographie des noms de vins
+
+Les noms des vins utilisent la police Cormorant Garamond, intégrée localement (licence SIL Open Font License), dans l'inventaire, les emplacements de cave, les infobulles, les liens de vins des diagnostics et le titre de la fiche détaillée. Les autres textes conservent la typographie habituelle de Home Assistant. La police est intégrée à la carte : aucun service de polices externe ni accès réseau n'est nécessaire à l'exécution.
