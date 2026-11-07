@@ -1532,7 +1532,7 @@ ve.styles = Vn`
     .empty-shelf { display: block; position: relative; flex: 0 0 28px; width: 28px; height: 28px; margin: 0; box-sizing: border-box; }
     .empty-shelf::after { content: ""; position: absolute; right: 0; bottom: 0; left: 0; height: 14px; border: 2px solid var(--secondary-text-color); border-top: 0; border-radius: 0 0 14px 14px; box-sizing: border-box; opacity: .75; }
     .slot strong { display: -webkit-box; width: 100%; min-height: 3.45em; max-height: 3.45em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; font-size: .76rem; line-height: 1.15; overflow-wrap: anywhere; }
-    .slot.occupied strong { font-size: .84rem; font-weight: 500; line-height: 1.05; }
+    .slot.occupied strong { max-height: calc(3 * 1.05em); -webkit-line-clamp: 3; font-size: .84rem; font-weight: 500; line-height: 1.05; }
     .slot small { color: var(--secondary-text-color); font-size: .68rem; margin-top: auto; }
     .bottle-marker { display: block; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: var(--bottle-color, var(--secondary-text-color)); border: 2px solid var(--divider-color); box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%); box-sizing: border-box; }
     .legend, .muted { color: var(--secondary-text-color); font-size: .85rem; }
@@ -18590,17 +18590,18 @@ let ge = class extends ke {
           </div>
           ${i ? L`
             <section class="section" aria-label=${e("rack_occupancy")}>
-              <div class="occupancy-heading">
-                <span>${e("rack_occupancy")}</span>
-                <span class="numeric-value">${this.formatNumber(t.occupied_positions)} / ${this.formatNumber(t.total_positions)}</span>
-              </div>
               <div class="occupancy-bar" role="progressbar"
                 aria-label=${e("rack_occupancy")}
                 aria-valuemin="0" aria-valuemax=${t.total_positions}
-                aria-valuenow=${t.occupied_positions}>
+                aria-valuenow=${Math.min(t.total_positions, Math.max(0, t.occupied_positions))}>
                 <div class="occupancy-fill" style=${`width: ${o}%`}></div>
+                <div class="occupancy-label">
+                  <span>${e("rack_occupancy")}</span>
+                  <span>·</span>
+                  <span class="numeric-value">${this.formatNumber(Math.max(0, t.total_positions - t.occupied_positions))}</span>
+                  <span>${e("empty_positions")}</span>
+                </div>
               </div>
-              <div class="muted">${e("empty_positions")}: <span class="numeric-value">${this.formatNumber(Math.max(0, t.total_positions - t.occupied_positions))}</span></div>
             </section>
           ` : R}
           ${n && l ? L`
@@ -18675,14 +18676,14 @@ ge.styles = Vn`
     .label, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .section { margin-top: 16px; }
     .section-title { margin: 0 0 8px; font-size: .95rem; font-weight: 500; }
-    .occupancy-heading { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; font-size: .85rem; }
-    .occupancy-bar { height: 9px; border-radius: 999px; overflow: hidden; background: var(--divider-color); }
-    .occupancy-fill { height: 100%; border-radius: inherit; background: var(--primary-color); }
+    .occupancy-bar { position: relative; height: 28px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
+    .occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
+    .occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; color: var(--primary-text-color); font-size: .8rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
     .diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
     .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; cursor: pointer; }
     .diagnostic:hover { background: var(--secondary-background-color); }
     .diagnostic:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
-    .diagnostic-value { display: block; font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
+    .diagnostic-value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .diagnostic-hint { display: block; align-self: flex-end; margin-top: auto; padding-top: 8px; color: var(--secondary-text-color); font-size: .75rem; text-align: right; }
     .diagnostic-detail-list { display: grid; gap: 12px; max-height: min(60vh, 520px); overflow: auto; }
     .diagnostic-detail-item { border-bottom: 1px solid var(--divider-color); padding: 0 0 10px; }
@@ -18703,7 +18704,7 @@ ge.styles = Vn`
     .donut { position: relative; display: block; width: 100%; max-width: 150px; aspect-ratio: 1; justify-self: center; }
     .donut-chart { display: block; width: 100%; height: 100%; }
     .donut-center { position: absolute; inset: 17%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; background: var(--card-background-color, var(--ha-card-background, #fff)); pointer-events: none; }
-    .donut-total { color: var(--primary-text-color); font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .donut-total { color: var(--primary-text-color); font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .donut-caption { color: var(--secondary-text-color); font-size: .48rem; }
     .legend { display: grid; gap: 4px; min-width: 0; }
     .legend-item { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; column-gap: 7px; row-gap: 2px; font-size: .82rem; }
