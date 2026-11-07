@@ -5,8 +5,9 @@
  * the service. Keep these exact key sets and the nullability assertions in
  * sync with that test whenever the backend contract intentionally changes.
  *
- * This file is intentionally imported nowhere: tsconfig includes src/**/*.ts,
- * so the regular strict TypeScript check evaluates these assertions in CI.
+ * This file is intentionally imported nowhere: the TypeScript configuration
+ * includes every source file, so the regular strict check evaluates these
+ * assertions in CI.
  */
 import type {
   InventoryResponse,
