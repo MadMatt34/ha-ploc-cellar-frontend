@@ -1,4 +1,6 @@
 import { LitElement, css, html, nothing } from "lit";
+import "./wine-typography";
+import "./numeric-typography";
 import { customElement, property, state } from "lit/decorators.js";
 import "./ploc-cellar-rack-card";
 import "./ploc-cellar-inventory-card";
@@ -60,7 +62,7 @@ export class PlocCellarCard extends LitElement {
     button[disabled] { opacity: .5; cursor: default; }
     .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 16px 0; }
     .metric { background: var(--secondary-background-color); border-radius: 10px; padding: 12px; min-width: 0; }
-    .value { display: block; font-size: 1.4rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .label, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .section { margin-top: 16px; }
     .section-title { margin: 0 0 8px; font-size: .95rem; font-weight: 500; }
@@ -71,18 +73,19 @@ export class PlocCellarCard extends LitElement {
     .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; cursor: pointer; }
     .diagnostic:hover { background: var(--secondary-background-color); }
     .diagnostic:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
-    .diagnostic-value { display: block; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .diagnostic-value { display: block; font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
     .diagnostic-hint { display: block; align-self: flex-end; margin-top: auto; padding-top: 8px; color: var(--secondary-text-color); font-size: .75rem; text-align: right; }
     .diagnostic-detail-list { display: grid; gap: 12px; max-height: min(60vh, 520px); overflow: auto; }
     .diagnostic-detail-item { border-bottom: 1px solid var(--divider-color); padding: 0 0 10px; }
-    .diagnostic-detail-name { margin: 0 0 6px; font-weight: 600; }
+    .diagnostic-detail-name { margin: 0 0 6px; font-family: var(--ploc-wine-font-family); font-size: 1.08rem; font-weight: 500; line-height: 1.25; }
     .diagnostic-wine-link { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: inherit; text-align: left; cursor: pointer; }
     .diagnostic-wine-link:hover { color: var(--primary-color); text-decoration: underline; }
     .diagnostic-wine-link:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 2px; }
     .diagnostic-detail-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px 14px; }
     .diagnostic-detail-meta div { display: flex; justify-content: space-between; gap: 12px; }
     .diagnostic-detail-meta dt { color: var(--secondary-text-color); }
-    .diagnostic-detail-meta dd { margin: 0; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .numeric-value { font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
+    .diagnostic-detail-meta dd { margin: 0; font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
     .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 14px; }
     .group { min-width: 0; border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; }
     .group-title { margin: 0 0 12px; font-size: 1rem; font-weight: 500; }
@@ -407,7 +410,7 @@ export class PlocCellarCard extends LitElement {
             <section class="section" aria-label=${t("rack_occupancy")}>
               <div class="occupancy-heading">
                 <span>${t("rack_occupancy")}</span>
-                <span>${this.formatNumber(data.occupied_positions)} / ${this.formatNumber(data.total_positions)}</span>
+                <span class="numeric-value">${this.formatNumber(data.occupied_positions)} / ${this.formatNumber(data.total_positions)}</span>
               </div>
               <div class="occupancy-bar" role="progressbar"
                 aria-label=${t("rack_occupancy")}
@@ -415,7 +418,7 @@ export class PlocCellarCard extends LitElement {
                 aria-valuenow=${data.occupied_positions}>
                 <div class="occupancy-fill" style=${`width: ${occupancy}%`}></div>
               </div>
-              <div class="muted">${t("empty_positions")}: ${this.formatNumber(Math.max(0, data.total_positions - data.occupied_positions))}</div>
+              <div class="muted">${t("empty_positions")}: <span class="numeric-value">${this.formatNumber(Math.max(0, data.total_positions - data.occupied_positions))}</span></div>
             </section>
           ` : nothing}
           ${showDiagnostics && hasDiagnostics ? html`
