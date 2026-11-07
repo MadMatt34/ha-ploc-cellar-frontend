@@ -21,7 +21,12 @@ Each card uses the native configuration-entry selector in its editor and stores 
 1. Install and configure the [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar).
 2. In HACS, open **Custom repositories**, add `MadMatt34/ha-ploc-cellar-frontend`, and select the **Dashboard** category. This manual step is needed until the repository is included in the default HACS catalog.
 3. Install **Ploc Cellar Cards** from HACS.
-4. HACS normally registers the dashboard resource automatically. If you manage dashboard resources manually (for example, in YAML), add this module resource:\n\n   ```yaml\n   url: /hacsfiles/ha-ploc-cellar-frontend/ploc-cellar-card.js\n   type: module\n   ```
+4. HACS normally registers the dashboard resource automatically. If you manage dashboard resources manually (for example, in YAML), add this module resource:
+
+   ```yaml
+   url: /hacsfiles/ha-ploc-cellar-frontend/ploc-cellar-card.js
+   type: module
+   ```
 5. Add one of the three cards from the dashboard card picker and select the Ploc Cellar configuration entry in its editor.
 
 The existing card types and their configuration keys are retained. Existing card configurations do not need to be recreated when migrating from the integration-served resource.
