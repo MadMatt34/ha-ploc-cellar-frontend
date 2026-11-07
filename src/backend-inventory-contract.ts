@@ -119,7 +119,7 @@ type WineDiagnosticKeys = Assert<
     | "effective_stock"
     | "unlocated_bottles"
     | "negative_movement_bottles"
-    | "physical_surplus_bottles"
+    | "physical_surplus_bottles" | "wine"
   >
 >;
 
