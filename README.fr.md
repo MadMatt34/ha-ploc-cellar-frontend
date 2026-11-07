@@ -15,7 +15,7 @@ Les cartes communiquent uniquement avec Home Assistant via le service WebSocket 
 1. Installez **Ploc Cellar** depuis [MadMatt34/ha-ploc-cellar](https://github.com/MadMatt34/ha-ploc-cellar) et terminez sa configuration.
 2. Dans HACS, ajoutez ce dépôt comme dépôt personnalisé de catégorie **Dashboard** (tant qu'il n'est pas encore disponible dans le catalogue HACS).
 3. Installez **Ploc Cellar Cards** depuis HACS.
-4. Si HACS ne l'ajoute pas automatiquement, ajoutez la ressource JavaScript fournie par HACS à votre tableau de bord. Le module s'appelle `ploc-cellar-card.js`.
+4. HACS ajoute normalement automatiquement la ressource au tableau de bord. Si vous gérez les ressources du tableau de bord en YAML, ajoutez manuellement le module `ploc-cellar-card.js`.
 5. Ajoutez l'une des trois cartes et sélectionnez la configuration Ploc Cellar dans son éditeur.
 
 Les types de cartes et leurs clés de configuration existants sont conservés :
