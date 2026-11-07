@@ -102,7 +102,7 @@ export class PlocCellarWineDetail extends LitElement {
     `;
   }
 
-  private get colorStyle(): string | undefined {
+  private get colorStyle(): string {
     const rgb = this.wine?.color_rgb;
     if (
       !rgb ||
@@ -110,7 +110,7 @@ export class PlocCellarWineDetail extends LitElement {
       !rgb.every((component) =>
         Number.isInteger(component) && component >= 0 && component <= 255
       )
-    ) return undefined;
+    ) return "background: var(--secondary-text-color);";
     return `background: rgb(${rgb[0]} ${rgb[1]} ${rgb[2]});`;
   }
 
@@ -125,7 +125,7 @@ export class PlocCellarWineDetail extends LitElement {
 
     return html`
       <div class="identity">
-        ${this.colorStyle ? html`<span class="color-swatch" style=${this.colorStyle} aria-hidden="true"></span>` : nothing}
+        <span class="color-swatch" style=${this.colorStyle} aria-hidden="true"></span>
         <div class="identity-text">
           ${metadata.length ? html`<div class="subtitle">${metadata.join(" · ")}</div>` : nothing}
           ${tags.length ? html`<div class="tags">${tags.map((tag) => html`<span class="tag">${tag}</span>`)}</div>` : nothing}
