@@ -84,8 +84,27 @@ Les assertions de contrat à la compilation et la vérification TypeScript de la
 
 ### Accords mets et vins
 
-Le champ PLOUD `ml` est enregistré sur chaque fiche Wine sous forme de l'énumération de bits `Meals`. L'énumération publique actuelle définit les indicateurs de `1` (apéritif) à `4096` (dessert) ; plusieurs accords sont combinés dans un masque de bits. Le backend expose l'entier brut sans supprimer les bits inconnus. Le frontend affiche les catégories connues dans la fenêtre de détail du vin, dans la langue de Home Assistant (français ou anglais). L'APK contient une ressource `foodtype8192`, mais `8192` ne figure pas dans l'énumération publique du serveur : aucun libellé ne lui est donc attribué.
+Le champ PLOUD `ml` est exposé sous la forme de l'entier brut facultatif `Wine.meals`. Il s'agit d'un masque de bits : chaque catégorie possède un indicateur correspondant à une puissance de deux, et plusieurs catégories sont combinées par OU binaire. Les indicateurs connus de l'énumération publique `Meals` sont :
 
+| Valeur du bit | Catégorie de mets |
+|---:|---|
+| `1` | Apéritif |
+| `2` | Soupe |
+| `4` | Entrée |
+| `8` | Porc et charcuterie |
+| `16` | Fruits de mer |
+| `32` | Poisson |
+| `64` | Viande blanche |
+| `128` | Gibier |
+| `256` | Volaille |
+| `512` | Viande rouge |
+| `1024` | Plats et légumes |
+| `2048` | Fromage |
+| `4096` | Dessert |
+
+Le frontend décode et affiche les catégories connues dans la fenêtre de détail du vin, dans la langue de Home Assistant (français ou anglais). Le backend doit conserver la valeur brute, y compris les bits qu'il ne connaît pas ; le frontend ignore les bits inconnus et doit rester compatible lorsque `meals` est absent ou nul.
+
+**Indicateur inconnu :** l'APK contient une ressource `foodtype8192`, mais `8192` ne figure pas dans l'énumération publique `Meals` du serveur. Sa signification n'est pas confirmée : aucune catégorie ni aucun libellé ne lui sont donc attribués. Ne pas déduire son sens du seul nom de la ressource APK.
 ### Image du vin
 
 La réponse `Wine` peut contenir le champ facultatif `image_url: string | null`.
