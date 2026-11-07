@@ -64,13 +64,12 @@ export class PlocCellarDonutChart extends LitElement {
         // variables are inherited and resolved by the browser.
         appendTo: () => this.chart?.getDom() ?? this.renderRoot.querySelector<HTMLElement>(".chart")!,
         backgroundColor: "var(--card-background-color)",
-        borderColor: "var(--divider-color)",
         borderWidth: 1,
         textStyle: {
           color: "var(--primary-text-color)",
           fontSize: 10,
         },
-        extraCssText: "border-radius: 6px; box-shadow: 0 2px 8px rgb(0 0 0 / 20%);",
+        extraCssText: "border-radius: 6px; line-height: normal; box-shadow: 0 2px 8px rgb(0 0 0 / 20%);",
         valueFormatter: (value: string | number) => numberFormat.format(Number(value)),
       },
       series: [{
