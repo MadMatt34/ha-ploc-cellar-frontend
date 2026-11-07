@@ -7,6 +7,7 @@
   "bottles_in_cellar": "Bouteilles en cave",
   "reconstructed_stock": "Stock reconstitué",
   "racks": "Casiers",
+  "positions": "places",
   "empty_positions": "Places libres",
   "stale": "Données potentiellement obsolètes : la dernière synchronisation a échoué.",
   "reconstruction_incomplete": "Reconstitution du stock en cours : seules les quantités physiques sont disponibles.",
