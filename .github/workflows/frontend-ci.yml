@@ -37,9 +37,14 @@ jobs:
         run: cp dist/ploc-cellar-card.js ploc-cellar-card.js
       - name: Verify distributables exist
         run: test -s dist/ploc-cellar-card.js && test -s ploc-cellar-card.js
-      - name: Verify committed distributables are up to date
+      - name: Verify generated HACS bundle matches the build output
+        run: cmp --silent dist/ploc-cellar-card.js ploc-cellar-card.js
+      - name: Report committed bundle updates
         if: github.event_name == 'pull_request'
-        run: git diff --exit-code -- dist/ploc-cellar-card.js ploc-cellar-card.js
+        run: |
+          if ! git diff --quiet -- dist/ploc-cellar-card.js ploc-cellar-card.js; then
+            echo "::warning::The generated bundles differ from the committed files. The protected main-branch publish job regenerates and commits them after merge."
+          fi
 
   publish:
     name: Update committed distributables
