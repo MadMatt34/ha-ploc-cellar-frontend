@@ -32,7 +32,7 @@ export class PlocCellarRackCard extends LitElement {
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
     .grid-wrap { overflow-x: auto; padding: 4px 0 12px; }
     .rack-grid { display: grid; gap: 6px; min-width: min-content; }
-    .slot { min-width: 76px; min-height: 76px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; text-align: center; padding: 7px 6px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
+    .slot { min-width: 76px; min-height: 76px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; gap: 5px; text-align: center; padding: 7px 6px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 2px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: rgb(50 50 50 / 90%); color: #fff; box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: .82rem; line-height: 1.45; pointer-events: none; overflow-wrap: anywhere; }
@@ -283,7 +283,7 @@ export class PlocCellarRackCard extends LitElement {
                       @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
                       ${occupied ? html`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(wine)};`} aria-hidden="true"></span>` : nothing}
                       <strong>${occupied ? this.wineLabel(item) : "—"}</strong>
-                      <small>${t("row")} ${item.row} · ${t("column")} ${item.column}</small>
+                      <small>r${(item.row as number) + 1};c${(item.column as number) + 1}</small>
                     </div>
                   `;
                 })}
