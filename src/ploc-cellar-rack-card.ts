@@ -32,8 +32,8 @@ export class PlocCellarRackCard extends LitElement {
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
     .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; padding: 4px 0 12px; }
     .rack-grid { display: grid; flex: 0 0 auto; gap: 6px; width: max-content; min-width: min-content; }
-    .rack-summary { color: var(--secondary-text-color); font-size: .85rem; text-align: center; margin: 8px 0; }
-    .color-counts { text-align: center; margin-top: 0; }
+    .rack-summary { color: var(--secondary-text-color); font-size: .85rem; line-height: 1.2; text-align: center; margin: 8px 0; }
+    .color-counts { text-align: center; margin-top: -2px; }
     .color-count { white-space: nowrap; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
