@@ -201,7 +201,7 @@ export class PlocCellarWineDetail extends LitElement {
       : null;
 
     return html`
-      <ha-dialog .open=${true} .heading=${wine.name} @closed=${() => this.onDialogClosed()}>
+      <ha-dialog .open=${true} header-title=${wine.name} @closed=${() => this.onDialogClosed()}>
         <div class="content">
           ${this.renderIdentity(wine)}
           ${this.renderStock(wine)}
