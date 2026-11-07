@@ -123,5 +123,6 @@
   "wine_detail_characteristics": "Caractéristiques du vin",
   "wine_detail_alcohol": "Degré d’alcool",
   "wine_detail_comment": "Notes",
-  "wine_detail_no_locations": "Aucun emplacement physique n’est affecté à ce vin."
+  "wine_detail_no_locations": "Aucun emplacement physique n’est affecté à ce vin.",
+  "rack_grid_compacted": "La disposition des emplacements est condensée car les coordonnées sont trop espacées."
 }
