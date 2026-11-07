@@ -18,12 +18,14 @@ export class PlocCellarWineDetail extends LitElement {
     .content { display: grid; gap: 20px; min-width: 0; }
     .identity { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
     .color-swatch {
-      flex: 0 0 18px;
-      width: 18px;
-      height: 18px;
-      margin-top: 3px;
-      border: 1px solid var(--divider-color);
+      display: block;
+      flex: 0 0 24px;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--divider-color);
       border-radius: 50%;
+      box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%);
+      box-sizing: border-box;
     }
     .identity-text { min-width: 0; }
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
