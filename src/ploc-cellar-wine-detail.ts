@@ -1,5 +1,5 @@
-import { LitElement, css, html, nothing } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { LitElement, css, html, nothing, type PropertyValues } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 
 import type { HomeAssistant, Wine } from "./types";
 import { translate, type TranslationKey } from "./translations";
@@ -8,6 +8,10 @@ import { translate, type TranslationKey } from "./translations";
 export class PlocCellarWineDetail extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
   @property({ attribute: false }) wine?: Wine;
+  @state() private imageUrl: string | null = null;
+
+  private imageObjectUrl: string | null = null;
+  private imageRequest = 0;
 
   static styles = css`
     :host {
@@ -16,6 +20,8 @@ export class PlocCellarWineDetail extends LitElement {
       --mdc-dialog-max-width: min(760px, calc(100vw - 32px));
     }
     .content { display: grid; gap: 20px; min-width: 0; }
+    .wine-image-container { display: flex; justify-content: center; min-width: 0; max-height: 320px; overflow: hidden; }
+    .wine-image { display: block; max-width: 100%; max-height: 320px; object-fit: contain; border-radius: 10px; }
     .identity { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
     .color-swatch {
       display: block;
@@ -69,6 +75,46 @@ export class PlocCellarWineDetail extends LitElement {
       dl { grid-template-columns: minmax(0, 1fr); }
     }
   `;
+
+  protected updated(changedProperties: PropertyValues<this>): void {
+    if (changedProperties.has("wine") || changedProperties.has("hass")) {
+      void this.loadWineImage();
+    }
+  }
+
+  disconnectedCallback(): void {
+    this.imageRequest += 1;
+    this.revokeWineImage();
+    super.disconnectedCallback();
+  }
+
+  private revokeWineImage(): void {
+    if (this.imageObjectUrl !== null) {
+      URL.revokeObjectURL(this.imageObjectUrl);
+      this.imageObjectUrl = null;
+    }
+  }
+
+  private async loadWineImage(): Promise<void> {
+    const request = ++this.imageRequest;
+    this.revokeWineImage();
+    this.imageUrl = null;
+    const imagePath = this.wine?.image_url;
+    const hass = this.hass;
+    if (!imagePath || !hass) return;
+
+    try {
+      const response = await hass.fetchWithAuth(imagePath);
+      if (!response.ok) return;
+      const imageBlob = await response.blob();
+      if (request !== this.imageRequest) return;
+      const objectUrl = URL.createObjectURL(imageBlob);
+      this.imageObjectUrl = objectUrl;
+      this.imageUrl = objectUrl;
+    } catch {
+      // The inventory remains usable when an image is temporarily unavailable.
+    }
+  }
 
   private get language(): string {
     return this.hass?.language ?? "en";
@@ -205,6 +251,11 @@ export class PlocCellarWineDetail extends LitElement {
     return html`
       <ha-dialog .open=${true} header-title=${wine.name} @closed=${() => this.onDialogClosed()}>
         <div class="content">
+          ${this.imageUrl ? html`
+            <div class="wine-image-container">
+              <img class="wine-image" src=${this.imageUrl} alt=${wine.name} />
+            </div>
+          ` : nothing}
           ${this.renderIdentity(wine)}
           ${this.renderStock(wine)}
           <section>
