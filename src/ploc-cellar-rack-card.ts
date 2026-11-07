@@ -8,6 +8,7 @@ import type {
   Wine,
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
+import "./ploc-cellar-wine-detail";
 
 @customElement("ploc-cellar-rack-card")
 export class PlocCellarRackCard extends LitElement {
@@ -18,6 +19,7 @@ export class PlocCellarRackCard extends LitElement {
   @state() private loading = false;
   @state() private error?: string;
   @state() private activeTooltip?: { wine?: Wine; left: number; top: number; color: string };
+  @state() private selectedWine?: Wine;
   private requestGeneration = 0;
 
   static styles = css`
@@ -36,7 +38,7 @@ export class PlocCellarRackCard extends LitElement {
     .color-counts { text-align: center; margin-top: -2px; }
     .color-count { white-space: nowrap; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
-    .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
+    .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: pointer; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 2px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: .82rem; line-height: 1.45; pointer-events: none; overflow-wrap: anywhere; }
     .wine-tooltip-name { margin: 0 0 4px; font-weight: 600; }
@@ -299,7 +301,16 @@ export class PlocCellarRackCard extends LitElement {
                     <div class=${occupied ? "slot occupied" : "slot empty"}
                       style=${`grid-row: ${row}; grid-column: ${column};`}
                       aria-label=${label}
-                      tabindex=${occupied ? "0" : nothing}
+                      role=${wine ? "button" : nothing}
+                      aria-haspopup=${wine ? "dialog" : nothing}
+                      tabindex=${wine ? "0" : nothing}
+                      @click=${wine ? () => { this.selectedWine = wine; } : nothing}
+                      @keydown=${wine ? (event: KeyboardEvent) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          this.selectedWine = wine;
+                        }
+                      } : nothing}
                       @pointerenter=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
                       @pointermove=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
                       @pointerleave=${occupied ? () => this.hideWineTooltip() : nothing}
@@ -344,6 +355,13 @@ export class PlocCellarRackCard extends LitElement {
               </dl>
             ` : t("unknown_wine")}
           </div>
+        ` : nothing}
+        ${this.selectedWine ? html`
+          <ploc-cellar-wine-detail
+            .hass=${this.hass}
+            .wine=${this.selectedWine}
+            @wine-detail-closed=${() => { this.selectedWine = undefined; }}>
+          </ploc-cellar-wine-detail>
         ` : nothing}
       </ha-card>
     `;
