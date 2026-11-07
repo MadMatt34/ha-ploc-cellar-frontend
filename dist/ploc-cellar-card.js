@@ -1174,7 +1174,7 @@ let de = class extends Pe {
                     <div class=${c ? "slot occupied" : "slot empty"}
                       style=${`grid-row: ${u}; grid-column: ${h};`}
                       aria-label=${v}
-                      role=${f ? "button" : $}
+                      role=${f ? "button" : c ? "img" : $}
                       aria-haspopup=${f ? "dialog" : $}
                       tabindex=${c ? "0" : $}
                       @click=${f ? () => {
@@ -1406,7 +1406,7 @@ let Et = class extends Pe {
   }
   renderWine(e) {
     const t = (a) => Dt(this.hass?.language ?? "en", a), r = e.locations.map((a) => {
-      const o = a.row !== null && a.column !== null ? ` · ${t("row")} ${a.row}, ${t("column")} ${a.column}` : "";
+      const o = a.row !== null && a.column !== null ? ` · ${t("row")} ${a.row + 1}, ${t("column")} ${a.column + 1}` : "";
       return `${a.rack}${o}`;
     }), i = e.vintage === null ? t("unknown_vintage") : String(e.vintage), n = e.bottle_volume_l === null ? null : `${e.bottle_volume_l.toLocaleString(this.hass?.language ?? void 0)} L`;
     return I`
@@ -18093,7 +18093,8 @@ let zn = class extends Pe {
         data: this.items.map((r) => ({
           name: r.name,
           value: r.bottles,
-          itemStyle: { color: r.color }
+          itemStyle: { color: r.color },
+          tooltip: { borderColor: r.color }
         }))
       }]
     };
