@@ -87,6 +87,7 @@ export class PlocCellarDonutChart extends LitElement {
           name: item.name,
           value: item.bottles,
           itemStyle: { color: item.color },
+          tooltip: { borderColor: item.color },
         })),
       }],
     };
