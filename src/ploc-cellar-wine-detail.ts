@@ -4,6 +4,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import type { HomeAssistant, Wine } from "./types";
 import { translate, type TranslationKey } from "./translations";
 import { WineImageLoader } from "./wine-image";
+import { getMealTranslationKeys } from "./meals";
 
 @customElement("ploc-cellar-wine-detail")
 export class PlocCellarWineDetail extends LitElement {
@@ -199,6 +200,19 @@ export class PlocCellarWineDetail extends LitElement {
     `;
   }
 
+  private renderMeals(wine: Wine) {
+    const mealKeys = getMealTranslationKeys(wine.meals);
+    if (!mealKeys.length) return nothing;
+    return html`
+      <section>
+        <h3>${this.t("wine_detail_meals")}</h3>
+        <div class="tags">
+          ${mealKeys.map((key) => html`<span class="tag">${this.t(key)}</span>`)}
+        </div>
+      </section>
+    `;
+  }
+
   private renderLocations(wine: Wine) {
     if (!wine.locations.length) {
       return html`<p class="muted">${this.t("wine_detail_no_locations")}</p>`;
@@ -243,6 +257,7 @@ export class PlocCellarWineDetail extends LitElement {
           ` : nothing}
           ${this.renderIdentity(wine)}
           ${this.renderStock(wine)}
+          ${this.renderMeals(wine)}
           <section>
             <h3>${this.t("wine_detail_characteristics")}</h3>
             <dl>
