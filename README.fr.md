@@ -42,7 +42,7 @@ npm run check
 npm run build
 ```
 
-Le bundle de production est généré dans `dist/ploc-cellar-card.js`. Les dépendances sont intégrées au module JavaScript autonome. Le workflow CI du frontend exécute la vérification TypeScript stricte et la compilation de production lors des push et des pull requests ; sur `main`, il commit le bundle généré lorsqu'il change.
+Le bundle de production est généré dans `dist/ploc-cellar-card.js`, puis copié à la racine sous `ploc-cellar-card.js`, nom attendu par HACS (`hacs.json`). Les deux fichiers sont versionnés. Les dépendances sont intégrées au module JavaScript autonome. Le workflow CI du frontend exécute la vérification TypeScript stricte et la compilation de production lors des push et des pull requests ; sur `main`, il commit les deux bundles générés lorsqu'ils changent.
 
 ## Contrat backend
 
