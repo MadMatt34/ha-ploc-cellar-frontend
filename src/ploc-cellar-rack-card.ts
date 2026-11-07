@@ -32,7 +32,7 @@ export class PlocCellarRackCard extends LitElement {
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
     .grid-wrap { overflow-x: auto; padding: 4px 0 12px; }
     .rack-grid { display: grid; gap: 6px; min-width: min-content; }
-    .slot { min-width: 76px; min-height: 76px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; gap: 5px; text-align: center; padding: 7px 6px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
+    .slot { width: 120px; height: 108px; min-width: 120px; min-height: 108px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 5px; text-align: center; padding: 7px 6px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 2px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: rgb(50 50 50 / 90%); color: #fff; box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: .82rem; line-height: 1.45; pointer-events: none; overflow-wrap: anywhere; }
@@ -41,7 +41,7 @@ export class PlocCellarRackCard extends LitElement {
     .wine-tooltip-details dt { color: rgb(255 255 255 / 72%); }
     .wine-tooltip-details dd { margin: 0; }
     .slot.missing { border-style: dashed; color: var(--secondary-text-color); background: transparent; }
-    .slot strong { font-size: .82rem; line-height: 1.25; overflow-wrap: anywhere; }
+    .slot strong { display: -webkit-box; width: 100%; min-height: 2.5em; max-height: 2.5em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: .82rem; line-height: 1.25; overflow-wrap: anywhere; }
     .slot small { color: var(--secondary-text-color); font-size: .72rem; }
     .bottle-marker { display: block; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; background: var(--bottle-color, var(--secondary-text-color)); border: 2px solid var(--divider-color); box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%); box-sizing: border-box; }
     .legend, .muted { color: var(--secondary-text-color); font-size: .85rem; }
@@ -173,6 +173,11 @@ export class PlocCellarRackCard extends LitElement {
     return wine ? wine.name : translate(this.hass?.language ?? "en", "unknown_wine");
   }
 
+  private displayWineLabel(item: RackItem): string {
+    const label = this.wineLabel(item);
+    return label.length > 20 ? `${label.slice(0, 20)}...` : label;
+  }
+
   private wineColor(wine: Wine | undefined): string {
     const rgb = wine?.color_rgb;
     if (
@@ -264,7 +269,7 @@ export class PlocCellarRackCard extends LitElement {
           <div class="legend">${rack?.name ?? ""} · ${this.selectedItems.filter((item) => item.wine_id).length} ${t("occupied")} · ${this.selectedItems.filter((item) => !item.wine_id).length} ${t("free")}</div>
           ${rows.length && columns.length ? html`
             <div class="grid-wrap">
-              <div class="rack-grid" style=${`grid-template-columns: repeat(${this.columnCount}, minmax(88px, 1fr)); grid-template-rows: repeat(${this.rowCount}, minmax(72px, auto));`}>
+              <div class="rack-grid" style=${`grid-template-columns: repeat(${this.columnCount}, 120px); grid-template-rows: repeat(${this.rowCount}, 108px);`}>
                 ${items.map((item) => {
                   const row = (item.row as number) - this.firstRow + 1;
                   const column = (item.column as number) - this.firstColumn + 1;
@@ -282,7 +287,7 @@ export class PlocCellarRackCard extends LitElement {
                       @focus=${occupied ? (event: FocusEvent) => this.showWineTooltip(event, wine) : nothing}
                       @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
                       ${occupied ? html`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(wine)};`} aria-hidden="true"></span>` : nothing}
-                      <strong>${occupied ? this.wineLabel(item) : "—"}</strong>
+                      <strong>${occupied ? this.displayWineLabel(item) : "—"}</strong>
                       <small>r${(item.row as number) + 1};c${(item.column as number) + 1}</small>
                     </div>
                   `;
