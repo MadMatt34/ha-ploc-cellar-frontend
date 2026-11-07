@@ -11,6 +11,7 @@ export class PlocCellarWineDetail extends LitElement {
   @state() private imageUrl: string | null = null;
 
   private imageObjectUrl: string | null = null;
+  private loadedImagePath: string | null = null;
   private imageRequest = 0;
 
   static styles = css`
@@ -84,6 +85,7 @@ export class PlocCellarWineDetail extends LitElement {
 
   disconnectedCallback(): void {
     this.imageRequest += 1;
+    this.loadedImagePath = null;
     this.revokeWineImage();
     super.disconnectedCallback();
   }
@@ -99,8 +101,10 @@ export class PlocCellarWineDetail extends LitElement {
     const request = ++this.imageRequest;
     this.revokeWineImage();
     this.imageUrl = null;
-    const imagePath = this.wine?.image_url;
+    const imagePath = this.wine?.image_url ?? null;
     const hass = this.hass;
+    if (imagePath === this.loadedImagePath && this.imageObjectUrl !== null) return;
+    this.loadedImagePath = imagePath;
     if (!imagePath || !hass) return;
 
     try {
