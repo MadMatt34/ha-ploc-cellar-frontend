@@ -327,7 +327,7 @@ export class PlocCellarRackCard extends LitElement {
                 })}
                 ${gridLayout.missingCoordinates.map((position) => html`
                   <div class="slot missing"
-                    style=${`grid-row: ${position.row}; grid-column: ${position.column};`}`}>
+                    style=${`grid-row: ${position.row}; grid-column: ${position.column};`}>
                     <strong>—</strong>
                     <small>${t("not_mapped")}</small>
                   </div>
