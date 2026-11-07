@@ -827,10 +827,9 @@ let Dn = class extends Pe {
   }
   get colorStyle() {
     const e = this.wine?.color_rgb;
-    if (!(!e || e.length !== 3 || !e.every(
+    return !e || e.length !== 3 || !e.every(
       (t) => Number.isInteger(t) && t >= 0 && t <= 255
-    )))
-      return `background: rgb(${e[0]} ${e[1]} ${e[2]});`;
+    ) ? "background: var(--secondary-text-color);" : `background: rgb(${e[0]} ${e[1]} ${e[2]});`;
   }
   renderIdentity(e) {
     const t = [e.domain, e.appellation, e.region, e.country].filter((i) => !!i), r = [
@@ -840,7 +839,7 @@ let Dn = class extends Pe {
     ].filter((i) => !!i);
     return I`
       <div class="identity">
-        ${this.colorStyle ? I`<span class="color-swatch" style=${this.colorStyle} aria-hidden="true"></span>` : $}
+        <span class="color-swatch" style=${this.colorStyle} aria-hidden="true"></span>
         <div class="identity-text">
           ${t.length ? I`<div class="subtitle">${t.join(" · ")}</div>` : $}
           ${r.length ? I`<div class="tags">${r.map((i) => I`<span class="tag">${i}</span>`)}</div>` : $}
