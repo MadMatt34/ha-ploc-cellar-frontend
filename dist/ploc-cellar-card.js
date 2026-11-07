@@ -18073,11 +18073,9 @@ let zn = class extends Pe {
         borderColor: "var(--divider-color)",
         borderWidth: 1,
         textStyle: {
-          color: "var(--primary-text-color)",
-          fontSize: 13,
-          lineHeight: 19
+          color: "var(--primary-text-color)"
         },
-        extraCssText: "border-radius: 6px; border: 1px solid var(--divider-color) !important; box-shadow: 0 2px 8px rgb(0 0 0 / 20%);",
+        extraCssText: "border-radius: 6px; border: 1px solid var(--divider-color) !important; line-height: 1.2; box-shadow: 0 2px 8px rgb(0 0 0 / 20%);",
         valueFormatter: (r) => e.format(Number(r))
       },
       series: [{
