@@ -9,6 +9,7 @@ import type {
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
 import "./ploc-cellar-wine-detail";
+import "./numeric-typography";
 import { buildRackGridLayout, clampTooltipPosition } from "./rack-grid";
 
 @customElement("ploc-cellar-rack-card")
