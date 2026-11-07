@@ -18,6 +18,7 @@
   "rack_selection": "Sélection du casier",
   "occupied": "occupées",
   "free": "libres",
+  "unknown_color": "Couleur non renseignée",
   "unknown_wine": "Vin inconnu",
   "empty_position": "Emplacement libre",
   "row": "Rangée",
