@@ -123,5 +123,6 @@
   "wine_detail_characteristics": "Wine characteristics",
   "wine_detail_alcohol": "Alcohol",
   "wine_detail_comment": "Notes",
-  "wine_detail_no_locations": "No physical location is assigned to this wine."
+  "wine_detail_no_locations": "No physical location is assigned to this wine.",
+  "rack_grid_compacted": "Rack positions are shown in a compact layout because their coordinates are too far apart."
 }
