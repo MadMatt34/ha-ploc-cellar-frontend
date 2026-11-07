@@ -81,6 +81,8 @@ export interface WineDiagnostic {
   unlocated_bottles: number | null;
   negative_movement_bottles: number | null;
   physical_surplus_bottles: number | null;
+  /** Complete wine data for opening the detail dialog, including zero-stock wines. */
+  wine?: Wine;
 }
 
 export interface InventoryResponse {
