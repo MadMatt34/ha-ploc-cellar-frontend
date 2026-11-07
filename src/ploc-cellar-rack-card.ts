@@ -37,6 +37,7 @@ export class PlocCellarRackCard extends LitElement {
     .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; padding: 4px 0 12px; }
     .rack-grid { display: grid; flex: 0 0 auto; gap: 6px; width: max-content; min-width: min-content; }
     .rack-summary { color: var(--secondary-text-color); font-size: .85rem; line-height: 1.2; text-align: center; margin: 8px 0; }
+    .numeric-value { font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
     .color-counts { text-align: center; margin-top: -2px; }
     .color-count { white-space: nowrap; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
@@ -288,8 +289,8 @@ export class PlocCellarRackCard extends LitElement {
               `
             : nothing}
           <div class="rack-summary">
-            <div><strong>${rack?.name ?? ""}</strong> · ${this.selectedItems.filter((item) => item.wine_id).length} ${t("occupied")} · ${this.selectedItems.filter((item) => !item.wine_id).length} ${t("free")}</div>
-            ${this.selectedRackColorCounts.length ? html`<div class="color-counts">${this.selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: ${count}</span>`)}</div>` : nothing}
+            <div><strong>${rack?.name ?? ""}</strong> · <span class="numeric-value">${this.selectedItems.filter((item) => item.wine_id).length}</span> ${t("occupied")} · <span class="numeric-value">${this.selectedItems.filter((item) => !item.wine_id).length}</span> ${t("free")}</div>
+            ${this.selectedRackColorCounts.length ? html`<div class="color-counts">${this.selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: <span class="numeric-value">${count}</span></span>`)}</div>` : nothing}
           </div>
           ${items.length ? html`
             ${gridLayout.compact ? html`<div class="warning">${t("rack_grid_compacted")}</div>` : nothing}
@@ -322,7 +323,7 @@ export class PlocCellarRackCard extends LitElement {
                       @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
                       ${occupied ? html`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(wine)};`} aria-hidden="true"></span>` : nothing}
                       ${occupied ? html`<strong>${this.displayWineLabel(item)}</strong>` : html`<span class="empty-shelf" aria-hidden="true"></span>`}
-                      <small>r${(item.row as number) + 1};c${(item.column as number) + 1}</small>
+                      <small><span class="numeric-value">r${(item.row as number) + 1};c${(item.column as number) + 1}</span></small>
                     </div>
                   `;
                 })}
@@ -344,7 +345,7 @@ export class PlocCellarRackCard extends LitElement {
           ` : nothing}
         ` : html`<p class="muted">${t("no_racks")}</p>`}
         ${rackItemsWithUnknownRack.length ? html`
-          <div class="warning">${rackItemsWithUnknownRack.length} ${t("missing_rack")}</div>
+          <div class="warning"><span class="numeric-value">${rackItemsWithUnknownRack.length}</span> ${t("missing_rack")}</div>
         ` : nothing}
         ${this.activeTooltip ? html`
           <div class="wine-tooltip"
