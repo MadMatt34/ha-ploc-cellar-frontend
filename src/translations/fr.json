@@ -106,5 +106,22 @@
   "tooltip_temperature": "Température de service",
   "editor_rack_picker_mode": "Affichage du choix de la cave",
   "editor_rack_picker_buttons": "Boutons",
-  "editor_rack_picker_dropdown": "Liste déroulante"
+  "editor_rack_picker_dropdown": "Liste déroulante",
+  "wine_detail_stock": "Stock",
+  "wine_detail_physical": "En cave physiquement",
+  "wine_detail_reconstructed": "Stock reconstitué",
+  "wine_detail_effective": "Stock effectif",
+  "wine_detail_source_stock": "Stock source PLOUD",
+  "wine_detail_movements": "Mouvements et diagnostics du stock",
+  "wine_detail_purchased": "Achats",
+  "wine_detail_consumed": "Consommations",
+  "wine_detail_balance": "Solde des mouvements",
+  "wine_detail_calculated": "Stock calculé",
+  "wine_detail_unlocated": "Bouteilles non localisées",
+  "wine_detail_negative": "Bouteilles au solde négatif",
+  "wine_detail_surplus": "Excédent physique",
+  "wine_detail_characteristics": "Caractéristiques du vin",
+  "wine_detail_alcohol": "Degré d’alcool",
+  "wine_detail_comment": "Notes",
+  "wine_detail_no_locations": "Aucun emplacement physique n’est affecté à ce vin."
 }
