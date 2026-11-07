@@ -9,6 +9,7 @@ import type {
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
 import "./ploc-cellar-wine-detail";
+import { buildRackGridLayout, clampTooltipPosition } from "./rack-grid";
 
 @customElement("ploc-cellar-rack-card")
 export class PlocCellarRackCard extends LitElement {
@@ -18,7 +19,8 @@ export class PlocCellarRackCard extends LitElement {
   @state() private selectedRackId?: string;
   @state() private loading = false;
   @state() private error?: string;
-  @state() private activeTooltip?: { wine?: Wine; left: number; top: number; color: string };
+  @state() private activeTooltip?: { wine?: Wine; color: string };
+  private tooltipPosition?: { left: number; top: number };
   @state() private selectedWine?: Wine;
   private requestGeneration = 0;
 
@@ -81,6 +83,7 @@ export class PlocCellarRackCard extends LitElement {
     if (this.hass && this.config && !this.inventory && !this.loading && !this.error) {
       void this.refresh();
     }
+    if (this.activeTooltip) this.applyTooltipPosition();
   }
 
   private async refresh(): Promise<void> {
@@ -120,50 +123,9 @@ export class PlocCellarRackCard extends LitElement {
 
   private get positionedItems(): RackItem[] {
     return this.selectedItems.filter(
-      (item) => item.row !== null && item.column !== null,
+      (item) =>
+        Number.isSafeInteger(item.row) && Number.isSafeInteger(item.column),
     );
-  }
-
-  private get rowValues(): number[] {
-    return this.positionedItems.map((item) => item.row as number);
-  }
-
-  private get columnValues(): number[] {
-    return this.positionedItems.map((item) => item.column as number);
-  }
-
-  private get firstRow(): number {
-    return Math.min(...this.rowValues);
-  }
-
-  private get firstColumn(): number {
-    return Math.min(...this.columnValues);
-  }
-
-  private get rowCount(): number {
-    return Math.max(...this.rowValues) - this.firstRow + 1;
-  }
-
-  private get columnCount(): number {
-    return Math.max(...this.columnValues) - this.firstColumn + 1;
-  }
-
-  private get missingCoordinates(): Array<{ row: number; column: number }> {
-    if (!this.positionedItems.length) return [];
-    const known = new Set(
-      this.positionedItems.map((item) => `${item.row}:${item.column}`),
-    );
-    const missing: Array<{ row: number; column: number }> = [];
-    for (let row = this.firstRow; row <= Math.max(...this.rowValues); row += 1) {
-      for (
-        let column = this.firstColumn;
-        column <= Math.max(...this.columnValues);
-        column += 1
-      ) {
-        if (!known.has(`${row}:${column}`)) missing.push({ row, column });
-      }
-    }
-    return missing;
   }
 
   private get wineById(): Map<string, Wine> {
@@ -227,27 +189,66 @@ export class PlocCellarRackCard extends LitElement {
     if (!(target instanceof HTMLElement)) return;
     const rect = target.getBoundingClientRect();
     const isPointer = "clientX" in event;
-    this.activeTooltip = {
-      wine,
+    this.tooltipPosition = {
       left: isPointer ? event.clientX + 12 : rect.right + 8,
       top: isPointer ? event.clientY + 12 : rect.top,
-      color: this.wineColor(wine),
     };
+    this.activeTooltip = { wine, color: this.wineColor(wine) };
+  }
+
+  /**
+   * Move an already-rendered tooltip without scheduling a Lit update for every
+   * pointer event. Lit remains responsible for its content and visibility.
+   */
+  private moveWineTooltip(event: PointerEvent): void {
+    if (!this.activeTooltip) return;
+    this.tooltipPosition = {
+      left: event.clientX + 12,
+      top: event.clientY + 12,
+    };
+    this.applyTooltipPosition();
+  }
+
+  private applyTooltipPosition(): void {
+    const tooltip = this.renderRoot.querySelector<HTMLElement>(".wine-tooltip");
+    const position = this.tooltipPosition;
+    if (!tooltip || !position) return;
+
+    const clamped = clampTooltipPosition(
+      position.left,
+      position.top,
+      tooltip.offsetWidth,
+      tooltip.offsetHeight,
+      window.innerWidth,
+      window.innerHeight,
+    );
+    tooltip.style.left = `${clamped.left}px`;
+    tooltip.style.top = `${clamped.top}px`;
   }
 
   private hideWineTooltip(): void {
     this.activeTooltip = undefined;
+    this.tooltipPosition = undefined;
   }
-
   protected render() {
     const t = (key: TranslationKey): string =>
       translate(this.hass?.language ?? "en", key);
     const data = this.inventory;
     const rack = data?.racks.find((item) => item.id === this.selectedRackId);
-    const rows = this.rowValues;
-    const columns = this.columnValues;
     const items = this.positionedItems;
-    const unplaced = this.selectedItems.filter((item) => item.row === null || item.column === null);
+    const gridLayout = buildRackGridLayout(
+      items.map((item) => ({
+        id: item.id,
+        row: item.row as number,
+        column: item.column as number,
+      })),
+    );
+    const gridPositionById = new Map(
+      gridLayout.positions.map((position) => [position.id, position]),
+    );
+    const unplaced = this.selectedItems.filter(
+      (item) => !Number.isSafeInteger(item.row) || !Number.isSafeInteger(item.column),
+    );
     const rackItemsWithUnknownRack = (data?.rack_items ?? []).filter(
       (item) => !data?.racks.some((candidate) => candidate.id === item.rack_id),
     );
@@ -289,18 +290,19 @@ export class PlocCellarRackCard extends LitElement {
             <div><strong>${rack?.name ?? ""}</strong> · ${this.selectedItems.filter((item) => item.wine_id).length} ${t("occupied")} · ${this.selectedItems.filter((item) => !item.wine_id).length} ${t("free")}</div>
             ${this.selectedRackColorCounts.length ? html`<div class="color-counts">${this.selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: ${count}</span>`)}</div>` : nothing}
           </div>
-          ${rows.length && columns.length ? html`
+          ${items.length ? html`
+            ${gridLayout.compact ? html`<div class="warning">${t("rack_grid_compacted")}</div>` : nothing}
             <div class="grid-wrap">
-              <div class="rack-grid" style=${`grid-template-columns: repeat(${this.columnCount}, 98px); grid-template-rows: repeat(${this.rowCount}, 98px);`}>
+              <div class="rack-grid" style=${`grid-template-columns: repeat(${gridLayout.columnCount}, 98px); grid-template-rows: repeat(${gridLayout.rowCount}, 98px);`}>
                 ${items.map((item) => {
-                  const row = (item.row as number) - this.firstRow + 1;
-                  const column = (item.column as number) - this.firstColumn + 1;
+                  const position = gridPositionById.get(item.id);
+                  if (!position) return nothing;
                   const occupied = Boolean(item.wine_id);
                   const wine = item.wine_id ? this.wineById.get(item.wine_id) : undefined;
                   const label = occupied ? this.wineLabel(item) : t("empty_position");
                   return html`
                     <div class=${occupied ? "slot occupied" : "slot empty"}
-                      style=${`grid-row: ${row}; grid-column: ${column};`}
+                      style=${`grid-row: ${position.row}; grid-column: ${position.column};`}
                       aria-label=${label}
                       role=${wine ? "button" : occupied ? "img" : nothing}
                       aria-haspopup=${wine ? "dialog" : nothing}
@@ -313,7 +315,7 @@ export class PlocCellarRackCard extends LitElement {
                         }
                       } : nothing}
                       @pointerenter=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
-                      @pointermove=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
+                      @pointermove=${occupied ? (event: PointerEvent) => this.moveWineTooltip(event) : nothing}
                       @pointerleave=${occupied ? () => this.hideWineTooltip() : nothing}
                       @focus=${occupied ? (event: FocusEvent) => this.showWineTooltip(event, wine) : nothing}
                       @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
@@ -323,9 +325,9 @@ export class PlocCellarRackCard extends LitElement {
                     </div>
                   `;
                 })}
-                ${this.missingCoordinates.map((position) => html`
+                ${gridLayout.missingCoordinates.map((position) => html`
                   <div class="slot missing"
-                    style=${`grid-row: ${position.row - this.firstRow + 1}; grid-column: ${position.column - this.firstColumn + 1};`}>
+                    style=${`grid-row: ${position.row}; grid-column: ${position.column};`}`}>
                     <strong>—</strong>
                     <small>${t("not_mapped")}</small>
                   </div>
@@ -346,7 +348,7 @@ export class PlocCellarRackCard extends LitElement {
         ${this.activeTooltip ? html`
           <div class="wine-tooltip"
             role="tooltip"
-            style=${`left: ${this.activeTooltip.left}px; top: ${this.activeTooltip.top}px; --wine-tooltip-border-color: ${this.activeTooltip.color};`}>
+            style=${`left: 12px; top: 12px; --wine-tooltip-border-color: ${this.activeTooltip.color};`}>
             ${this.activeTooltip.wine ? html`
               <div class="wine-tooltip-name">${this.activeTooltip.wine.name}</div>
               <dl class="wine-tooltip-details">
