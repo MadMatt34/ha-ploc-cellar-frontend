@@ -7,6 +7,7 @@
   "bottles_in_cellar": "Bottles in cellar",
   "reconstructed_stock": "Reconstructed stock",
   "racks": "Racks",
+  "positions": "positions",
   "empty_positions": "Empty positions",
   "stale": "Data may be stale: the latest synchronization failed.",
   "reconstruction_incomplete": "Stock reconstruction is incomplete: only physical quantities are available.",
