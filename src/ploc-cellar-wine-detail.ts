@@ -3,6 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 
 import type { HomeAssistant, Wine } from "./types";
 import { translate, type TranslationKey } from "./translations";
+import { WineImageLoader } from "./wine-image";
 
 @customElement("ploc-cellar-wine-detail")
 export class PlocCellarWineDetail extends LitElement {
@@ -10,10 +11,7 @@ export class PlocCellarWineDetail extends LitElement {
   @property({ attribute: false }) wine?: Wine;
   @state() private imageUrl: string | null = null;
 
-  private imageObjectUrl: string | null = null;
-  private loadedImagePath: string | null = null;
-  private pendingImagePath: string | null = null;
-  private imageRequest = 0;
+  private readonly imageLoader = new WineImageLoader();
 
   static styles = css`
     :host {
@@ -90,52 +88,17 @@ export class PlocCellarWineDetail extends LitElement {
   }
 
   disconnectedCallback(): void {
-    this.imageRequest += 1;
-    this.loadedImagePath = null;
-    this.pendingImagePath = null;
-    this.revokeWineImage();
-    this.imageUrl = null;
+    this.imageLoader.dispose((url) => { this.imageUrl = url; });
     super.disconnectedCallback();
   }
 
-  private revokeWineImage(): void {
-    if (this.imageObjectUrl !== null) {
-      URL.revokeObjectURL(this.imageObjectUrl);
-      this.imageObjectUrl = null;
-    }
-  }
-
   private async loadWineImage(): Promise<void> {
-    const imagePath = this.wine?.image_url ?? null;
     const hass = this.hass;
-    if (
-      imagePath === this.loadedImagePath &&
-      (this.imageObjectUrl !== null || this.pendingImagePath === imagePath)
-    ) return;
-
-    const request = ++this.imageRequest;
-    this.revokeWineImage();
-    this.imageUrl = null;
-    this.loadedImagePath = imagePath;
-    this.pendingImagePath = imagePath;
-    if (!imagePath || !hass) {
-      this.pendingImagePath = null;
-      return;
-    }
-
-    try {
-      const response = await hass.fetchWithAuth(imagePath);
-      if (!response.ok) return;
-      const imageBlob = await response.blob();
-      if (request !== this.imageRequest) return;
-      const objectUrl = URL.createObjectURL(imageBlob);
-      this.imageObjectUrl = objectUrl;
-      this.imageUrl = objectUrl;
-    } catch {
-      // The inventory remains usable when an image is temporarily unavailable.
-    } finally {
-      if (request === this.imageRequest) this.pendingImagePath = null;
-    }
+    await this.imageLoader.load(
+      this.wine?.image_url ?? null,
+      hass ? (path) => hass.fetchWithAuth(path) : undefined,
+      (url) => { this.imageUrl = url; },
+    );
   }
 
   private get language(): string {
