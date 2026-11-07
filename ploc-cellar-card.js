@@ -1175,7 +1175,7 @@ let de = class extends Ae {
                       aria-label=${v}
                       role=${f ? "button" : $}
                       aria-haspopup=${f ? "dialog" : $}
-                      tabindex=${f ? "0" : $}
+                      tabindex=${c ? "0" : $}
                       @click=${f ? () => {
         this.selectedWine = f;
       } : $}
@@ -1266,7 +1266,8 @@ de.styles = Hn`
     .color-counts { text-align: center; margin-top: -2px; }
     .color-count { white-space: nowrap; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
-    .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: pointer; }
+    .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
+    .slot.occupied[role="button"] { cursor: pointer; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 2px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: .82rem; line-height: 1.45; pointer-events: none; overflow-wrap: anywhere; }
     .wine-tooltip-name { margin: 0 0 4px; font-weight: 600; }
