@@ -37,10 +37,10 @@ export class PlocCellarRackCard extends LitElement {
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
     .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; padding: 0; }
     .rack-grid { display: grid; flex: 0 0 auto; gap: 6px; width: max-content; min-width: min-content; }
-    .rack-summary { color: var(--secondary-text-color); font-size: .85rem; line-height: 1.2; text-align: center; margin: 8px 0; }
+    .rack-summary { color: var(--secondary-text-color); font-size: .85rem; line-height: 1.2; text-align: center; }
     .rack-name { color: var(--primary-text-color); font-size: 1rem; font-weight: 500; }
-    .color-counts { color: var(--secondary-text-color); text-align: center; margin: 8px 0; }
-    .rack-occupancy { position: relative; height: 28px; margin: 0 0 0; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
+    .color-counts { color: var(--secondary-text-color); text-align: center; }
+    .rack-occupancy { position: relative; height: 20px; margin: 0 0 0; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); margin: 4px 0 8px 0; }
     .rack-occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .rack-occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 8px; color: var(--primary-text-color); font-size: .8rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
     .numeric-value { font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
