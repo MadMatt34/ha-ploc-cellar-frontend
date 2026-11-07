@@ -17790,7 +17790,11 @@ let Fn = class extends ze {
         backgroundColor: "var(--card-background-color)",
         borderColor: "var(--divider-color)",
         borderWidth: 1,
-        textStyle: { color: "var(--primary-text-color)" },
+        textStyle: {
+          color: "var(--primary-text-color)",
+          fontSize: 13,
+          lineHeight: 19
+        },
         extraCssText: "border-radius: 6px; box-shadow: 0 2px 8px rgb(0 0 0 / 20%);",
         valueFormatter: (r) => e.format(Number(r))
       },
