@@ -858,8 +858,7 @@ let Pe = class extends ze {
     return t ? t.name : Lt(this.hass?.language ?? "en", "unknown_wine");
   }
   displayWineLabel(e) {
-    const t = this.wineLabel(e);
-    return t.length > 33 ? `${t.slice(0, 33)}...` : t;
+    return this.wineLabel(e);
   }
   wineColor(e) {
     const t = e?.color_rgb;
