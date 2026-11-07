@@ -101,6 +101,7 @@ type WineKeys = Assert<
     | "bottle_format"
     | "bottle_volume_l"
     | "ploud_pid"
+    | "image_url"
     | "locations"
   >
 >;
