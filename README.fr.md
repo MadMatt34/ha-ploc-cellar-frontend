@@ -58,3 +58,11 @@ Le frontend dépend du service WebSocket Home Assistant `ploc_cellar.get_invento
 ## Langues
 
 Le français et l'anglais sont pris en charge.
+
+## Photos des vins
+
+La fenêtre de détail d'un vin affiche la photo PLOUD mise en cache lorsque le backend fournit un champ `image_url` non nul. Le backend privilégie l'image principale et utilise l'image de couverture si l'image principale n'est pas disponible localement.
+
+Les images sont servies par une route Home Assistant authentifiée. La carte les récupère avec `hass.fetchWithAuth()` ; elle ne contacte jamais directement PLOUD et ne stocke aucun identifiant PLOUD. Le contenu reçu sous forme de blob est affiché au moyen d'une URL d'objet du navigateur. Cette URL est révoquée lorsqu'elle est remplacée ou lorsque l'élément de la fenêtre modale est déconnecté. Si le backend modifie `image_url` (y compris son paramètre de version lorsque le document PLOUD conserve le même identifiant), la carte télécharge la nouvelle image et libère l'ancienne URL d'objet.
+
+Le champ est facultatif afin de rester compatible avec les réponses d'anciennes versions du backend. S'il est absent ou nul, la fenêtre de détail reste utilisable et n'affiche simplement aucune photo.
