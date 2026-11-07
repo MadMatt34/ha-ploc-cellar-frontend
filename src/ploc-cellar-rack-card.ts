@@ -35,11 +35,15 @@ export class PlocCellarRackCard extends LitElement {
     button[disabled] { opacity: .5; cursor: default; }
     .rack-picker { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0; }
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
-    .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; padding: 4px 0 12px; }
+    .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; padding: 0; }
     .rack-grid { display: grid; flex: 0 0 auto; gap: 6px; width: max-content; min-width: min-content; }
     .rack-summary { color: var(--secondary-text-color); font-size: .85rem; line-height: 1.2; text-align: center; margin: 8px 0; }
+    .rack-name { color: var(--primary-text-color); font-size: 1rem; font-weight: 500; }
+    .color-counts { color: var(--secondary-text-color); text-align: center; margin: 8px 0; }
+    .rack-occupancy { position: relative; height: 28px; margin: 0 0 0; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
+    .rack-occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
+    .rack-occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 8px; color: var(--primary-text-color); font-size: .8rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
     .numeric-value { font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
-    .color-counts { text-align: center; margin-top: -2px; }
     .color-count { white-space: nowrap; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
@@ -238,6 +242,11 @@ export class PlocCellarRackCard extends LitElement {
       translate(this.hass?.language ?? "en", key);
     const data = this.inventory;
     const rack = data?.racks.find((item) => item.id === this.selectedRackId);
+    const occupiedCount = this.selectedItems.filter((item) => Boolean(item.wine_id)).length;
+    const freeCount = this.selectedItems.length - occupiedCount;
+    const occupancyPercent = this.selectedItems.length
+      ? (occupiedCount / this.selectedItems.length) * 100
+      : 0;
     const items = this.positionedItems;
     const gridLayout = buildRackGridLayout(
       items.map((item) => ({
@@ -290,8 +299,19 @@ export class PlocCellarRackCard extends LitElement {
               `
             : nothing}
           <div class="rack-summary">
-            <div><strong>${rack?.name ?? ""}</strong> · <span class="numeric-value">${this.selectedItems.filter((item) => item.wine_id).length}</span> ${t("occupied")} · <span class="numeric-value">${this.selectedItems.filter((item) => !item.wine_id).length}</span> ${t("free")}</div>
+            <div class="rack-name">${rack?.name ?? ""}</div>
             ${this.selectedRackColorCounts.length ? html`<div class="color-counts">${this.selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: <span class="numeric-value">${count}</span></span>`)}</div>` : nothing}
+          </div>
+          <div class="rack-occupancy"
+            role="progressbar"
+            aria-label="${t("occupied")} / ${t("free")}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow=${Math.round(occupancyPercent)}>
+            <div class="rack-occupancy-fill" style=${`width: ${occupancyPercent}%;`}></div>
+            <div class="rack-occupancy-label">
+              <span class="numeric-value">${occupiedCount}</span>&nbsp;${t("occupied")}&nbsp;·&nbsp;<span class="numeric-value">${freeCount}</span>&nbsp;${t("free")}
+            </div>
           </div>
           ${items.length ? html`
             ${gridLayout.compact ? html`<div class="warning">${t("rack_grid_compacted")}</div>` : nothing}
