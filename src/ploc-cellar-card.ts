@@ -303,7 +303,8 @@ export class PlocCellarCard extends LitElement {
   }
 
   private openDiagnosticWine(diagnostic: WineDiagnostic): void {
-    const wine = this.inventory?.wines.find((item) => item.id === diagnostic.id);
+    const wine = this.inventory?.wines.find((item) => item.id === diagnostic.id)
+      ?? diagnostic.wine;
     if (!wine) return;
     this.activeDiagnostic = undefined;
     this.selectedWine = wine;
@@ -330,7 +331,7 @@ export class PlocCellarCard extends LitElement {
           ${wines.length ? wines.map((wine) => html`
             <section class="diagnostic-detail-item">
               <h4 class="diagnostic-detail-name">
-                ${this.inventory?.wines.some((item) => item.id === wine.id)
+                ${this.inventory?.wines.some((item) => item.id === wine.id) || wine.wine
                   ? html`<button class="diagnostic-wine-link" type="button"
                       aria-haspopup="dialog"
                       @click=${() => this.openDiagnosticWine(wine)}>${wine.name}${wine.vintage ? ` · ${wine.vintage}` : ""}</button>`
