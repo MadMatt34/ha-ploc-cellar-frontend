@@ -71,9 +71,9 @@ Le champ est facultatif afin de rester compatible avec les réponses d'anciennes
 
 ## Typographie des noms de vins
 
-Les noms des vins utilisent la police Cormorant Garamond, intégrée localement (licence SIL Open Font License), dans l'inventaire, les emplacements de cave, les infobulles, les liens de vins des diagnostics et le titre de la fiche détaillée. Les autres textes conservent la typographie habituelle de Home Assistant. La police est intégrée à la carte : aucun service de polices externe ni accès réseau n'est nécessaire à l'exécution.
+Les noms des vins utilisent la police Cormorant Garamond, intégrée localement (licence SIL Open Font License), dans les lignes d'inventaire, les liens de vins des diagnostics et le titre de la fiche détaillée. Les libellés des emplacements de cave et les infobulles utilisent la typographie standard de Home Assistant. Les autres textes conservent la typographie habituelle de Home Assistant. La police est intégrée à la carte : aucun service de polices externe ni accès réseau n'est nécessaire à l'exécution.
 
 
 ## Typographie des chiffres
 
-Les valeurs de la vue d’ensemble, les quantités et coordonnées des casiers ainsi que les valeurs des diagnostics utilisent la police DJB Get Digital intégrée localement. Les totaux, légendes et valeurs des graphiques statistiques conservent volontairement la typographie standard de l’interface. DJB Get Digital est une police propriétaire intégrée avec l’autorisation du titulaire des droits ; elle n’est pas couverte par la licence logicielle de ce dépôt.
+Les valeurs de la vue d’ensemble, les nombres de bouteilles par casier et les valeurs des diagnostics utilisent la police DJB Get Digital intégrée localement. Les coordonnées des emplacements de bouteilles utilisent la typographie standard de Home Assistant. Les totaux, légendes et valeurs des graphiques statistiques conservent volontairement la typographie standard de l’interface. DJB Get Digital est une police propriétaire intégrée avec l’autorisation du titulaire des droits ; elle n’est pas couverte par la licence logicielle de ce dépôt.
