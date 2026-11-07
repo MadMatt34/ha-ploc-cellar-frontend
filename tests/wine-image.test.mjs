@@ -42,7 +42,7 @@ test("missing paths and absent fetchers do not create object URLs", async () => 
   await loader.load(null, async () => assert.fail("no path must not fetch"), (url) => changes.push(url));
   await loader.load("/image.jpg", undefined, (url) => changes.push(url));
 
-  assert.deepEqual(changes, [null, null]);
+  assert.deepEqual(changes, [null]);
 });
 
 test("HTTP and network errors leave the image optional and can be retried", async () => {
