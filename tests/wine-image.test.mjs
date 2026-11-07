@@ -122,3 +122,16 @@ test("disconnect disposes the object URL and invalidates pending requests", asyn
   assert.equal(created, 1);
   assert.deepEqual(changes, [null, "blob:1", null, null]);
 });
+
+test("uses the browser object-URL APIs by default", async () => {
+  const loader = new WineImageLoader();
+  let objectUrl = null;
+
+  await loader.load("/image.jpg", async () => response(), (url) => {
+    objectUrl = url;
+  });
+
+  assert.equal(typeof objectUrl, "string");
+  assert.match(objectUrl, /^blob:/);
+  loader.dispose();
+});
