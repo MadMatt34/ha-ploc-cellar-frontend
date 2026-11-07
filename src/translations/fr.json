@@ -98,6 +98,7 @@
   "tooltip_color": "Couleur du vin",
   "tooltip_region": "Région",
   "tooltip_country": "Pays",
+  "tooltip_region_country": "Région / pays",
   "tooltip_grapes": "Cépages",
   "tooltip_cuvee": "Cuvée",
   "tooltip_format": "Format de bouteille",
