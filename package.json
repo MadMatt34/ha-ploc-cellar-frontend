@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "check": "tsc --noEmit",
-    "build": "vite build"
+    "build": "vite build",
+    "test": "tsc -p tsconfig.test.json && node --test tests/*.test.mjs"
   },
   "dependencies": {
     "lit": "^3.3.1",
