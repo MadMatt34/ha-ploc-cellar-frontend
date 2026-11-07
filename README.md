@@ -15,7 +15,7 @@ The cards communicate only with the Home Assistant integration through its `ploc
 1. Install **Ploc Cellar** from [MadMatt34/ha-ploc-cellar](https://github.com/MadMatt34/ha-ploc-cellar) and complete its configuration.
 2. In HACS, add this repository as a custom repository of category **Dashboard** (until it is available in the default HACS catalog).
 3. Install **Ploc Cellar Cards** from HACS.
-4. Add the resource provided by HACS to your dashboard if it is not added automatically. The JavaScript module is `ploc-cellar-card.js`.
+4. HACS normally adds the dashboard resource automatically. If you manage dashboard resources in YAML, add the module `ploc-cellar-card.js` manually.
 5. Add one of the three cards to a dashboard and select the Ploc Cellar configuration in its card editor.
 
 Existing card types and their configuration keys are retained:
