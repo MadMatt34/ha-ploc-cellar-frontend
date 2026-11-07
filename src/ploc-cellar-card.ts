@@ -365,8 +365,14 @@ export class PlocCellarCard extends LitElement {
     const showOccupancy = this.config?.show_occupancy !== false;
     const showDiagnostics = this.config?.show_diagnostics !== false;
     const showStatistics = this.config?.show_statistics !== false;
+    const occupiedPositions = data
+      ? Math.min(data.total_positions, Math.max(0, data.occupied_positions))
+      : 0;
+    const freePositions = data
+      ? Math.max(0, data.total_positions - occupiedPositions)
+      : 0;
     const occupancy = data && data.total_positions > 0
-      ? Math.round((data.occupied_positions / data.total_positions) * 100)
+      ? Math.round((occupiedPositions / data.total_positions) * 100)
       : 0;
     const diagnostics = data?.stock_reconstruction_complete
       ? [
@@ -411,13 +417,15 @@ export class PlocCellarCard extends LitElement {
               <div class="occupancy-bar" role="progressbar"
                 aria-label=${t("rack_occupancy")}
                 aria-valuemin="0" aria-valuemax=${data.total_positions}
-                aria-valuenow=${Math.min(data.total_positions, Math.max(0, data.occupied_positions))}>
+                aria-valuenow=${occupiedPositions}>
                 <div class="occupancy-fill" style=${`width: ${occupancy}%`}></div>
                 <div class="occupancy-label">
-                  <span>${t("rack_occupancy")}</span>
+                  <span>${t("rack_occupancy")}:</span>
+                  <span class="numeric-value">${this.formatNumber(data.total_positions)} ${t("positions")}</span>
                   <span>·</span>
-                  <span class="numeric-value">${this.formatNumber(Math.max(0, data.total_positions - data.occupied_positions))}</span>
-                  <span>${t("empty_positions")}</span>
+                  <span class="numeric-value">${this.formatNumber(occupiedPositions)} ${t("occupied")}</span>
+                  <span>·</span>
+                  <span class="numeric-value">${this.formatNumber(freePositions)} ${t("free")}</span>
                 </div>
               </div>
             </section>
