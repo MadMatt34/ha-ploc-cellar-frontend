@@ -28,10 +28,13 @@ export class PlocCellarRackCard extends LitElement {
     button { color: var(--primary-text-color); background: var(--secondary-background-color); border: 1px solid var(--divider-color); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
     button[aria-pressed="true"] { border-color: var(--primary-color); background: var(--secondary-background-color); }
     button[disabled] { opacity: .5; cursor: default; }
-    .rack-picker { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .rack-picker { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0; }
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
-    .grid-wrap { overflow-x: auto; padding: 4px 0 12px; }
-    .rack-grid { display: grid; gap: 6px; min-width: min-content; }
+    .grid-wrap { display: flex; justify-content: center; overflow-x: auto; padding: 4px 0 12px; }
+    .rack-grid { display: grid; gap: 6px; width: max-content; min-width: min-content; }
+    .rack-summary { color: var(--secondary-text-color); font-size: .85rem; text-align: center; margin: 8px 0; }
+    .color-counts { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; margin-left: 8px; }
+    .color-count { white-space: nowrap; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
@@ -161,6 +164,17 @@ export class PlocCellarRackCard extends LitElement {
     return new Map((this.inventory?.wines ?? []).map((wine) => [wine.id, wine]));
   }
 
+  private get selectedRackColorCounts(): Array<[string, number]> {
+    const counts = new Map<string, number>();
+    for (const item of this.selectedItems) {
+      if (!item.wine_id) continue;
+      const color = this.wineById.get(item.wine_id)?.color?.trim();
+      if (!color) continue;
+      counts.set(color, (counts.get(color) ?? 0) + 1);
+    }
+    return [...counts.entries()].sort(([left], [right]) => left.localeCompare(right, this.hass?.language));
+  }
+
   private selectRack(event: Event): void {
     if (event.currentTarget instanceof HTMLSelectElement) {
       this.selectedRackId = event.currentTarget.value;
@@ -266,7 +280,10 @@ export class PlocCellarRackCard extends LitElement {
                 </nav>
               `
             : nothing}
-          <div class="legend">${rack?.name ?? ""} · ${this.selectedItems.filter((item) => item.wine_id).length} ${t("occupied")} · ${this.selectedItems.filter((item) => !item.wine_id).length} ${t("free")}</div>
+          <div class="rack-summary">
+            ${rack?.name ?? ""} · ${this.selectedItems.filter((item) => item.wine_id).length} ${t("occupied")} · ${this.selectedItems.filter((item) => !item.wine_id).length} ${t("free")}
+            ${this.selectedRackColorCounts.length ? html`<span class="color-counts">${this.selectedRackColorCounts.map(([color, count]) => html`<span class="color-count">${color}: ${count}</span>`)}</span>` : nothing}
+          </div>
           ${rows.length && columns.length ? html`
             <div class="grid-wrap">
               <div class="rack-grid" style=${`grid-template-columns: repeat(${this.columnCount}, 98px); grid-template-rows: repeat(${this.rowCount}, 98px);`}>
