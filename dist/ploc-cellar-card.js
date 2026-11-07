@@ -850,7 +850,7 @@ let Pe = class extends ze {
   }
   displayWineLabel(e) {
     const t = this.wineLabel(e);
-    return t.length > 20 ? `${t.slice(0, 20)}...` : t;
+    return t.length > 22 ? `${t.slice(0, 22)}...` : t;
   }
   wineColor(e) {
     const t = e?.color_rgb;
@@ -914,7 +914,7 @@ let Pe = class extends ze {
           <div class="legend">${r?.name ?? ""} · ${this.selectedItems.filter((l) => l.wine_id).length} ${e("occupied")} · ${this.selectedItems.filter((l) => !l.wine_id).length} ${e("free")}</div>
           ${i.length && n.length ? $`
             <div class="grid-wrap">
-              <div class="rack-grid" style=${`grid-template-columns: repeat(${this.columnCount}, 120px); grid-template-rows: repeat(${this.rowCount}, 108px);`}>
+              <div class="rack-grid" style=${`grid-template-columns: repeat(${this.columnCount}, 98px); grid-template-rows: repeat(${this.rowCount}, 98px);`}>
                 ${a.map((l) => {
       const u = l.row - this.firstRow + 1, h = l.column - this.firstColumn + 1, f = !!l.wine_id, v = l.wine_id ? this.wineById.get(l.wine_id) : void 0, c = f ? this.wineLabel(l) : e("empty_position");
       return $`
@@ -993,7 +993,7 @@ Pe.styles = po`
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
     .grid-wrap { overflow-x: auto; padding: 4px 0 12px; }
     .rack-grid { display: grid; gap: 6px; min-width: min-content; }
-    .slot { width: 120px; height: 108px; min-width: 120px; min-height: 108px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 5px; text-align: center; padding: 7px 6px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
+    .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 2px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: rgb(50 50 50 / 90%); color: #fff; box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: .82rem; line-height: 1.45; pointer-events: none; overflow-wrap: anywhere; }
@@ -1002,9 +1002,9 @@ Pe.styles = po`
     .wine-tooltip-details dt { color: rgb(255 255 255 / 72%); }
     .wine-tooltip-details dd { margin: 0; }
     .slot.missing { border-style: dashed; color: var(--secondary-text-color); background: transparent; }
-    .slot strong { display: -webkit-box; width: 100%; min-height: 2.5em; max-height: 2.5em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: .82rem; line-height: 1.25; overflow-wrap: anywhere; }
-    .slot small { color: var(--secondary-text-color); font-size: .72rem; }
-    .bottle-marker { display: block; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; background: var(--bottle-color, var(--secondary-text-color)); border: 2px solid var(--divider-color); box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%); box-sizing: border-box; }
+    .slot strong { display: -webkit-box; width: 100%; min-height: 2.3em; max-height: 2.3em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: .76rem; line-height: 1.15; overflow-wrap: anywhere; }
+    .slot small { color: var(--secondary-text-color); font-size: .68rem; }
+    .bottle-marker { display: block; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: var(--bottle-color, var(--secondary-text-color)); border: 2px solid var(--divider-color); box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%); box-sizing: border-box; }
     .legend, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .warning { color: var(--warning-color); padding: 8px 0; }
     .error { color: var(--error-color); padding: 8px 0; }
