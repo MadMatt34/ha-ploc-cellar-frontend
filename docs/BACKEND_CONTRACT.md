@@ -84,8 +84,27 @@ The compile-time contract assertions and frontend CI type-check verify the decla
 
 ### Food pairings
 
-The PLOUD `ml` field is stored on each Wine record as the `Meals` flags enum. The current public enum defines flags from `1` (Aperitif) through `4096` (Dessert); multiple associations are combined as a bitmask. The backend exposes the raw integer without dropping unknown bits. The frontend displays the known categories in the wine detail dialog using the Home Assistant language (English or French). The APK contains a `foodtype8192` resource, but `8192` is not in the public server enum and is intentionally not given a label.
+The PLOUD `ml` field is exposed as the optional raw integer `Wine.meals`. It is a bitmask: each category has its own power-of-two flag, and multiple categories are combined with bitwise OR. The known public `Meals` flags are:
 
+| Bit value | Food category |
+|---:|---|
+| `1` | Aperitif |
+| `2` | Soup |
+| `4` | Starter |
+| `8` | Pork and charcuterie |
+| `16` | Seafood |
+| `32` | Fish |
+| `64` | White meat |
+| `128` | Game |
+| `256` | Poultry |
+| `512` | Red meat |
+| `1024` | Dishes with vegetables |
+| `2048` | Cheese |
+| `4096` | Dessert |
+
+The frontend decodes and displays the known categories in the wine detail dialog using the Home Assistant language (English or French). The backend must preserve the raw value, including bits it does not recognize; the frontend ignores unknown bits and must remain compatible when `meals` is absent or null.
+
+**Unknown flag:** the APK contains a `foodtype8192` resource, but `8192` is not part of the public server `Meals` enum. Its meaning is unconfirmed, so it is deliberately not assigned a category or displayed label. Do not infer a label from the APK resource name alone.
 ### Wine image
 
 The `Wine` response may include the optional field `image_url: string | null`.
