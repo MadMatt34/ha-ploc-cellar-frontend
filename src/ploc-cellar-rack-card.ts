@@ -44,6 +44,8 @@ export class PlocCellarRackCard extends LitElement {
     .wine-tooltip-details dt { color: rgb(255 255 255 / 72%); }
     .wine-tooltip-details dd { margin: 0; }
     .slot.missing { border-style: dashed; color: var(--secondary-text-color); background: transparent; }
+    .slot.empty { position: relative; }
+    .empty-shelf { display: block; flex: 0 0 22px; width: 46px; height: 22px; margin-top: 10px; border: 2px solid var(--secondary-text-color); border-top: 0; border-radius: 0 0 24px 24px; box-sizing: border-box; opacity: .75; }
     .slot strong { display: -webkit-box; width: 100%; min-height: 3.45em; max-height: 3.45em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; font-size: .76rem; line-height: 1.15; overflow-wrap: anywhere; }
     .slot small { color: var(--secondary-text-color); font-size: .68rem; margin-top: auto; }
     .bottle-marker { display: block; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: var(--bottle-color, var(--secondary-text-color)); border: 2px solid var(--divider-color); box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%); box-sizing: border-box; }
@@ -293,7 +295,7 @@ export class PlocCellarRackCard extends LitElement {
                   const wine = item.wine_id ? this.wineById.get(item.wine_id) : undefined;
                   const label = occupied ? this.wineLabel(item) : t("empty_position");
                   return html`
-                    <div class=${occupied ? "slot occupied" : "slot"}
+                    <div class=${occupied ? "slot occupied" : "slot empty"}
                       style=${`grid-row: ${row}; grid-column: ${column};`}
                       aria-label=${label}
                       tabindex=${occupied ? "0" : nothing}
@@ -303,7 +305,7 @@ export class PlocCellarRackCard extends LitElement {
                       @focus=${occupied ? (event: FocusEvent) => this.showWineTooltip(event, wine) : nothing}
                       @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
                       ${occupied ? html`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(wine)};`} aria-hidden="true"></span>` : nothing}
-                      <strong>${occupied ? this.displayWineLabel(item) : "—"}</strong>
+                      ${occupied ? html`<strong>${this.displayWineLabel(item)}</strong>` : html`<span class="empty-shelf" aria-hidden="true"></span>`}
                       <small>r${(item.row as number) + 1};c${(item.column as number) + 1}</small>
                     </div>
                   `;
