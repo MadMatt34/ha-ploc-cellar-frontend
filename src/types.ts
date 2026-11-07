@@ -61,6 +61,8 @@ export interface Wine {
   bottle_format: string | null;
   bottle_volume_l: number | null;
   ploud_pid: string | null;
+  /** Raw PLOUD ml bitmask; optional for compatibility with older backends. */
+  meals?: number | null;
   image_url?: string | null;
   locations: Array<{
     rack: string;
