@@ -28,6 +28,8 @@ The backend service also supports optional `search` and `color` filters. The car
 
 The response shape is represented by `InventoryResponse`, `Rack`, `RackItem`, `Wine` and `WineDiagnostic` in `src/types.ts`.
 
+The backend repository contains the authoritative structural test in [`tests/test_service_contract.py`](https://github.com/MadMatt34/ha-ploc-cellar/blob/main/tests/test_service_contract.py). The frontend mirrors its public key sets and important nullability guarantees in [`src/backend-inventory-contract.ts`](../src/backend-inventory-contract.ts). This file contains compile-time assertions only; it is included automatically by the strict TypeScript check and adds no runtime code to the dashboard bundle.
+
 Top-level response fields:
 
 | Field | Meaning |
@@ -61,8 +63,20 @@ Top-level response fields:
 - Unresolved wine references on occupied positions remain part of physical totals even when the corresponding wine record is unavailable.
 - Backend filters must not change global totals.
 
+## Procedure for changing a response field
+
+Treat a change to the service response as a coordinated backend/frontend contract change, even when it is additive.
+
+1. **Backend first:** change the response implementation and update the exact key sets, representative values and nullable semantics in `tests/test_service_contract.py` in the same backend PR. Run the backend test suite and CI. The backend contract test must not be weakened just to make an incompatible change pass.
+2. **Frontend types:** update the corresponding interface in `src/types.ts` and the mirrored assertions in `src/backend-inventory-contract.ts`. Keep the key sets exact; update nullability and primitive-type assertions when those semantics change.
+3. **Review consumers:** search all three cards and their editors for the affected field. Handle `null` explicitly where applicable; preserve the distinction between physical rack positions and reconstructed stock.
+4. **Documentation:** update this contract document and its French counterpart, including field meaning and any changed semantics.
+5. **Validation and release:** run `npm ci`, `npm run check` and `npm run build`. Merge/release the backend and frontend in a coordinated order so users do not receive a frontend expecting fields that an installed backend does not yet provide. For a breaking change, keep the frontend compatible with the old backend during the transition or clearly require the matching backend version.
+
+An additive response field is still added to both the backend's exact contract test and the frontend's exact key assertion. This deliberate strictness makes the two repositories' declared shapes move together.
+
 ## Compatibility rules
 
-Changes to the backend response must be reflected in `src/types.ts` and reviewed against all three cards. Preserve the physical-position versus reconstructed-stock distinction. New nullable fields must be handled as nullable in the UI. Do not change the service domain, service name, response mode or request shape without coordinating a frontend release.
+Preserve the physical-position versus reconstructed-stock distinction. New nullable fields must be handled as nullable in the UI. Do not change the service domain, service name, response mode or request shape without coordinating a frontend release.
 
-The frontend CI type-check verifies TypeScript consistency; it does not replace an integration test against a running Home Assistant instance.
+The compile-time contract assertions and frontend CI type-check verify the declared TypeScript shape; they do not execute the backend or replace an integration test against a running Home Assistant instance.
