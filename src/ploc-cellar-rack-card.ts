@@ -17,6 +17,7 @@ export class PlocCellarRackCard extends LitElement {
   @state() private selectedRackId?: string;
   @state() private loading = false;
   @state() private error?: string;
+  @state() private activeTooltip?: { wine?: Wine; left: number; top: number; color: string };
   private requestGeneration = 0;
 
   static styles = css`
@@ -34,6 +35,11 @@ export class PlocCellarRackCard extends LitElement {
     .slot { min-width: 76px; min-height: 76px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; text-align: center; padding: 7px 6px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+    .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 2px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: rgb(50 50 50 / 90%); color: #fff; box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: .82rem; line-height: 1.45; pointer-events: none; overflow-wrap: anywhere; }
+    .wine-tooltip-name { margin: 0 0 4px; font-weight: 600; }
+    .wine-tooltip-details { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 8px; margin: 0; }
+    .wine-tooltip-details dt { color: rgb(255 255 255 / 72%); }
+    .wine-tooltip-details dd { margin: 0; }
     .slot.missing { border-style: dashed; color: var(--secondary-text-color); background: transparent; }
     .slot strong { font-size: .82rem; line-height: 1.25; overflow-wrap: anywhere; }
     .slot small { color: var(--secondary-text-color); font-size: .72rem; }
@@ -179,25 +185,25 @@ export class PlocCellarRackCard extends LitElement {
     return `rgb(${rgb[0]} ${rgb[1]} ${rgb[2]})`;
   }
 
-  private wineTooltip(wine: Wine | undefined): string {
+  private wineTooltipFields(wine: Wine): Array<[string, string]> {
     const language = this.hass?.language ?? "en";
     const t = (key: TranslationKey): string => translate(language, key);
-    if (!wine) return t("unknown_wine");
-
-    const lines = [wine.name];
-    if (wine.vintage !== null) lines.push(`${t("tooltip_vintage")}: ${wine.vintage}`);
-    if (wine.domain) lines.push(`${t("tooltip_domain")}: ${wine.domain}`);
-    if (wine.appellation) lines.push(`${t("tooltip_appellation")}: ${wine.appellation}`);
-    if (wine.classification) lines.push(`${t("tooltip_classification")}: ${wine.classification}`);
-    if (wine.color) lines.push(`${t("tooltip_color")}: ${wine.color}`);
-    if (wine.region) lines.push(`${t("tooltip_region")}: ${wine.region}`);
-    if (wine.country) lines.push(`${t("tooltip_country")}: ${wine.country}`);
-    if (wine.grapes) lines.push(`${t("tooltip_grapes")}: ${wine.grapes}`);
-    if (wine.cuvee) lines.push(`${t("tooltip_cuvee")}: ${wine.cuvee}`);
-    if (wine.bottle_format) lines.push(`${t("tooltip_format")}: ${wine.bottle_format}`);
+    const fields: Array<[string, string]> = [];
+    if (wine.vintage !== null) fields.push([t("tooltip_vintage"), String(wine.vintage)]);
+    if (wine.domain) fields.push([t("tooltip_domain"), wine.domain]);
+    if (wine.appellation) fields.push([t("tooltip_appellation"), wine.appellation]);
+    if (wine.classification) fields.push([t("tooltip_classification"), wine.classification]);
+    if (wine.color) fields.push([t("tooltip_color"), wine.color]);
+    if (wine.region) fields.push([t("tooltip_region"), wine.region]);
+    if (wine.country) fields.push([t("tooltip_country"), wine.country]);
+    if (wine.grapes) fields.push([t("tooltip_grapes"), wine.grapes]);
+    if (wine.cuvee) fields.push([t("tooltip_cuvee"), wine.cuvee]);
+    if (wine.bottle_format) fields.push([t("tooltip_format"), wine.bottle_format]);
     if (wine.bottle_volume_l !== null) {
-      const volume = wine.bottle_volume_l.toLocaleString(language);
-      lines.push(`${t("tooltip_volume")}: ${volume} L`);
+      fields.push([
+        t("tooltip_volume"),
+        `${wine.bottle_volume_l.toLocaleString(language)} L`,
+      ]);
     }
     if (wine.service_temperature_min !== null || wine.service_temperature_max !== null) {
       const minimum = wine.service_temperature_min;
@@ -205,9 +211,26 @@ export class PlocCellarRackCard extends LitElement {
       const temperature = minimum !== null && maximum !== null
         ? `${minimum}–${maximum} °C`
         : `${minimum ?? maximum} °C`;
-      lines.push(`${t("tooltip_temperature")}: ${temperature}`);
+      fields.push([t("tooltip_temperature"), temperature]);
     }
-    return lines.join("\n");
+    return fields;
+  }
+
+  private showWineTooltip(event: PointerEvent | FocusEvent, wine?: Wine): void {
+    const target = event.currentTarget;
+    if (!(target instanceof HTMLElement)) return;
+    const rect = target.getBoundingClientRect();
+    const isPointer = "clientX" in event;
+    this.activeTooltip = {
+      wine,
+      left: isPointer ? event.clientX + 12 : rect.right + 8,
+      top: isPointer ? event.clientY + 12 : rect.top,
+      color: this.wineColor(wine),
+    };
+  }
+
+  private hideWineTooltip(): void {
+    this.activeTooltip = undefined;
   }
 
   protected render() {
@@ -265,13 +288,17 @@ export class PlocCellarRackCard extends LitElement {
                   const column = (item.column as number) - this.firstColumn + 1;
                   const occupied = Boolean(item.wine_id);
                   const wine = item.wine_id ? this.wineById.get(item.wine_id) : undefined;
-                  const label = occupied ? this.wineTooltip(wine) : t("empty_position");
+                  const label = occupied ? this.wineLabel(item) : t("empty_position");
                   return html`
                     <div class=${occupied ? "slot occupied" : "slot"}
                       style=${`grid-row: ${row}; grid-column: ${column};`}
-                      title=${label}
                       aria-label=${label}
-                      tabindex=${occupied ? "0" : nothing}>
+                      tabindex=${occupied ? "0" : nothing}
+                      @pointerenter=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
+                      @pointermove=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
+                      @pointerleave=${occupied ? () => this.hideWineTooltip() : nothing}
+                      @focus=${occupied ? (event: FocusEvent) => this.showWineTooltip(event, wine) : nothing}
+                      @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
                       ${occupied ? html`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(wine)};`} aria-hidden="true"></span>` : nothing}
                       <strong>${occupied ? this.wineLabel(item) : "—"}</strong>
                       <small>${t("row")} ${item.row} · ${t("column")} ${item.column}</small>
@@ -297,6 +324,20 @@ export class PlocCellarRackCard extends LitElement {
         ` : html`<p class="muted">${t("no_racks")}</p>`}
         ${rackItemsWithUnknownRack.length ? html`
           <div class="warning">${rackItemsWithUnknownRack.length} ${t("missing_rack")}</div>
+        ` : nothing}
+        ${this.activeTooltip ? html`
+          <div class="wine-tooltip"
+            role="tooltip"
+            style=${`left: ${this.activeTooltip.left}px; top: ${this.activeTooltip.top}px; --wine-tooltip-border-color: ${this.activeTooltip.color};`}>
+            ${this.activeTooltip.wine ? html`
+              <div class="wine-tooltip-name">${this.activeTooltip.wine.name}</div>
+              <dl class="wine-tooltip-details">
+                ${this.wineTooltipFields(this.activeTooltip.wine).map(([name, value]) => html`
+                  <dt>${name}</dt><dd>${value}</dd>
+                `)}
+              </dl>
+            ` : t("unknown_wine")}
+          </div>
         ` : nothing}
       </ha-card>
     `;
