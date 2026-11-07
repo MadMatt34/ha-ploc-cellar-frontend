@@ -83,10 +83,16 @@ export class PlocCellarWineDetail extends LitElement {
     }
   }
 
+  connectedCallback(): void {
+    super.connectedCallback();
+    if (this.wine?.image_url && this.hass) void this.loadWineImage();
+  }
+
   disconnectedCallback(): void {
     this.imageRequest += 1;
     this.loadedImagePath = null;
     this.revokeWineImage();
+    this.imageUrl = null;
     super.disconnectedCallback();
   }
 
