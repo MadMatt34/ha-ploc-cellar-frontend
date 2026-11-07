@@ -98,6 +98,7 @@
   "tooltip_color": "Wine color",
   "tooltip_region": "Region",
   "tooltip_country": "Country",
+  "tooltip_region_country": "Region / country",
   "tooltip_grapes": "Grapes",
   "tooltip_cuvee": "Cuvée",
   "tooltip_format": "Bottle format",
