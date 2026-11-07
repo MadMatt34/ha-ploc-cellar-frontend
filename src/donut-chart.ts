@@ -68,7 +68,8 @@ export class PlocCellarDonutChart extends LitElement {
           fontSize: 13,
           lineHeight: 19,
         },
-        extraCssText: "border-radius: 6px; box-shadow: 0 2px 8px rgb(0 0 0 / 20%);",
+        extraCssText:
+          "border-radius: 6px; border: 1px solid var(--divider-color) !important; box-shadow: 0 2px 8px rgb(0 0 0 / 20%);",
         valueFormatter: (value: string | number) => numberFormat.format(Number(value)),
       },
       series: [{
