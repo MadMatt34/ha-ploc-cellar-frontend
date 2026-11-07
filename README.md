@@ -58,3 +58,11 @@ The frontend depends on the `ploc_cellar.get_inventory` Home Assistant WebSocket
 ## Languages
 
 English and French are supported.
+
+## Wine photos
+
+The wine detail dialog displays the cached PLOUD wine image when the backend provides a non-null `image_url`. The backend selects the primary image first and falls back to the cover image when the primary image is unavailable locally.
+
+Images are served by an authenticated Home Assistant endpoint. The card retrieves them with `hass.fetchWithAuth()`; it does not contact PLOUD directly and does not store PLOUD credentials. The returned blob is displayed through a browser object URL. Object URLs are revoked when replaced or when the dialog element is disconnected. If the backend changes `image_url` (including its version query when the same PLOUD document is updated), the card fetches the new image and releases the previous object URL.
+
+The field is optional for compatibility with older backend responses. When it is absent or null, the wine dialog remains usable and simply displays no photo.
