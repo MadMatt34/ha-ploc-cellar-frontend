@@ -44,7 +44,7 @@ export class PlocCellarRackCard extends LitElement {
     .wine-tooltip-details dt { color: rgb(255 255 255 / 72%); }
     .wine-tooltip-details dd { margin: 0; }
     .slot.missing { border-style: dashed; color: var(--secondary-text-color); background: transparent; }
-    .slot strong { display: -webkit-box; width: 100%; min-height: 2.3em; max-height: 2.3em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: .76rem; line-height: 1.15; overflow-wrap: anywhere; }
+    .slot strong { display: -webkit-box; width: 100%; min-height: 3.45em; max-height: 3.45em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; font-size: .76rem; line-height: 1.15; overflow-wrap: anywhere; }
     .slot small { color: var(--secondary-text-color); font-size: .68rem; margin-top: auto; }
     .bottle-marker { display: block; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: var(--bottle-color, var(--secondary-text-color)); border: 2px solid var(--divider-color); box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%); box-sizing: border-box; }
     .legend, .muted { color: var(--secondary-text-color); font-size: .85rem; }
@@ -189,7 +189,7 @@ export class PlocCellarRackCard extends LitElement {
 
   private displayWineLabel(item: RackItem): string {
     const label = this.wineLabel(item);
-    return label.length > 22 ? `${label.slice(0, 22)}...` : label;
+    return label.length > 33 ? `${label.slice(0, 33)}...` : label;
   }
 
   private wineColor(wine: Wine | undefined): string {
@@ -281,7 +281,7 @@ export class PlocCellarRackCard extends LitElement {
               `
             : nothing}
           <div class="rack-summary">
-            <div>${rack?.name ?? ""} · ${this.selectedItems.filter((item) => item.wine_id).length} ${t("occupied")} · ${this.selectedItems.filter((item) => !item.wine_id).length} ${t("free")}</div>
+            <div><strong>${rack?.name ?? ""}</strong> · ${this.selectedItems.filter((item) => item.wine_id).length} ${t("occupied")} · ${this.selectedItems.filter((item) => !item.wine_id).length} ${t("free")}</div>
             ${this.selectedRackColorCounts.length ? html`<div class="color-counts">${this.selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: ${count}</span>`)}</div>` : nothing}
           </div>
           ${rows.length && columns.length ? html`
