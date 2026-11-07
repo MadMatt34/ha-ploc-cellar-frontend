@@ -66,9 +66,9 @@ export class PlocCellarCard extends LitElement {
     .label, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .section { margin-top: 16px; }
     .section-title { margin: 0 0 8px; font-size: .95rem; font-weight: 500; }
-    .occupancy-heading { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; font-size: .85rem; }
-    .occupancy-bar { height: 9px; border-radius: 999px; overflow: hidden; background: var(--divider-color); }
-    .occupancy-fill { height: 100%; border-radius: inherit; background: var(--primary-color); }
+    .occupancy-bar { position: relative; height: 28px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
+    .occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
+    .occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; color: var(--primary-text-color); font-size: .8rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
     .diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
     .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; cursor: pointer; }
     .diagnostic:hover { background: var(--secondary-background-color); }
@@ -408,17 +408,18 @@ export class PlocCellarCard extends LitElement {
           </div>
           ${showOccupancy ? html`
             <section class="section" aria-label=${t("rack_occupancy")}>
-              <div class="occupancy-heading">
-                <span>${t("rack_occupancy")}</span>
-                <span class="numeric-value">${this.formatNumber(data.occupied_positions)} / ${this.formatNumber(data.total_positions)}</span>
-              </div>
               <div class="occupancy-bar" role="progressbar"
                 aria-label=${t("rack_occupancy")}
                 aria-valuemin="0" aria-valuemax=${data.total_positions}
-                aria-valuenow=${data.occupied_positions}>
+                aria-valuenow=${Math.min(data.total_positions, Math.max(0, data.occupied_positions))}>
                 <div class="occupancy-fill" style=${`width: ${occupancy}%`}></div>
+                <div class="occupancy-label">
+                  <span>${t("rack_occupancy")}</span>
+                  <span>·</span>
+                  <span class="numeric-value">${this.formatNumber(Math.max(0, data.total_positions - data.occupied_positions))}</span>
+                  <span>${t("empty_positions")}</span>
+                </div>
               </div>
-              <div class="muted">${t("empty_positions")}: <span class="numeric-value">${this.formatNumber(Math.max(0, data.total_positions - data.occupied_positions))}</span></div>
             </section>
           ` : nothing}
           ${showDiagnostics && hasDiagnostics ? html`
