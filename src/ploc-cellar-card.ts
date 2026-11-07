@@ -324,7 +324,7 @@ export class PlocCellarCard extends LitElement {
       ? wine.unlocated_bottles ?? 0
       : kind === "negative" ? wine.negative_movement_bottles ?? 0 : wine.physical_surplus_bottles ?? 0;
     return html`
-      <ha-dialog .open=${true} .heading=${t(titleKey)} @closed=${() => { this.activeDiagnostic = undefined; }}>
+      <ha-dialog .open=${true} header-title=${t(titleKey)} @closed=${() => { this.activeDiagnostic = undefined; }}>
         <div class="diagnostic-detail-list">
           <p class="muted">${t(detailKey)}</p>
           ${wines.length ? wines.map((wine) => html`
