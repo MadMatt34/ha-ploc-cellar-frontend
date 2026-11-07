@@ -897,7 +897,7 @@ let Dn = class extends Pe {
     if (!e) return $;
     const t = e.service_temperature_min !== null || e.service_temperature_max !== null ? `${e.service_temperature_min === null ? "—" : this.formatNumber(e.service_temperature_min)}–${e.service_temperature_max === null ? "—" : this.formatNumber(e.service_temperature_max)} °C` : null;
     return I`
-      <ha-dialog .open=${!0} .heading=${e.name} @closed=${() => this.onDialogClosed()}>
+      <ha-dialog .open=${!0} header-title=${e.name} @closed=${() => this.onDialogClosed()}>
         <div class="content">
           ${this.renderIdentity(e)}
           ${this.renderStock(e)}
