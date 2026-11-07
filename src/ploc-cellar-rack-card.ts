@@ -190,28 +190,10 @@ export class PlocCellarRackCard extends LitElement {
     const t = (key: TranslationKey): string => translate(language, key);
     const fields: Array<[string, string]> = [];
     if (wine.vintage !== null) fields.push([t("tooltip_vintage"), String(wine.vintage)]);
-    if (wine.domain) fields.push([t("tooltip_domain"), wine.domain]);
     if (wine.appellation) fields.push([t("tooltip_appellation"), wine.appellation]);
-    if (wine.classification) fields.push([t("tooltip_classification"), wine.classification]);
-    if (wine.color) fields.push([t("tooltip_color"), wine.color]);
-    if (wine.region) fields.push([t("tooltip_region"), wine.region]);
-    if (wine.country) fields.push([t("tooltip_country"), wine.country]);
-    if (wine.grapes) fields.push([t("tooltip_grapes"), wine.grapes]);
-    if (wine.cuvee) fields.push([t("tooltip_cuvee"), wine.cuvee]);
-    if (wine.bottle_format) fields.push([t("tooltip_format"), wine.bottle_format]);
-    if (wine.bottle_volume_l !== null) {
-      fields.push([
-        t("tooltip_volume"),
-        `${wine.bottle_volume_l.toLocaleString(language)} L`,
-      ]);
-    }
-    if (wine.service_temperature_min !== null || wine.service_temperature_max !== null) {
-      const minimum = wine.service_temperature_min;
-      const maximum = wine.service_temperature_max;
-      const temperature = minimum !== null && maximum !== null
-        ? `${minimum}–${maximum} °C`
-        : `${minimum ?? maximum} °C`;
-      fields.push([t("tooltip_temperature"), temperature]);
+    const regionAndCountry = [wine.region, wine.country].filter(Boolean).join(" / ");
+    if (regionAndCountry) {
+      fields.push([t("tooltip_region_country"), regionAndCountry]);
     }
     return fields;
   }
