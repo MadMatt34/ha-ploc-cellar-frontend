@@ -80,3 +80,14 @@ Même un nouveau champ additif doit être ajouté au test de contrat exact du ba
 Préserver la distinction entre emplacements physiques et stock reconstitué. Les nouveaux champs nullable doivent être traités comme tels dans l'interface. Ne pas modifier le domaine du service, son nom, son mode de réponse ou la forme de la requête sans coordonner une version du frontend.
 
 Les assertions de contrat à la compilation et la vérification TypeScript de la CI contrôlent la structure TypeScript déclarée ; elles n'exécutent pas le backend et ne remplacent pas un test d'intégration sur une instance Home Assistant en fonctionnement.
+
+### Image du vin
+
+La réponse `Wine` peut contenir le champ facultatif `image_url: string | null`.
+
+- Une valeur non nulle désigne une route locale Home Assistant vers l'image principale mise en cache, ou vers l'image de couverture si l'image principale n'est pas disponible.
+- La route exige une authentification Home Assistant. Le consommateur doit récupérer l'image avec `hass.fetchWithAuth(image_url)` ; une requête d'image distante non authentifiée n'est pas prise en charge.
+- L'URL peut contenir un paramètre de version. Une URL modifiée indique que la version du document mis en cache a changé : l'image doit être téléchargée à nouveau, même si l'identifiant du document PLOUD est identique.
+- Le champ peut être nul ou absent avec une ancienne version du backend, pour un vin sans référence d'image, lorsque le document n'a pas encore été téléchargé ou lorsque l'image est indisponible. L'interface doit le traiter comme facultatif et ne jamais rendre l'affichage de la fiche vin dépendant de sa présence.
+
+La carte affiche le blob reçu au moyen d'une URL d'objet. Elle révoque l'ancienne URL lorsqu'une image est remplacée et libère l'URL active lorsque le composant est déconnecté. L'échec d'une requête d'image ne doit pas empêcher l'affichage de l'inventaire ou des détails du vin.
