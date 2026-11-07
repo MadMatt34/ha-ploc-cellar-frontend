@@ -60,6 +60,9 @@ export class PlocCellarDonutChart extends LitElement {
         trigger: "item",
         renderMode: "html",
         confine: true,
+        // Keep the HTML tooltip inside this component's shadow tree so HA theme
+        // variables are inherited and resolved by the browser.
+        appendTo: () => this.chart?.getDom() ?? this.renderRoot.querySelector<HTMLElement>(".chart")!,
         backgroundColor: "var(--card-background-color)",
         borderColor: "var(--divider-color)",
         borderWidth: 1,
