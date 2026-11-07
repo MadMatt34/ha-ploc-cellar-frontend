@@ -18279,7 +18279,7 @@ let ge = class extends Pe {
     if (!e) return $;
     const t = e === "unlocated" ? "diagnostic_unlocated" : e === "negative" ? "diagnostic_negative" : "diagnostic_surplus", r = e === "unlocated" ? "diagnostic_detail_unlocated" : e === "negative" ? "diagnostic_detail_negative" : "diagnostic_detail_surplus", i = this.getDiagnosticWines(e), n = (o) => Dt(this.hass?.language ?? "en", o), a = (o) => e === "unlocated" ? o.unlocated_bottles ?? 0 : e === "negative" ? o.negative_movement_bottles ?? 0 : o.physical_surplus_bottles ?? 0;
     return I`
-      <ha-dialog .open=${!0} .heading=${n(t)} @closed=${() => {
+      <ha-dialog .open=${!0} header-title=${n(t)} @closed=${() => {
       this.activeDiagnostic = void 0;
     }}>
         <div class="diagnostic-detail-list">
