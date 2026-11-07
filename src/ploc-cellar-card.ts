@@ -3,6 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import "./ploc-cellar-rack-card";
 import "./ploc-cellar-inventory-card";
 import "./ploc-cellar-card-editor";
+import "./ploc-cellar-wine-detail";
 
 import type {
   HomeAssistant,
@@ -47,6 +48,7 @@ export class PlocCellarCard extends LitElement {
   @state() private loading = false;
   @state() private error?: string;
   @state() private activeDiagnostic?: "unlocated" | "negative" | "surplus";
+  @state() private selectedWine?: Wine;
   private requestGeneration = 0;
 
   static styles = css`
@@ -74,6 +76,9 @@ export class PlocCellarCard extends LitElement {
     .diagnostic-detail-list { display: grid; gap: 12px; max-height: min(60vh, 520px); overflow: auto; }
     .diagnostic-detail-item { border-bottom: 1px solid var(--divider-color); padding: 0 0 10px; }
     .diagnostic-detail-name { margin: 0 0 6px; font-weight: 600; }
+    .diagnostic-wine-link { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: inherit; text-align: left; cursor: pointer; }
+    .diagnostic-wine-link:hover { color: var(--primary-color); text-decoration: underline; }
+    .diagnostic-wine-link:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 2px; }
     .diagnostic-detail-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px 14px; }
     .diagnostic-detail-meta div { display: flex; justify-content: space-between; gap: 12px; }
     .diagnostic-detail-meta dt { color: var(--secondary-text-color); }
@@ -297,6 +302,13 @@ export class PlocCellarCard extends LitElement {
       .sort((a, b) => (b[field] ?? 0) - (a[field] ?? 0) || a.name.localeCompare(b.name, this.hass?.language));
   }
 
+  private openDiagnosticWine(diagnostic: WineDiagnostic): void {
+    const wine = this.inventory?.wines.find((item) => item.id === diagnostic.id);
+    if (!wine) return;
+    this.activeDiagnostic = undefined;
+    this.selectedWine = wine;
+  }
+
   private renderDiagnosticDialog() {
     const kind = this.activeDiagnostic;
     if (!kind) return nothing;
@@ -317,7 +329,13 @@ export class PlocCellarCard extends LitElement {
           <p class="muted">${t(detailKey)}</p>
           ${wines.length ? wines.map((wine) => html`
             <section class="diagnostic-detail-item">
-              <h4 class="diagnostic-detail-name">${wine.name}${wine.vintage ? ` · ${wine.vintage}` : ""}</h4>
+              <h4 class="diagnostic-detail-name">
+                ${this.inventory?.wines.some((item) => item.id === wine.id)
+                  ? html`<button class="diagnostic-wine-link" type="button"
+                      aria-haspopup="dialog"
+                      @click=${() => this.openDiagnosticWine(wine)}>${wine.name}${wine.vintage ? ` · ${wine.vintage}` : ""}</button>`
+                  : html`${wine.name}${wine.vintage ? ` · ${wine.vintage}` : ""}`}
+              </h4>
               <dl class="diagnostic-detail-meta">
                 <div><dt>${t("diagnostic_detail_quantity")}</dt><dd>${this.formatNumber(amount(wine))}</dd></div>
                 <div><dt>${t("diagnostic_detail_in_cellar")}</dt><dd>${this.formatNumber(wine.bottles_in_cellar)}</dd></div>
@@ -441,6 +459,13 @@ export class PlocCellarCard extends LitElement {
           ` : nothing}
           <div class="muted section">${t("last_sync")}: ${this.formatSync(data.last_sync)}</div>
           ${this.renderDiagnosticDialog()}
+          ${this.selectedWine ? html`
+            <ploc-cellar-wine-detail
+              .hass=${this.hass}
+              .wine=${this.selectedWine}
+              @wine-detail-closed=${() => { this.selectedWine = undefined; }}>
+            </ploc-cellar-wine-detail>
+          ` : nothing}
         ` : nothing}
       </ha-card>
     `;
