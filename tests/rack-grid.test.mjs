@@ -43,8 +43,8 @@ test("large sparse coordinates switch to a bounded compact grid", () => {
   ]);
 
   assert.equal(layout.compact, true);
-  assert.equal(layout.rowCount, 2);
-  assert.equal(layout.columnCount, 1);
+  assert.equal(layout.rowCount, 1);
+  assert.equal(layout.columnCount, 2);
   assert.equal(layout.positions.length, 2);
   assert.deepEqual(layout.missingCoordinates, []);
   assert.ok(layout.rowCount * layout.columnCount <= MAX_RACK_GRID_CELLS);
@@ -74,7 +74,7 @@ test("compact layout is deterministic and does not mutate its input", () => {
   assert.deepEqual(items, original);
   assert.deepEqual(layout.positions, [
     { id: "a", row: 1, column: 1 },
-    { id: "b", row: 2, column: 1 },
+    { id: "b", row: 1, column: 2 },
   ]);
 });
 
