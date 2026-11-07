@@ -46,6 +46,8 @@ The production bundle is generated at `dist/ploc-cellar-card.js`. Dependencies a
 
 ## Backend contract
 
+See the [backend contract](docs/BACKEND_CONTRACT.md) for the WebSocket request, response fields, inventory semantics and compatibility rules.
+
 The frontend depends on the `ploc_cellar.get_inventory` Home Assistant WebSocket response service exposed by the integration. The service contract and inventory model are maintained in the [backend repository](https://github.com/MadMatt34/ha-ploc-cellar). Changes to the backend response must remain compatible with the TypeScript interfaces in `src/types.ts`.
 
 ## Languages
