@@ -70,3 +70,8 @@ The field is optional for compatibility with older backend responses. When it is
 ## Wine-name typography
 
 Wine names use the locally bundled Cormorant Garamond typeface (SIL Open Font License) in the inventory, rack positions, wine tooltips, diagnostic wine links and wine-detail dialog title. Other interface text retains Home Assistant's normal typography. The font is bundled with the card, so no external font service or network request is needed at runtime.
+
+
+## Numeric typography
+
+Cellar overview values, rack counts and coordinates, and diagnostic quantities use the locally bundled DJB Get Digital typeface. Statistical chart totals, legends and distribution values deliberately retain the standard interface typography. DJB Get Digital is proprietary font software and is included with permission from the rights holder; it is not covered by this repository's software license.
