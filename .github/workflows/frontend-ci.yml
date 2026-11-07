@@ -28,6 +28,8 @@ jobs:
         run: npm ci
       - name: Type-check
         run: npm run check
+      - name: Run frontend unit tests
+        run: npm test
       - name: Build standalone dashboard module
         run: npm run build
       - name: Prepare HACS distributable
