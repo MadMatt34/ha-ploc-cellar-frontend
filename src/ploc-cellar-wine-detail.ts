@@ -1,5 +1,5 @@
 import { LitElement, css, html, nothing, type PropertyValues } from "lit";
-import "./fonts.css";
+
 import { customElement, property, state } from "lit/decorators.js";
 
 import type { HomeAssistant, Wine } from "./types";

@@ -15,6 +15,8 @@ export default defineConfig({
     outDir: "dist",
     emptyOutDir: true,
     target: "es2022",
+    // Keep the locally bundled wine fonts inside the single HACS JavaScript resource.
+    assetsInlineLimit: 100_000,
     minify: true,
   },
 });
