@@ -18118,11 +18118,11 @@ Ie.styles = po`
     .occupancy-bar { height: 9px; border-radius: 999px; overflow: hidden; background: var(--divider-color); }
     .occupancy-fill { height: 100%; border-radius: inherit; background: var(--primary-color); }
     .diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
-    .diagnostic { display: block; width: 100%; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; cursor: pointer; }
+    .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; cursor: pointer; }
     .diagnostic:hover { background: var(--secondary-background-color); }
     .diagnostic:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .diagnostic-value { display: block; font-weight: 600; font-variant-numeric: tabular-nums; }
-    .diagnostic-hint { display: block; margin-top: 4px; color: var(--secondary-text-color); font-size: .75rem; }
+    .diagnostic-hint { display: block; align-self: flex-end; margin-top: auto; padding-top: 8px; color: var(--secondary-text-color); font-size: .75rem; text-align: right; }
     .diagnostic-detail-list { display: grid; gap: 12px; max-height: min(60vh, 520px); overflow: auto; }
     .diagnostic-detail-item { border-bottom: 1px solid var(--divider-color); padding: 0 0 10px; }
     .diagnostic-detail-name { margin: 0 0 6px; font-weight: 600; }
