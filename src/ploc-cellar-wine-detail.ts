@@ -104,12 +104,13 @@ export class PlocCellarWineDetail extends LitElement {
   }
 
   private async loadWineImage(): Promise<void> {
-    const request = ++this.imageRequest;
-    this.revokeWineImage();
-    this.imageUrl = null;
     const imagePath = this.wine?.image_url ?? null;
     const hass = this.hass;
     if (imagePath === this.loadedImagePath && this.imageObjectUrl !== null) return;
+
+    const request = ++this.imageRequest;
+    this.revokeWineImage();
+    this.imageUrl = null;
     this.loadedImagePath = imagePath;
     if (!imagePath || !hass) return;
 
