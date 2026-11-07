@@ -33,7 +33,7 @@ export class PlocCellarRackCard extends LitElement {
     .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; padding: 4px 0 12px; }
     .rack-grid { display: grid; flex: 0 0 auto; gap: 6px; width: max-content; min-width: min-content; }
     .rack-summary { color: var(--secondary-text-color); font-size: .85rem; text-align: center; margin: 8px 0; }
-    .color-counts { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; margin-top: 4px; }
+    .color-counts { text-align: center; margin-top: 0; }
     .color-count { white-space: nowrap; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
@@ -45,7 +45,7 @@ export class PlocCellarRackCard extends LitElement {
     .wine-tooltip-details dd { margin: 0; }
     .slot.missing { border-style: dashed; color: var(--secondary-text-color); background: transparent; }
     .slot strong { display: -webkit-box; width: 100%; min-height: 2.3em; max-height: 2.3em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: .76rem; line-height: 1.15; overflow-wrap: anywhere; }
-    .slot small { color: var(--secondary-text-color); font-size: .68rem; }
+    .slot small { color: var(--secondary-text-color); font-size: .68rem; margin-top: auto; }
     .bottle-marker { display: block; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: var(--bottle-color, var(--secondary-text-color)); border: 2px solid var(--divider-color); box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%); box-sizing: border-box; }
     .legend, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .warning { color: var(--warning-color); padding: 8px 0; }
@@ -282,7 +282,7 @@ export class PlocCellarRackCard extends LitElement {
             : nothing}
           <div class="rack-summary">
             <div>${rack?.name ?? ""} · ${this.selectedItems.filter((item) => item.wine_id).length} ${t("occupied")} · ${this.selectedItems.filter((item) => !item.wine_id).length} ${t("free")}</div>
-            ${this.selectedRackColorCounts.length ? html`<div class="color-counts">${this.selectedRackColorCounts.map(([color, count]) => html`<span class="color-count">${color}: ${count}</span>`)}</div>` : nothing}
+            ${this.selectedRackColorCounts.length ? html`<div class="color-counts">${this.selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: ${count}</span>`)}</div>` : nothing}
           </div>
           ${rows.length && columns.length ? html`
             <div class="grid-wrap">
