@@ -41,10 +41,17 @@ export function buildRackGridLayout(
     };
   }
 
-  const minRow = Math.min(...items.map((item) => item.row));
-  const maxRow = Math.max(...items.map((item) => item.row));
-  const minColumn = Math.min(...items.map((item) => item.column));
-  const maxColumn = Math.max(...items.map((item) => item.column));
+  let minRow = Number.POSITIVE_INFINITY;
+  let maxRow = Number.NEGATIVE_INFINITY;
+  let minColumn = Number.POSITIVE_INFINITY;
+  let maxColumn = Number.NEGATIVE_INFINITY;
+
+  for (const item of items) {
+    minRow = Math.min(minRow, item.row);
+    maxRow = Math.max(maxRow, item.row);
+    minColumn = Math.min(minColumn, item.column);
+    maxColumn = Math.max(maxColumn, item.column);
+  }
   const rowSpan = maxRow - minRow + 1;
   const columnSpan = maxColumn - minColumn + 1;
   const isBounded =
