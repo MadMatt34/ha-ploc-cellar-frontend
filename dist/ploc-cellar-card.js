@@ -18339,7 +18339,7 @@ let ge = class extends Pe {
     return (this.inventory?.wine_diagnostics ?? []).filter((r) => (r[t] ?? 0) > 0).sort((r, i) => (i[t] ?? 0) - (r[t] ?? 0) || r.name.localeCompare(i.name, this.hass?.language));
   }
   openDiagnosticWine(e) {
-    const t = this.inventory?.wines.find((r) => r.id === e.id);
+    const t = this.inventory?.wines.find((r) => r.id === e.id) ?? e.wine;
     t && (this.activeDiagnostic = void 0, this.selectedWine = t);
   }
   renderDiagnosticDialog() {
@@ -18355,7 +18355,7 @@ let ge = class extends Pe {
           ${i.length ? i.map((o) => L`
             <section class="diagnostic-detail-item">
               <h4 class="diagnostic-detail-name">
-                ${this.inventory?.wines.some((s) => s.id === o.id) ? L`<button class="diagnostic-wine-link" type="button"
+                ${this.inventory?.wines.some((s) => s.id === o.id) || o.wine ? L`<button class="diagnostic-wine-link" type="button"
                       aria-haspopup="dialog"
                       @click=${() => this.openDiagnosticWine(o)}>${o.name}${o.vintage ? ` · ${o.vintage}` : ""}</button>` : L`${o.name}${o.vintage ? ` · ${o.vintage}` : ""}`}
               </h4>
