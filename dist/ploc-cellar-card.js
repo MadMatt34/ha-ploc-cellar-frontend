@@ -1003,8 +1003,8 @@ Pe.styles = po`
     button[disabled] { opacity: .5; cursor: default; }
     .rack-picker { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0; }
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
-    .grid-wrap { overflow-x: auto; padding: 4px 0 12px; }
-    .rack-grid { display: grid; gap: 6px; width: max-content; min-width: min-content; margin-inline: auto; }
+    .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; padding: 4px 0 12px; }
+    .rack-grid { display: grid; flex: 0 0 auto; gap: 6px; width: max-content; min-width: min-content; }
     .rack-summary { color: var(--secondary-text-color); font-size: .85rem; text-align: center; margin: 8px 0; }
     .color-counts { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; margin-top: 4px; }
     .color-count { white-space: nowrap; }
