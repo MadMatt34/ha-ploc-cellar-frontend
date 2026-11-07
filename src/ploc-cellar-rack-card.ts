@@ -188,8 +188,7 @@ export class PlocCellarRackCard extends LitElement {
   }
 
   private displayWineLabel(item: RackItem): string {
-    const label = this.wineLabel(item);
-    return label.length > 33 ? `${label.slice(0, 33)}...` : label;
+    return this.wineLabel(item);
   }
 
   private wineColor(wine: Wine | undefined): string {
