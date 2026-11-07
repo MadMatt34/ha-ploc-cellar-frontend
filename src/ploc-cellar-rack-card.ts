@@ -45,7 +45,8 @@ export class PlocCellarRackCard extends LitElement {
     .wine-tooltip-details dd { margin: 0; }
     .slot.missing { border-style: dashed; color: var(--secondary-text-color); background: transparent; }
     .slot.empty { position: relative; }
-    .empty-shelf { display: block; flex: 0 0 22px; width: 46px; height: 22px; margin-top: 10px; border: 2px solid var(--secondary-text-color); border-top: 0; border-radius: 0 0 24px 24px; box-sizing: border-box; opacity: .75; }
+    .empty-shelf { display: block; position: relative; flex: 0 0 24px; width: 24px; height: 24px; margin: 0; box-sizing: border-box; }
+    .empty-shelf::after { content: ""; position: absolute; right: 0; bottom: 0; left: 0; height: 12px; border: 2px solid var(--secondary-text-color); border-top: 0; border-radius: 0 0 12px 12px; box-sizing: border-box; opacity: .75; }
     .slot strong { display: -webkit-box; width: 100%; min-height: 3.45em; max-height: 3.45em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; font-size: .76rem; line-height: 1.15; overflow-wrap: anywhere; }
     .slot small { color: var(--secondary-text-color); font-size: .68rem; margin-top: auto; }
     .bottle-marker { display: block; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: var(--bottle-color, var(--secondary-text-color)); border: 2px solid var(--divider-color); box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%); box-sizing: border-box; }
