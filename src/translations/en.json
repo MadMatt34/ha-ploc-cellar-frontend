@@ -106,5 +106,22 @@
   "tooltip_temperature": "Serving temperature",
   "editor_rack_picker_mode": "Rack selection display",
   "editor_rack_picker_buttons": "Buttons",
-  "editor_rack_picker_dropdown": "Dropdown list"
+  "editor_rack_picker_dropdown": "Dropdown list",
+  "wine_detail_stock": "Stock",
+  "wine_detail_physical": "Physically in cellar",
+  "wine_detail_reconstructed": "Reconstructed stock",
+  "wine_detail_effective": "Effective stock",
+  "wine_detail_source_stock": "PLOUD source stock",
+  "wine_detail_movements": "Stock movements and diagnostics",
+  "wine_detail_purchased": "Purchased",
+  "wine_detail_consumed": "Consumed",
+  "wine_detail_balance": "Movement balance",
+  "wine_detail_calculated": "Calculated stock",
+  "wine_detail_unlocated": "Unlocated bottles",
+  "wine_detail_negative": "Negative movement bottles",
+  "wine_detail_surplus": "Physical surplus",
+  "wine_detail_characteristics": "Wine characteristics",
+  "wine_detail_alcohol": "Alcohol",
+  "wine_detail_comment": "Notes",
+  "wine_detail_no_locations": "No physical location is assigned to this wine."
 }
