@@ -28,7 +28,9 @@ Le service backend accepte également les filtres facultatifs `search` et `color
 
 La structure de la réponse est décrite par `InventoryResponse`, `Rack`, `RackItem`, `Wine` et `WineDiagnostic` dans `src/types.ts`.
 
-Champs principaux :
+Le dépôt backend contient le test structurel de référence dans [`tests/test_service_contract.py`](https://github.com/MadMatt34/ha-ploc-cellar/blob/main/tests/test_service_contract.py). Le frontend en reprend les ensembles exacts de clés publiques et les principales garanties de nullabilité dans [`src/backend-inventory-contract.ts`](../src/backend-inventory-contract.ts). Ce fichier ne contient que des assertions vérifiées à la compilation ; il est automatiquement inclus dans la vérification TypeScript stricte et n'ajoute aucun code à l'exécution du dashboard.
+
+Principaux champs de la réponse :
 
 | Champ | Signification |
 |---|---|
@@ -61,8 +63,20 @@ Champs principaux :
 - Les emplacements occupés dont la référence vin n'est pas résolue restent inclus dans les totaux physiques, même si la fiche vin correspondante est indisponible.
 - Les filtres backend ne doivent pas modifier les totaux globaux.
 
+## Procédure de modification d'un champ de réponse
+
+Toute évolution de la réponse du service doit être traitée comme une modification coordonnée du contrat backend/frontend, même lorsqu'elle est additive.
+
+1. **Backend en premier :** modifier l'implémentation de la réponse et mettre à jour dans la même PR backend les ensembles exacts de clés, les valeurs représentatives et les règles de nullabilité dans `tests/test_service_contract.py`. Exécuter les tests backend et la CI. Ne pas affaiblir le test de contrat pour faire passer une modification incompatible.
+2. **Types frontend :** mettre à jour l'interface correspondante dans `src/types.ts` ainsi que les assertions miroir dans `src/backend-inventory-contract.ts`. Conserver les ensembles exacts de clés ; adapter les assertions de nullabilité et de types primitifs si ces propriétés changent.
+3. **Vérifier les consommateurs :** rechercher le champ concerné dans les trois cartes et leurs éditeurs. Gérer explicitement les valeurs `null` lorsque nécessaire et préserver la distinction entre emplacements physiques et stock reconstitué.
+4. **Documentation :** mettre à jour ce document et son équivalent anglais, avec la signification du champ et toute évolution de sémantique.
+5. **Validation et publication :** exécuter `npm ci`, `npm run check` et `npm run build`. Fusionner/publier le backend et le frontend de manière coordonnée afin que les utilisateurs ne reçoivent pas un frontend qui attend des champs absents de leur version backend. Pour une modification incompatible, conserver temporairement la compatibilité du frontend avec l'ancien backend ou exiger clairement la version backend correspondante.
+
+Même un nouveau champ additif doit être ajouté au test de contrat exact du backend et à l'assertion exacte des clés côté frontend. Cette stricte synchronisation est volontaire : elle force les deux dépôts à faire évoluer ensemble leurs structures déclarées.
+
 ## Règles de compatibilité
 
-Toute évolution de la réponse backend doit être répercutée dans `src/types.ts` et vérifiée dans les trois cartes. Il faut préserver la distinction entre emplacement physique et stock reconstitué. Les nouveaux champs nullable doivent être traités comme tels dans l'interface. Ne pas modifier le domaine du service, son nom, son mode de réponse ou la forme de la requête sans coordonner une version du frontend.
+Préserver la distinction entre emplacements physiques et stock reconstitué. Les nouveaux champs nullable doivent être traités comme tels dans l'interface. Ne pas modifier le domaine du service, son nom, son mode de réponse ou la forme de la requête sans coordonner une version du frontend.
 
-La vérification TypeScript de la CI contrôle la cohérence du code ; elle ne remplace pas un test d'intégration sur une instance Home Assistant en fonctionnement.
+Les assertions de contrat à la compilation et la vérification TypeScript de la CI contrôlent la structure TypeScript déclarée ; elles n'exécutent pas le backend et ne remplacent pas un test d'intégration sur une instance Home Assistant en fonctionnement.
