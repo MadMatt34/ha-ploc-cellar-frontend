@@ -12,6 +12,7 @@ export class PlocCellarWineDetail extends LitElement {
 
   private imageObjectUrl: string | null = null;
   private loadedImagePath: string | null = null;
+  private pendingImagePath: string | null = null;
   private imageRequest = 0;
 
   static styles = css`
@@ -91,6 +92,7 @@ export class PlocCellarWineDetail extends LitElement {
   disconnectedCallback(): void {
     this.imageRequest += 1;
     this.loadedImagePath = null;
+    this.pendingImagePath = null;
     this.revokeWineImage();
     this.imageUrl = null;
     super.disconnectedCallback();
@@ -106,13 +108,20 @@ export class PlocCellarWineDetail extends LitElement {
   private async loadWineImage(): Promise<void> {
     const imagePath = this.wine?.image_url ?? null;
     const hass = this.hass;
-    if (imagePath === this.loadedImagePath && this.imageObjectUrl !== null) return;
+    if (
+      imagePath === this.loadedImagePath &&
+      (this.imageObjectUrl !== null || this.pendingImagePath === imagePath)
+    ) return;
 
     const request = ++this.imageRequest;
     this.revokeWineImage();
     this.imageUrl = null;
     this.loadedImagePath = imagePath;
-    if (!imagePath || !hass) return;
+    this.pendingImagePath = imagePath;
+    if (!imagePath || !hass) {
+      this.pendingImagePath = null;
+      return;
+    }
 
     try {
       const response = await hass.fetchWithAuth(imagePath);
@@ -124,6 +133,8 @@ export class PlocCellarWineDetail extends LitElement {
       this.imageUrl = objectUrl;
     } catch {
       // The inventory remains usable when an image is temporarily unavailable.
+    } finally {
+      if (request === this.imageRequest) this.pendingImagePath = null;
     }
   }
 
