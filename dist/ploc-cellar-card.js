@@ -1267,7 +1267,7 @@ var O0 = Object.defineProperty, B0 = Object.getOwnPropertyDescriptor, Wl = (e, t
 let Ua = class extends Fe {
   constructor() {
     super(...arguments), this.computeLabel = (e) => {
-      const r = {
+      const t = {
         config_entry_id: "editor_configuration",
         title: "editor_title",
         rack_picker_mode: "editor_rack_picker_mode",
@@ -1275,8 +1275,11 @@ let Ua = class extends Fe {
         show_diagnostics: "editor_show_diagnostics",
         show_statistics: "editor_show_statistics",
         show_statistics_legends: "editor_show_statistics_legends"
-      }[e.name];
-      return Lt(this.hass?.language ?? "en", r);
+      };
+      return Lt(
+        this.hass?.language ?? "en",
+        t[e.name]
+      );
     }, this.computeHelper = (e) => {
       if (e.name === "config_entry_id")
         return Lt(this.hass?.language ?? "en", "editor_configuration_helper");
@@ -1284,15 +1287,31 @@ let Ua = class extends Fe {
         return Lt(this.hass?.language ?? "en", "editor_title_helper");
     };
   }
+  get isOverviewCard() {
+    return this.config?.type === "custom:ploc-cellar-card" || this.config?.type === "custom:ploc-cellar-statistics-card";
+  }
+  get isRackCard() {
+    return this.config?.type === "custom:ploc-cellar-rack-card";
+  }
   get schema() {
-    return [
+    const e = [
       {
         name: "config_entry_id",
         required: !0,
         selector: { config_entry: { integration: "ploc_cellar" } }
-      },
+      }
+    ];
+    return this.isOverviewCard ? (e.push(
       { name: "title", selector: { text: {} } },
-      ...this.config?.type === "custom:ploc-cellar-rack-card" ? [{
+      { name: "show_occupancy", selector: { boolean: {} } },
+      { name: "show_diagnostics", selector: { boolean: {} } },
+      { name: "show_statistics", selector: { boolean: {} } }
+    ), this.config?.show_statistics !== !1 && e.push({
+      name: "show_statistics_legends",
+      selector: { boolean: {} }
+    })) : this.isRackCard && e.push(
+      { name: "title", selector: { text: {} } },
+      {
         name: "rack_picker_mode",
         selector: {
           select: {
@@ -1309,22 +1328,15 @@ let Ua = class extends Fe {
             ]
           }
         }
-      }] : [],
-      { name: "show_occupancy", selector: { boolean: {} } },
-      { name: "show_diagnostics", selector: { boolean: {} } },
-      { name: "show_statistics", selector: { boolean: {} } },
-      ...this.config?.show_statistics !== !1 ? [{ name: "show_statistics_legends", selector: { boolean: {} } }] : []
-    ];
+      }
+    ), e;
   }
   setConfig(e) {
-    this.config = {
-      ...e,
-      rack_picker_mode: e.rack_picker_mode ?? "buttons",
-      show_occupancy: e.show_occupancy !== !1,
-      show_diagnostics: e.show_diagnostics !== !1,
-      show_statistics: e.show_statistics !== !1,
-      show_statistics_legends: e.show_statistics_legends !== !1
-    };
+    const t = { ...e };
+    this.isOverviewType(e.type) ? (t.show_occupancy = e.show_occupancy !== !1, t.show_diagnostics = e.show_diagnostics !== !1, t.show_statistics = e.show_statistics !== !1, t.show_statistics_legends = e.show_statistics_legends !== !1) : e.type === "custom:ploc-cellar-rack-card" && (t.rack_picker_mode = e.rack_picker_mode ?? "buttons"), this.config = t;
+  }
+  isOverviewType(e) {
+    return e === "custom:ploc-cellar-card" || e === "custom:ploc-cellar-statistics-card";
   }
   valueChanged(e) {
     e.stopPropagation();
