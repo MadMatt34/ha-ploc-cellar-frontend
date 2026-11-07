@@ -8,6 +8,7 @@ import type {
   Wine,
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
+import "./ploc-cellar-wine-detail";
 
 type SortMode = "name" | "bottles" | "vintage";
 
@@ -24,6 +25,7 @@ export class PlocCellarInventoryCard extends LitElement {
   @state() private appellation = "";
   @state() private vintage = "";
   @state() private sort: SortMode = "name";
+  @state() private selectedWine?: Wine;
   private requestGeneration = 0;
 
   static styles = css`
@@ -49,6 +51,9 @@ export class PlocCellarInventoryCard extends LitElement {
     .wine { border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; min-width: 0; }
     .wine-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
     .wine-name { font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+    .wine-name-button { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: inherit; line-height: inherit; text-align: left; cursor: pointer; }
+    .wine-name-button:hover { color: var(--primary-color); text-decoration: underline; }
+    .wine-name-button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 2px; }
     .quantity { flex: 0 0 auto; white-space: nowrap; font-weight: 600; }
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
@@ -204,7 +209,7 @@ export class PlocCellarInventoryCard extends LitElement {
       <article class="wine">
         <div class="wine-main">
           <div>
-            <div class="wine-name">${wine.name}</div>
+            <div class="wine-name"><button class="wine-name-button" type="button" aria-haspopup="dialog" @click=${() => { this.selectedWine = wine; }}>${wine.name}</button></div>
             <div class="metadata">${[
               wine.domain,
               wine.appellation,
@@ -284,6 +289,13 @@ export class PlocCellarInventoryCard extends LitElement {
             ${wines.map((wine) => this.renderWine(wine))}
           </div>
           ${wines.length === 0 ? html`<p class="muted">${t("no_matching_wines")}</p>` : nothing}
+          ${this.selectedWine ? html`
+            <ploc-cellar-wine-detail
+              .hass=${this.hass}
+              .wine=${this.selectedWine}
+              @wine-detail-closed=${() => { this.selectedWine = undefined; }}>
+            </ploc-cellar-wine-detail>
+          ` : nothing}
         ` : nothing}
       </ha-card>
     `;
