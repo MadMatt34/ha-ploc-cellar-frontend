@@ -35,10 +35,7 @@
   "filter_appellation": "Toutes les appellations",
   "filter_meal": "Tous les mets",
   "filter_vintage": "Tous les millésimes",
-  "sort_by": "Trier par",
-  "sort_name": "Nom",
-  "sort_bottles": "Quantité décroissante",
-  "sort_vintage": "Millésime décroissant",
+  "sort_by": "Trier par :",
   "inventory_results": "{count} référence(s)",
   "inventory_bottle_total": "{count} bouteille(s)",
   "clear_filters": "Effacer les filtres",
@@ -141,5 +138,11 @@
   "meal_cheese": "Fromages",
   "meal_dessert": "Desserts",
   "wine_detail_no_locations": "Aucun emplacement physique n’est affecté à ce vin.",
-  "rack_grid_compacted": "La disposition des emplacements est condensée car les coordonnées sont trop espacées."
+  "rack_grid_compacted": "La disposition des emplacements est condensée car les coordonnées sont trop espacées.",
+  "sort_name_asc": "Nom ascendant",
+  "sort_name_desc": "Nom descendant",
+  "sort_bottles_asc": "Quantité ascendante",
+  "sort_bottles_desc": "Quantité descendante",
+  "sort_vintage_asc": "Millésime ascendant",
+  "sort_vintage_desc": "Millésime descendant"
 }
