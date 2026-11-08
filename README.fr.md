@@ -42,16 +42,18 @@ Dans une vue **Sections**, la carte de vue d'ensemble utilise par défaut une la
 
 ## Développement
 
-Node.js `^20.19.0` ou `>=22.12.0` est requis (versions prises en charge par Vite 8).
+Node.js `^20.19.0` ou `>=22.12.0` est requis (versions prises en charge par Vite 8). Les tests d'interaction navigateur utilisent Playwright 1.65.0, version verrouillée, et Chromium.
 
 ```sh
 npm ci
 npm run check
 npm test
+npx playwright install chromium # une fois par environnement local
+npm run test:e2e
 npm run build
 ```
 
-Le bundle de production est généré dans `dist/ploc-cellar-card.js`, puis copié à la racine sous `ploc-cellar-card.js`, nom attendu par HACS (`hacs.json`). Les deux fichiers sont versionnés. Les dépendances sont intégrées au module JavaScript autonome. Le workflow CI du frontend exécute la vérification TypeScript stricte, les tests unitaires et la compilation de production lors des push et des pull requests ; sur `main`, il commit les deux bundles générés lorsqu'ils changent.
+Le bundle de production est généré dans `dist/ploc-cellar-card.js`, puis copié à la racine sous `ploc-cellar-card.js`, nom attendu par HACS (`hacs.json`). Les deux fichiers sont versionnés. Les dépendances sont intégrées au module JavaScript autonome. Le workflow CI du frontend exécute la vérification TypeScript stricte, les tests unitaires et la compilation de production lors des push et des pull requests. Un job Chromium distinct exécute les tests d'interaction navigateur à chaque push et pull request ; la publication des bundles sur `main` attend la réussite des deux jobs.
 
 ## Contrat backend
 
