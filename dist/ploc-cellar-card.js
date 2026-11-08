@@ -750,6 +750,7 @@ var He = {
 	meal_dish_vegetable: "Dishes and vegetables",
 	meal_cheese: "Cheese",
 	meal_dessert: "Dessert",
+	meal_spicy: "Spicy dishes",
 	wine_detail_no_locations: "No physical location is assigned to this wine.",
 	rack_grid_compacted: "Rack positions are shown in a compact layout because their coordinates are too far apart.",
 	sort_name_asc: "Name ascending",
@@ -902,6 +903,7 @@ var He = {
 	meal_dish_vegetable: "Plats et légumes",
 	meal_cheese: "Fromages",
 	meal_dessert: "Desserts",
+	meal_spicy: "Épicés",
 	wine_detail_no_locations: "Aucun emplacement physique n’est affecté à ce vin.",
 	rack_grid_compacted: "La disposition des emplacements est condensée car les coordonnées sont trop espacées.",
 	sort_name_asc: "Nom ascendant",
@@ -981,7 +983,8 @@ var Je = class {
 	[512, "meal_red_meat"],
 	[1024, "meal_dish_vegetable"],
 	[2048, "meal_cheese"],
-	[4096, "meal_dessert"]
+	[4096, "meal_dessert"],
+	[8192, "meal_spicy"]
 ], Xe = {
 	meal_aperitif: "mdi:glass-cocktail",
 	meal_soup: "mdi:soup",
@@ -995,7 +998,8 @@ var Je = class {
 	meal_red_meat: "mdi:food-steak",
 	meal_dish_vegetable: "mdi:carrot",
 	meal_cheese: "mdi:cheese",
-	meal_dessert: "mdi:cupcake"
+	meal_dessert: "mdi:cupcake",
+	meal_spicy: "mdi:chili-hot"
 };
 function Ze(e) {
 	return Xe[e];
