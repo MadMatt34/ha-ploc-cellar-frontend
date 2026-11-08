@@ -8,7 +8,7 @@ import { translate, type TranslationKey } from "./translations";
 import { WineImageLoader } from "./wine-image";
 import { getMealIcon, getMealTranslationKeys } from "./meals";
 import { parseGrapeComposition } from "./grape-composition";
-import { groupWineLocations } from "./wine-locations";
+import { groupCoordinatesByRow, groupWineLocations } from "./wine-locations";
 
 @customElement("ploc-cellar-wine-detail")
 export class PlocCellarWineDetail extends LitElement {
