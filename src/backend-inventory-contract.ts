@@ -25,6 +25,9 @@ type Equal<Left, Right> =
     : false;
 type Keys<T> = keyof T;
 type Nullable<T> = null extends T ? true : false;
+type OptionalKeys<T> = {
+  [Key in keyof T]-?: {} extends Pick<T, Key> ? Key : never;
+}[keyof T];
 
 type InventoryResponseKeys = Assert<
   Equal<
@@ -174,6 +177,13 @@ type RequiredNumericContract = Assert<
   >
 >;
 
+type OptionalFieldContract = Assert<
+  Equal<
+    [OptionalKeys<Wine>, OptionalKeys<WineDiagnostic>],
+    ["meals" | "image_url", "wine"]
+  >
+>;
+
 // Keep the aliases referenced so editor tooling exposes all contract checks.
 export type BackendInventoryContract = [
   InventoryResponseKeys,
@@ -184,4 +194,5 @@ export type BackendInventoryContract = [
   WineDiagnosticKeys,
   NullableContract,
   RequiredNumericContract,
+  OptionalFieldContract,
 ];
