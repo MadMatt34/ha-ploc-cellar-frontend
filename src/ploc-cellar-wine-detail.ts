@@ -93,8 +93,8 @@ export class PlocCellarWineDetail extends LitElement {
     .grape-name { min-width: 0; overflow-wrap: anywhere; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .grape-percentage { flex: 0 0 42px; text-align: right; font-variant-numeric: tabular-nums; }
-    .grape-track { flex: 1 1 auto; width: 100%; min-width: 0; height: 7px; overflow: hidden; border-radius: 999px; background: var(--divider-color); }
-    .grape-fill { height: 100%; background: var(--wine-accent, var(--error-color)); }
+    .grape-track { display: block; flex: 1 1 0; width: 100%; min-width: 0; height: 7px; overflow: hidden; border-radius: 999px; background: var(--divider-color); }
+    .grape-fill { height: 100%; background: var(--wine-accent, var(--secondary-text-color)); }
     .grape-row:not(.has-percentage) { grid-template-columns: minmax(0, 1fr); }
     .grape-row:not(.has-percentage) .grape-composition { display: none; }
     .stock { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px; }
@@ -174,6 +174,18 @@ export class PlocCellarWineDetail extends LitElement {
     `;
   }
 
+  private get grapeAccentStyle(): string {
+    const rgb = this.wine?.color_rgb;
+    if (
+      !rgb ||
+      rgb.length !== 3 ||
+      !rgb.every((component) =>
+        Number.isInteger(component) && component >= 0 && component <= 255
+      )
+    ) return "";
+    return `--wine-accent: rgb(${rgb[0]} ${rgb[1]} ${rgb[2]});`;
+  }
+
   private renderGrapes(value: string | null) {
     if (!value?.trim()) return nothing;
     const grapes = parseGrapeComposition(value);
@@ -183,7 +195,7 @@ export class PlocCellarWineDetail extends LitElement {
         <ha-icon icon="mdi:grape" aria-hidden="true"></ha-icon>
         <div class="characteristic-value">
           <span class="characteristic-label">${this.t("tooltip_grapes")}</span>
-          <div class="grapes-card">
+          <div class="grapes-card" style=${this.grapeAccentStyle}>
             ${grapes.map((grape) => html`
               <div class="grape-row ${grape.percentage !== null ? "has-percentage" : ""}">
                 <span class="grape-name">${grape.name}</span>
