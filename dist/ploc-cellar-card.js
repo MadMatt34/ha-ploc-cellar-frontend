@@ -1098,7 +1098,9 @@ var rt = class extends je {
     .nested-details > .section-summary { min-height: 42px; padding: 9px 0; font-size: .88rem; }
     .nested-details > .section-body { padding: 0 0 4px; }
     .wine-dialog-title { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; white-space: normal; }
-    .wine-hero { display: grid; grid-template-columns: 8px minmax(0, 1fr); align-items: stretch; gap: 14px; min-width: 0; }
+    .wine-hero { position: relative; display: grid; grid-template-columns: 8px minmax(0, 1fr); align-items: stretch; gap: 14px; min-width: 0; }
+.wine-hero-alert { position: absolute; top: 4px; right: 4px; z-index: 1; display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--error-color); border-radius: 50%; background: var(--card-background-color, var(--ha-card-background, var(--primary-background-color))); color: var(--error-color); }
+.wine-hero-alert ha-icon { --mdc-icon-size: 20px; }
     .wine-hero-banner { width: 8px; min-height: 120px; border-radius: 999px; }
     .wine-hero-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 32%); align-items: center; gap: 14px; min-width: 0; }
     .wine-image-container { display: flex; justify-content: flex-end; align-items: center; min-width: 0; max-height: 160px; overflow: hidden; padding-right: 10px; border-radius: 20px; }
@@ -1269,6 +1271,29 @@ var rt = class extends je {
 		let e = this.wine?.color_rgb;
 		return !e || e.length !== 3 || !e.every((e) => Number.isInteger(e) && e >= 0 && e <= 255) ? "background: var(--secondary-text-color);" : `background: rgb(${e[0]} ${e[1]} ${e[2]});`;
 	}
+	renderHeroAlert(e) {
+		let t = [
+			{
+				key: "wine_detail_issue_unlocated",
+				count: e.unlocated_bottles ?? 0
+			},
+			{
+				key: "wine_detail_issue_negative",
+				count: e.negative_movement_bottles ?? 0
+			},
+			{
+				key: "wine_detail_issue_surplus",
+				count: e.physical_surplus_bottles ?? 0
+			}
+		].filter((e) => e.count > 0);
+		if (!t.length) return P;
+		let n = t.map((e) => this.t(e.key).replace("{count}", this.formatNumber(e.count))).join(" · ");
+		return N`
+      <span class="wine-hero-alert" role="img" aria-label="${n}" title="${n}">
+        <ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon>
+      </span>
+    `;
+	}
 	renderIdentity(e) {
 		let t = [e.color, e.bottle_format].filter((e) => !!e);
 		return N`
@@ -1395,6 +1420,7 @@ var rt = class extends je {
         <span slot="headerTitle" class="wine-dialog-title">${e.name}</span>
         <div class="content">
           <div class="wine-hero">
+            ${this.renderHeroAlert(e)}
             <div class="wine-hero-banner" style=${this.colorStyle} aria-hidden="true"></div>
             <div class="wine-hero-main">
               ${this.renderIdentity(e)}
