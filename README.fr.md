@@ -42,12 +42,14 @@ Dans une vue **Sections**, la carte de vue d'ensemble utilise par défaut une la
 
 ## Développement
 
-Node.js `^20.19.0` ou `>=22.12.0` est requis (versions prises en charge par Vite 8).
+Node.js `^20.19.0` ou `>=22.12.0` est requis (versions prises en charge par Vite 8). Les tests d'interaction navigateur utilisent Playwright 1.65.0, version verrouillée, et Chromium.
 
 ```sh
 npm ci
 npm run check
 npm test
+npx playwright install chromium # une fois par environnement local
+npm run test:e2e
 npm run build
 ```
 
