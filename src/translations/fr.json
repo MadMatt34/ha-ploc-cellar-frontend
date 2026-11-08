@@ -35,6 +35,7 @@
   "filter_appellation": "Toutes les appellations",
   "filter_meal": "Tous les mets",
   "filter_vintage": "Tous les millésimes",
+  "filter_unknown": "Inconnu",
   "sort_by": "Trier par :",
   "inventory_results": "{count} référence(s)",
   "inventory_bottle_total": "{count} bouteille(s)",
