@@ -190,7 +190,7 @@ export class PlocCellarInventoryCard extends LitElement {
   }
 
   private mealValues(): MealTranslationKey[] {
-    const values = new Set<TranslationKey>();
+    const values = new Set<MealTranslationKey>();
     for (const wine of this.inventory?.wines ?? []) {
       for (const key of getMealTranslationKeys(wine.meals)) values.add(key);
     }
