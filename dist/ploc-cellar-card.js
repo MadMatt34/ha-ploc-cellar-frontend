@@ -1680,7 +1680,7 @@ var ot = class extends je {
                       @blur=${r ? () => this.hideWineTooltip() : P}>
                       ${r ? N`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(a)};`} aria-hidden="true"></span>` : P}
                       ${r ? N`<strong>${this.displayWineLabel(t, i)}</strong>` : N`<span class="empty-shelf" aria-hidden="true"></span>`}
-                      <small>r${t.row + 1};c${t.column + 1}</small>
+                      <small>r${t.row + 1}&nbsp;·&nbsp;c${t.column + 1}</small>
                     </div>
                   `;
 		})}
