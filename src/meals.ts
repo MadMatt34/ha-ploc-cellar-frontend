@@ -17,6 +17,30 @@ const MEAL_FLAGS = [
   [4096, "meal_dessert"],
 ] as const satisfies ReadonlyArray<readonly [number, TranslationKey]>;
 
+export type MealTranslationKey = (typeof MEAL_FLAGS)[number][1];
+
+/** Home Assistant Material Design Icons associated with each food pairing. */
+const MEAL_ICONS: Record<MealTranslationKey, string> = {
+  meal_aperitif: "mdi:glass-cocktail",
+  meal_soup: "mdi:soup",
+  meal_entry: "mdi:food-apple",
+  meal_pork_butchery: "mdi:pig",
+  meal_seafood: "mdi:shrimp",
+  meal_fish: "mdi:fish",
+  meal_white_meat: "mdi:food-drumstick",
+  meal_game: "mdi:deer",
+  meal_poultry: "mdi:turkey",
+  meal_red_meat: "mdi:food-steak",
+  meal_dish_vegetable: "mdi:carrot",
+  meal_cheese: "mdi:cheese",
+  meal_dessert: "mdi:cupcake",
+};
+
+/** Return the icon associated with a known food-pairing translation key. */
+export function getMealIcon(key: MealTranslationKey): string {
+  return MEAL_ICONS[key];
+}
+
 /**
  * Return translated-label keys for the known flags in a PLOUD meal bitmask.
  *
@@ -25,7 +49,7 @@ const MEAL_FLAGS = [
  */
 export function getMealTranslationKeys(
   mask: number | null | undefined,
-): TranslationKey[] {
+): MealTranslationKey[] {
   if (mask === null || mask === undefined || !Number.isSafeInteger(mask) || mask < 0) {
     return [];
   }
