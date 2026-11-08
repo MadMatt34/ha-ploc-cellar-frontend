@@ -346,7 +346,7 @@ export class PlocCellarRackCard extends LitElement {
                       @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
                       ${occupied ? html`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(wine)};`} aria-hidden="true"></span>` : nothing}
                       ${occupied ? html`<strong>${this.displayWineLabel(item, winesById)}</strong>` : html`<span class="empty-shelf" aria-hidden="true"></span>`}
-                      <small>r${(item.row as number) + 1};c${(item.column as number) + 1}</small>
+                      <small>r${(item.row as number) + 1}&nbsp;·&nbsp;c${(item.column as number) + 1}</small>
                     </div>
                   `;
                 })}
