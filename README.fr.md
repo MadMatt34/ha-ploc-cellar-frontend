@@ -42,7 +42,7 @@ Dans une vue **Sections**, la carte de vue d'ensemble utilise par défaut une la
 
 ## Développement
 
-Node.js `^20.19.0` ou `>=22.12.0` est requis (versions prises en charge par Vite 7).
+Node.js `^20.19.0` ou `>=22.12.0` est requis (versions prises en charge par Vite 8).
 
 ```sh
 npm ci
