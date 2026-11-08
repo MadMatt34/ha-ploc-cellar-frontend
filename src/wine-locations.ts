@@ -26,3 +26,19 @@ export function groupWineLocations(locations: readonly WineLocation[]): GroupedW
 
   return [...groups.values()];
 }
+
+/** Group complete coordinates by physical row, preserving their source order. */
+export function groupCoordinatesByRow(
+  coordinates: readonly { row: number | null; column: number | null }[],
+): Array<{ row: number; columns: number[] }> {
+  const rows = new Map<number, number[]>();
+
+  for (const coordinate of coordinates) {
+    if (coordinate.row === null || coordinate.column === null) continue;
+    const columns = rows.get(coordinate.row) ?? [];
+    columns.push(coordinate.column);
+    rows.set(coordinate.row, columns);
+  }
+
+  return [...rows].map(([row, columns]) => ({ row, columns }));
+}
