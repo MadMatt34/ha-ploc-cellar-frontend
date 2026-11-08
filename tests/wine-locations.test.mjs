@@ -28,3 +28,18 @@ test("keeps positions without complete coordinates in their rack group", () => {
 test("returns no groups for an empty location list", () => {
   assert.deepEqual(groupWineLocations([]), []);
 });
+
+test("groups coordinate tags horizontally by physical row", async () => {
+  const { groupCoordinatesByRow } = await import("../.test-dist/wine-locations.js");
+  assert.deepEqual(groupCoordinatesByRow([
+    { row: 0, column: 1 },
+    { row: 0, column: 2 },
+    { row: 1, column: 0 },
+    { row: 0, column: 3 },
+    { row: null, column: 4 },
+    { row: 2, column: null },
+  ]), [
+    { row: 0, columns: [1, 2, 3] },
+    { row: 1, columns: [0] },
+  ]);
+});
