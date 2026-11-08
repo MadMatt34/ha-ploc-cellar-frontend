@@ -935,25 +935,29 @@ function qe(e, t) {
 // src/wine-image.ts
 var Je = class {
 	constructor(e = (e) => URL.createObjectURL(e), t = (e) => URL.revokeObjectURL(e)) {
-		this.createObjectUrl = e, this.revokeObjectUrl = t, this.objectUrl = null, this.loadedPath = null, this.pendingPath = null, this.request = 0;
+		this.createObjectUrl = e, this.revokeObjectUrl = t, this.objectUrl = null, this.loadedPath = null, this.pendingPath = null, this.attemptedPath = null, this.request = 0;
 	}
 	async load(e, t, n) {
-		if (e === this.loadedPath && (this.objectUrl !== null || this.pendingPath === e)) return;
+		if (e === this.loadedPath && (this.objectUrl !== null || this.pendingPath === e || this.attemptedPath === e)) return;
 		let r = ++this.request;
-		if (this.revokeCurrent(), n(null), this.loadedPath = e, this.pendingPath = e, !e || !t) this.pendingPath = null;
-		else try {
-			let i = await t(e);
-			if (!i.ok) return;
-			let a = await i.blob();
-			if (r !== this.request) return;
-			let o = this.createObjectUrl(a);
-			this.objectUrl = o, n(o);
-		} catch {} finally {
-			r === this.request && (this.pendingPath = null);
+		if (this.revokeCurrent(), n(null), this.loadedPath = e, this.pendingPath = e, this.attemptedPath = null, !e) this.pendingPath = null;
+		else if (!t) this.loadedPath = null, this.pendingPath = null;
+		else {
+			this.attemptedPath = e;
+			try {
+				let i = await t(e);
+				if (!i.ok) return;
+				let a = await i.blob();
+				if (r !== this.request) return;
+				let o = this.createObjectUrl(a);
+				this.objectUrl = o, n(o);
+			} catch {} finally {
+				r === this.request && (this.pendingPath = null);
+			}
 		}
 	}
 	dispose(e) {
-		this.request += 1, this.loadedPath = null, this.pendingPath = null, this.revokeCurrent(), e?.(null);
+		this.request += 1, this.loadedPath = null, this.pendingPath = null, this.attemptedPath = null, this.revokeCurrent(), e?.(null);
 	}
 	revokeCurrent() {
 		this.objectUrl !== null && (this.revokeObjectUrl(this.objectUrl), this.objectUrl = null);
@@ -1067,9 +1071,7 @@ var Ze = class extends je {
 	}
 	async loadWineImage() {
 		let e = this.hass;
-		this.imageHass !== e && (this.imageHass = e, this.imageLoader.dispose((e) => {
-			this.imageUrl = e;
-		})), await this.imageLoader.load(this.wine?.image_url ?? null, e ? (t) => e.fetchWithAuth(t) : void 0, (e) => {
+		await this.imageLoader.load(this.wine?.image_url ?? null, e ? (t) => e.fetchWithAuth(t) : void 0, (e) => {
 			this.imageUrl = e;
 		});
 	}
