@@ -315,7 +315,7 @@ export class PlocCellarRackCard extends LitElement {
                     <div class=${occupied ? "slot occupied" : "slot empty"}
                       style=${`grid-row: ${position.row}; grid-column: ${position.column};`}
                       aria-label=${label}
-                      aria-describedby=${occupied && this.activeTooltip ? "ploc-cellar-wine-tooltip" : nothing}
+                      aria-describedby=${occupied && this.activeTooltip?.wine === wine ? "ploc-cellar-wine-tooltip" : nothing}
                       role=${wine ? "button" : occupied ? "img" : nothing}
                       aria-haspopup=${wine ? "dialog" : nothing}
                       tabindex=${occupied ? "0" : nothing}
@@ -350,7 +350,7 @@ export class PlocCellarRackCard extends LitElement {
           ${unplaced.length ? html`
             <div class="unplaced">
               <strong>${t("positions_without_coordinates")}</strong>
-              ${unplaced.map((item) => html`<div class="unplaced-item">${this.wineLabel(item) || (t("empty_position"))}</div>`)}
+              ${unplaced.map((item) => html`<div class="unplaced-item">${this.wineLabel(item, winesById) || (t("empty_position"))}</div>`)}
             </div>
           ` : nothing}
         ` : html`<p class="muted">${t("no_racks")}</p>`}
