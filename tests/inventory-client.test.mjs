@@ -27,7 +27,7 @@ test("coalesces simultaneous requests for the same configuration entry", async (
   const first = fetchInventory(hass, "entry-1");
   const second = fetchInventory(hass, "entry-1");
   assert.strictEqual(first, second);
-  assert.equal(calls, 0);
+  assert.equal(calls, 1);
 
   pending.resolve({ response: inventory });
   assert.strictEqual(await first, inventory);
