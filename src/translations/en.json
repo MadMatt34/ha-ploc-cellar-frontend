@@ -35,10 +35,7 @@
   "filter_appellation": "All appellations",
   "filter_meal": "All food pairings",
   "filter_vintage": "All vintages",
-  "sort_by": "Sort by",
-  "sort_name": "Name",
-  "sort_bottles": "Quantity descending",
-  "sort_vintage": "Vintage descending",
+  "sort_by": "Sort by:",
   "inventory_results": "{count} wine(s)",
   "inventory_bottle_total": "{count} bottle(s)",
   "clear_filters": "Clear filters",
@@ -141,5 +138,11 @@
   "meal_cheese": "Cheese",
   "meal_dessert": "Dessert",
   "wine_detail_no_locations": "No physical location is assigned to this wine.",
-  "rack_grid_compacted": "Rack positions are shown in a compact layout because their coordinates are too far apart."
+  "rack_grid_compacted": "Rack positions are shown in a compact layout because their coordinates are too far apart.",
+  "sort_name_asc": "Name ascending",
+  "sort_name_desc": "Name descending",
+  "sort_bottles_asc": "Quantity ascending",
+  "sort_bottles_desc": "Quantity descending",
+  "sort_vintage_asc": "Vintage ascending",
+  "sort_vintage_desc": "Vintage descending"
 }
