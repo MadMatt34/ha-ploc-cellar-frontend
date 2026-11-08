@@ -720,7 +720,11 @@ var He = {
 	editor_rack_picker_buttons: "Buttons",
 	editor_rack_picker_dropdown: "Dropdown list",
 	wine_detail_stock: "Stock",
-	wine_detail_bottles_in_stock: "bottles in stock",
+	wine_detail_bottles_in_stock: "bottles in cellar",
+	wine_detail_effective_stock_suffix: "{count} in effective stock",
+	wine_detail_issue_unlocated: "Unlocated bottles: {count}",
+	wine_detail_issue_negative: "Negative balance: {count} bottle(s)",
+	wine_detail_issue_surplus: "Physical surplus: {count} bottle(s)",
 	wine_detail_physical: "Physically in cellar",
 	wine_detail_reconstructed: "Reconstructed stock",
 	wine_detail_effective: "Effective stock",
@@ -873,7 +877,11 @@ var He = {
 	editor_rack_picker_buttons: "Boutons",
 	editor_rack_picker_dropdown: "Liste déroulante",
 	wine_detail_stock: "Stock",
-	wine_detail_bottles_in_stock: "bouteilles en stock",
+	wine_detail_bottles_in_stock: "bouteilles en cave",
+	wine_detail_effective_stock_suffix: "{count} en stock effectif",
+	wine_detail_issue_unlocated: "Bouteilles non localisées : {count}",
+	wine_detail_issue_negative: "Solde négatif : {count} bouteille(s)",
+	wine_detail_issue_surplus: "Excédent physique : {count} bouteille(s)",
 	wine_detail_physical: "En cave physiquement",
 	wine_detail_reconstructed: "Stock reconstitué",
 	wine_detail_effective: "Stock effectif",
@@ -1141,6 +1149,9 @@ var rt = class extends je {
     .grape-fill { height: 100%; background: var(--wine-accent, var(--secondary-text-color)); }
     .grape-row:not(.has-percentage) { grid-template-columns: minmax(0, 1fr); }
     .grape-row:not(.has-percentage) .grape-composition { display: none; }
+    .stock-details.has-inventory-issues { border-color: var(--error-color, #db4437); }
+    .stock-issues { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 12px; color: var(--error-color, #db4437); font-size: .88rem; line-height: 1.4; }
+    .stock-issues ha-icon { --mdc-icon-size: 19px; flex: 0 0 auto; }
     .stock { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px; }
     .stock-item {
       min-width: 0;
@@ -1267,6 +1278,7 @@ var rt = class extends je {
             <ha-icon icon="mdi:bottle-wine" style=${this.bottleColorStyle} aria-hidden="true"></ha-icon>
             <span class="wine-stock-count">${this.formatNumber(e.bottles_in_cellar)}</span>
             <span>${this.t("wine_detail_bottles_in_stock")}</span>
+            ${e.bottles_in_cellar === 0 && e.effective_stock !== null ? N`<span>(${this.t("wine_detail_effective_stock_suffix").replace("{count}", this.formatNumber(e.effective_stock))})</span>` : P}
           </div>
           ${t.length ? N`<div class="tags">${t.map((e) => N`<span class="tag">${e}</span>`)}</div>` : P}
         </div>
@@ -1274,17 +1286,36 @@ var rt = class extends je {
     `;
 	}
 	renderStock(e) {
-		let t = e.purchased !== null || e.consumed !== null || e.movement_balance !== null || e.calculated_stock !== null || e.negative_movement_bottles !== null || e.physical_surplus_bottles !== null || e.unlocated_bottles !== null;
+		let t = [
+			{
+				key: "wine_detail_issue_unlocated",
+				count: e.unlocated_bottles ?? 0
+			},
+			{
+				key: "wine_detail_issue_negative",
+				count: e.negative_movement_bottles ?? 0
+			},
+			{
+				key: "wine_detail_issue_surplus",
+				count: e.physical_surplus_bottles ?? 0
+			}
+		].filter((e) => e.count > 0), n = t.length > 0, r = e.purchased !== null || e.consumed !== null || e.movement_balance !== null || e.calculated_stock !== null || e.negative_movement_bottles !== null || e.physical_surplus_bottles !== null || e.unlocated_bottles !== null;
 		return N`
-      <details class="detail-section stock-details">
+      <details class="detail-section stock-details ${n ? "has-inventory-issues" : ""}">
         <summary class="section-summary"><ha-icon icon="mdi:chart-box-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_stock")}</summary>
         <div class="section-body">
+        ${n ? N`
+          <div class="stock-issues" role="alert">
+            <ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon>
+            <span>${t.map((e) => this.t(e.key).replace("{count}", this.formatNumber(e.count))).join(" · ")}</span>
+          </div>
+        ` : P}
         <div class="stock">
           ${this.stockItem("wine_detail_physical", e.bottles_in_cellar)}
           ${this.stockItem("wine_detail_reconstructed", e.bottles)}
           ${this.stockItem("wine_detail_effective", e.effective_stock)}
         </div>
-        ${t ? N`
+        ${r ? N`
           <div class="section-subtitle"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>${this.t("wine_detail_movements")}</div>
           <div class="section-body"><dl>
           ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", e.purchased)}
