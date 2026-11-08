@@ -32,6 +32,12 @@ async function openFixture() {
   page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.addInitScript(() => {
     window.__resizeObserverStats = { observed: 0, disconnected: 0 };
+    window.__objectUrlStats = { revoked: [] };
+    const originalRevokeObjectURL = URL.revokeObjectURL.bind(URL);
+    URL.revokeObjectURL = (url) => {
+      window.__objectUrlStats.revoked.push(url);
+      originalRevokeObjectURL(url);
+    };
     window.ResizeObserver = class {
       constructor(callback) {
         this.callback = callback;
