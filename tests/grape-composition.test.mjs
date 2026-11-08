@@ -11,6 +11,19 @@ test("parses grape names and explicit percentages", () => {
   ]);
 });
 
+test("parses PLOUD assemblies with percentages before grape names", () => {
+  assert.deepEqual(
+    parseGrapeComposition("60% Grenache, 15% Mourvèdre, 15% Syrah, 5% Cinsault, 5% Terret Noir"),
+    [
+      { name: "Grenache", percentage: 60 },
+      { name: "Mourvèdre", percentage: 15 },
+      { name: "Syrah", percentage: 15 },
+      { name: "Cinsault", percentage: 5 },
+      { name: "Terret Noir", percentage: 5 },
+    ],
+  );
+});
+
 test("treats grape names without an explicit percentage as 100%", () => {
   assert.deepEqual(parseGrapeComposition("Syrah; Grenache\nMourvèdre"), [
     { name: "Syrah", percentage: 100 },
