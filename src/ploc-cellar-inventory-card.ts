@@ -145,10 +145,8 @@ export class PlocCellarInventoryCard extends LitElement {
       if (this.vintage && String(wine.vintage ?? "") !== this.vintage) return false;
       if (this.meal && !getMealTranslationKeys(wine.meals).includes(this.meal)) return false;
       if (!query) return true;
-      return [
-        wine.name, wine.domain, wine.appellation, wine.region, wine.country,
-        wine.grapes, wine.cuvee, wine.color, wine.vintage, wine.bottle_format,
-      ].filter((value) => value !== null && value !== undefined)
+      return [wine.name, wine.domain]
+        .filter((value): value is string => value !== null)
         .join(" ").toLocaleLowerCase().includes(query);
     });
     const collator = new Intl.Collator(this.hass?.language ?? undefined, {
