@@ -11,15 +11,15 @@ test("parses grape names and explicit percentages", () => {
   ]);
 });
 
-test("keeps plain grape names without inventing percentages", () => {
+test("treats grape names without an explicit percentage as 100%", () => {
   assert.deepEqual(parseGrapeComposition("Syrah; Grenache\nMourvèdre"), [
-    { name: "Syrah", percentage: null },
-    { name: "Grenache", percentage: null },
-    { name: "Mourvèdre", percentage: null },
+    { name: "Syrah", percentage: 100 },
+    { name: "Grenache", percentage: 100 },
+    { name: "Mourvèdre", percentage: 100 },
   ]);
 });
 
-test("preserves malformed or out-of-range percentage text as a name", () => {
+test("preserves malformed or out-of-range percentage text as an unknown proportion", () => {
   assert.deepEqual(parseGrapeComposition("Grenache 120%, Syrah 15.5%"), [
     { name: "Grenache 120%", percentage: null },
     { name: "Syrah", percentage: 15.5 },
