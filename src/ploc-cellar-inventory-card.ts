@@ -1,4 +1,5 @@
 import { LitElement, css, html, nothing } from "lit";
+import "./numeric-typography";
 import { customElement, property, state } from "lit/decorators.js";
 
 import type {
@@ -12,7 +13,7 @@ import { fetchInventory } from "./inventory-client";
 import { getMealTranslationKeys } from "./meals";
 import "./ploc-cellar-wine-detail";
 
-type SortMode = "name" | "bottles" | "vintage";
+type SortMode = "name-asc" | "name-desc" | "bottles-asc" | "bottles-desc" | "vintage-asc" | "vintage-desc";
 
 @customElement("ploc-cellar-inventory-card")
 export class PlocCellarInventoryCard extends LitElement {
@@ -27,7 +28,7 @@ export class PlocCellarInventoryCard extends LitElement {
   @state() private appellation = "";
   @state() private vintage = "";
   @state() private meal: TranslationKey | "" = "";
-  @state() private sort: SortMode = "name";
+  @state() private sort: SortMode = "name-asc";
   @state() private selectedWine?: Wine;
   private requestGeneration = 0;
 
@@ -51,13 +52,13 @@ export class PlocCellarInventoryCard extends LitElement {
     .search { grid-column: 1 / -1; }
     .summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; color: var(--secondary-text-color); font-size: .85rem; margin: 12px 0; }
     .wine-list { display: grid; gap: 8px; }
-    .wine { border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; }
+    .wine { display: block; width: 100%; box-sizing: border-box; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; cursor: pointer; }
+    .wine:hover { background: var(--secondary-background-color); }
+    .wine:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
     .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
-    .wine-name-button { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: inherit; line-height: inherit; text-align: left; cursor: pointer; }
-    .wine-name-button:hover { color: var(--primary-color); text-decoration: underline; }
-    .wine-name-button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 2px; }
-    .quantity { flex: 0 0 auto; white-space: nowrap; font-weight: 600; }
+    .quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; font-family: var(--ploc-numeric-font-family); font-size: 1.05rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .quantity ha-icon { --mdc-icon-size: 20px; color: var(--wine-color, var(--secondary-text-color)); }
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
@@ -67,6 +68,9 @@ export class PlocCellarInventoryCard extends LitElement {
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
     .filters-chevron { --mdc-icon-size: 18px; margin-left: auto; color: var(--secondary-text-color); transition: transform 120ms ease; }
     .filters[open] .filters-chevron { transform: rotate(90deg); }
+    .sort-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .sort-row > span { flex: 0 0 auto; color: var(--secondary-text-color); font-size: .9rem; }
+    .sort-row select { flex: 1; width: 100%; }
     .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
     .error { color: var(--error-color); padding: 8px 0; }
@@ -150,11 +154,18 @@ export class PlocCellarInventoryCard extends LitElement {
       sensitivity: "base",
     });
     return [...wines].sort((a, b) => {
-      if (this.sort === "bottles") {
-        return (b.bottles_in_cellar - a.bottles_in_cellar) || collator.compare(a.name, b.name);
+      if (this.sort === "name-desc") return collator.compare(b.name, a.name);
+      if (this.sort === "bottles-asc" || this.sort === "bottles-desc") {
+        const difference = a.bottles_in_cellar - b.bottles_in_cellar;
+        return (this.sort === "bottles-asc" ? difference : -difference)
+          || collator.compare(a.name, b.name);
       }
-      if (this.sort === "vintage") {
-        return ((b.vintage ?? 0) - (a.vintage ?? 0)) || collator.compare(a.name, b.name);
+      if (this.sort === "vintage-asc" || this.sort === "vintage-desc") {
+        if (a.vintage == null && b.vintage != null) return 1;
+        if (a.vintage != null && b.vintage == null) return -1;
+        const difference = (a.vintage ?? 0) - (b.vintage ?? 0);
+        return (this.sort === "vintage-asc" ? difference : -difference)
+          || collator.compare(a.name, b.name);
       }
       return collator.compare(a.name, b.name);
     });
@@ -167,7 +178,7 @@ export class PlocCellarInventoryCard extends LitElement {
     this.appellation = "";
     this.vintage = "";
     this.meal = "";
-    this.sort = "name";
+    this.sort = "name-asc";
   }
 
   private mealValues(): TranslationKey[] {
@@ -228,24 +239,27 @@ export class PlocCellarInventoryCard extends LitElement {
     const wineColor = color ? `rgb(${color.join(", ")})` : "";
 
     return html`
-      <article class="wine" style=${wineColor ? "--wine-color: " + wineColor : ""}>
+      <button class="wine" type="button" aria-haspopup="dialog"
+        aria-label=${`${wine.name}, ${new Intl.NumberFormat(this.hass?.language ?? undefined).format(wine.bottles_in_cellar)} ${t("bottles_short")}`}
+        style=${wineColor ? "--wine-color: " + wineColor : ""}
+        @click=${() => { this.selectedWine = wine; }}>
         <div class="wine-main">
           <div>
-            <div class="wine-name"><button class="wine-name-button" type="button" aria-haspopup="dialog" @click=${() => { this.selectedWine = wine; }}>${wine.name}</button></div>
+            <div class="wine-name">${wine.name}</div>
             <div class="metadata">${[
               wine.appellation,
               wine.region,
               wine.country,
             ].filter(Boolean).join(" · ")}</div>
           </div>
-          <div class="quantity">${wine.bottles_in_cellar} ${t("bottles_short")}</div>
+          <div class="quantity"><span>${new Intl.NumberFormat(this.hass?.language ?? undefined).format(wine.bottles_in_cellar)}</span><ha-icon icon="mdi:bottle-wine" aria-hidden="true"></ha-icon></div>
         </div>
         <div class="tags">
           ${wine.color ? html`<span class="tag">${wine.color}</span>` : nothing}
           <span class="tag">${vintage}</span>
           ${wine.bottle_format ? html`<span class="tag">${wine.bottle_format}</span>` : nothing}
         </div>
-      </article>
+      </button>
     `;
   }
 
@@ -285,12 +299,19 @@ export class PlocCellarInventoryCard extends LitElement {
               ${this.selectFilter("appellation", t("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
               ${this.selectFilter("vintage", t("filter_vintage"), this.vintage, this.valuesFor("vintage"))}
               ${this.selectMealFilter()}
+            </div>
+            <label class="sort-row">
+              <span>${t("sort_by")}</span>
               <select aria-label=${t("sort_by")} .value=${this.sort}
                 @change=${(event: Event) => { this.sort = (event.target as HTMLSelectElement).value as SortMode; }}>
-                <option value="name" ?selected=${this.sort === "name"}>${t("sort_name")}</option>
-                <option value="bottles" ?selected=${this.sort === "bottles"}>${t("sort_bottles")}</option>
-                <option value="vintage" ?selected=${this.sort === "vintage"}>${t("sort_vintage")}</option>
+                <option value="name-asc">${t("sort_name_asc")}</option>
+                <option value="name-desc">${t("sort_name_desc")}</option>
+                <option value="bottles-asc">${t("sort_bottles_asc")}</option>
+                <option value="bottles-desc">${t("sort_bottles_desc")}</option>
+                <option value="vintage-asc">${t("sort_vintage_asc")}</option>
+                <option value="vintage-desc">${t("sort_vintage_desc")}</option>
               </select>
+            </label>
             </div>
           </details>
           <div class="summary">
