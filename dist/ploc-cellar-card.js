@@ -1275,15 +1275,15 @@ var nt = class extends je {
           ${this.stockItem("wine_detail_effective", e.effective_stock)}
         </div>
         ${t ? N`
-          <div class="section-summary"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></div>
+          <div class="section-subtitle"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>${this.t("wine_detail_movements")}</div>
           <div class="section-body"><dl>
           ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", e.purchased)}
           ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", e.consumed)}
           ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", e.movement_balance)}
           ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", e.calculated_stock)}
-          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", e.unlocated_bottles)}
           ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", e.negative_movement_bottles)}
           ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", e.physical_surplus_bottles)}
+          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", e.unlocated_bottles)}
           </dl></div>
         ` : P}
         </div>
