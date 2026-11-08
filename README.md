@@ -16,6 +16,8 @@ The former **Ploc Cellar Statistics** card type remains registered as a compatib
 
 Each card uses the native configuration-entry selector in its editor and stores its own `config_entry_id`. The cards communicate only with Home Assistant through the integration's `ploc_cellar.get_inventory` WebSocket response service. They do not connect to PLOUD directly. The backend integration must be installed and configured before the cards can display data.
 
+The cards request the inventory when they are initialized and expose a manual refresh action. They do not poll for backend synchronization events, so use **Refresh** after a PLOUD synchronization when a dashboard has remained open.
+
 ## Installation
 
 1. Install and configure the [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar).
