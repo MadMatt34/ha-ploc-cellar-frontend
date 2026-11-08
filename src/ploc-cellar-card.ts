@@ -15,6 +15,7 @@ import type {
   WineDiagnostic,
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
+import { fetchInventory } from "./inventory-client";
 import "./donut-chart";
 
 interface DistributionItem {
@@ -150,14 +151,8 @@ export class PlocCellarCard extends LitElement {
     this.loading = true;
     this.error = undefined;
     try {
-      const result = await hass.callWS<{ response: InventoryResponse }>({
-        type: "call_service",
-        domain: "ploc_cellar",
-        service: "get_inventory",
-        service_data: { config_entry_id: configEntryId },
-        return_response: true,
-      });
-      if (generation === this.requestGeneration) this.inventory = result.response;
+      const inventory = await fetchInventory(hass, configEntryId);
+      if (generation === this.requestGeneration) this.inventory = inventory;
     } catch (error) {
       if (generation === this.requestGeneration) {
         this.error = error instanceof Error ? error.message : String(error);
