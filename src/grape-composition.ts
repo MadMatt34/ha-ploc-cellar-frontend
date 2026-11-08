@@ -10,12 +10,12 @@ export interface GrapeCompositionItem {
  */
 export function parseGrapeComposition(value: string): GrapeCompositionItem[] {
   return value
-    .split(/(?<!\\d),(?!\\d)|[;\\n]+/)
+    .split(/(?<!\d),(?!\d)|[;\n]+/)
     .map((part) => part.trim())
     .filter(Boolean)
     .map((part) => {
-      const prefixMatch = /^(\\d+(?:[.,]\\d+)?)\\s*%\\s*(.+)$/.exec(part);
-      const suffixMatch = /^(.*?)\\s*(?:\\(\\s*)?(\\d+(?:[.,]\\d+)?)\\s*%\\s*\\)?$/.exec(part);
+      const prefixMatch = /^(\d+(?:[.,]\d+)?)\s*%\s*(.+)$/.exec(part);
+      const suffixMatch = /^(.*?)\s*(?:\(\s*)?(\d+(?:[.,]\d+)?)\s*%\s*\)?$/.exec(part);
       const match = prefixMatch ?? suffixMatch;
 
       if (!match) {
@@ -24,7 +24,7 @@ export function parseGrapeComposition(value: string): GrapeCompositionItem[] {
 
       const name = (prefixMatch ? match[2] : match[1])
         .trim()
-        .replace(/^[:\\-–—]+|[:\\-–—]+$/g, "")
+        .replace(/^[:\-–—]+|[:\-–—]+$/g, "")
         .trim();
       const percentage = Number((prefixMatch ? match[1] : match[2]).replace(",", "."));
 
