@@ -11,6 +11,14 @@ import type {
 import { translate, translatePicker, type TranslationKey } from "./translations";
 import { fetchInventory } from "./inventory-client";
 import { getMealTranslationKeys } from "./meals";
+import {
+  ALL_FILTER_VALUES,
+  getInventoryFilterOptionValue,
+  isMissingInventoryValue,
+  matchesInventoryFilter,
+  parseInventoryFilterOptionValue,
+  type InventoryFilterSelection,
+} from "./inventory-filters";
 import "./ploc-cellar-wine-detail";
 
 type SortMode = "name-asc" | "name-desc" | "bottles-asc" | "bottles-desc" | "vintage-asc" | "vintage-desc";
@@ -23,10 +31,10 @@ export class PlocCellarInventoryCard extends LitElement {
   @state() private loading = false;
   @state() private error?: string;
   @state() private search = "";
-  @state() private color = "";
-  @state() private region = "";
-  @state() private appellation = "";
-  @state() private vintage = "";
+  @state() private color: InventoryFilterSelection = ALL_FILTER_VALUES;
+  @state() private region: InventoryFilterSelection = ALL_FILTER_VALUES;
+  @state() private appellation: InventoryFilterSelection = ALL_FILTER_VALUES;
+  @state() private vintage: InventoryFilterSelection = ALL_FILTER_VALUES;
   @state() private meal: TranslationKey | "" = "";
   @state() private sort: SortMode = "name-asc";
   @state() private selectedWine?: Wine;
@@ -130,7 +138,7 @@ export class PlocCellarInventoryCard extends LitElement {
   private valuesFor(field: "color" | "region" | "appellation" | "vintage"): string[] {
     const values = (this.inventory?.wines ?? [])
       .map((wine) => wine[field])
-      .filter((value): value is string | number => value !== null && value !== "");
+      .filter((value): value is string | number => !isMissingInventoryValue(value));
     return [...new Set(values.map(String))].sort((a, b) =>
       a.localeCompare(b, this.hass?.language ?? undefined, { numeric: true, sensitivity: "base" }),
     );
@@ -139,10 +147,10 @@ export class PlocCellarInventoryCard extends LitElement {
   private get filteredWines(): Wine[] {
     const query = this.search.trim().toLocaleLowerCase();
     const wines = (this.inventory?.wines ?? []).filter((wine) => {
-      if (this.color && wine.color !== this.color) return false;
-      if (this.region && wine.region !== this.region) return false;
-      if (this.appellation && wine.appellation !== this.appellation) return false;
-      if (this.vintage && String(wine.vintage ?? "") !== this.vintage) return false;
+      if (!matchesInventoryFilter(wine.color, this.color)) return false;
+      if (!matchesInventoryFilter(wine.region, this.region)) return false;
+      if (!matchesInventoryFilter(wine.appellation, this.appellation)) return false;
+      if (!matchesInventoryFilter(wine.vintage, this.vintage)) return false;
       if (this.meal && !getMealTranslationKeys(wine.meals).includes(this.meal)) return false;
       if (!query) return true;
       return [wine.name, wine.domain]
@@ -173,10 +181,10 @@ export class PlocCellarInventoryCard extends LitElement {
 
   private clearFilters(): void {
     this.search = "";
-    this.color = "";
-    this.region = "";
-    this.appellation = "";
-    this.vintage = "";
+    this.color = ALL_FILTER_VALUES;
+    this.region = ALL_FILTER_VALUES;
+    this.appellation = ALL_FILTER_VALUES;
+    this.vintage = ALL_FILTER_VALUES;
     this.meal = "";
     this.sort = "name-asc";
   }
@@ -211,20 +219,25 @@ export class PlocCellarInventoryCard extends LitElement {
   private selectFilter(
     key: "color" | "region" | "appellation" | "vintage",
     label: string,
-    value: string,
+    selection: InventoryFilterSelection,
     values: string[],
   ) {
+    const optionValue = getInventoryFilterOptionValue(selection, values);
     return html`
-      <select aria-label=${label} .value=${value}
+      <select aria-label=${label} .value=${optionValue}
         @change=${(event: Event) => {
-          const nextValue = (event.target as HTMLSelectElement).value;
-          if (key === "color") this.color = nextValue;
-          else if (key === "region") this.region = nextValue;
-          else if (key === "appellation") this.appellation = nextValue;
-          else this.vintage = nextValue;
+          const nextSelection = parseInventoryFilterOptionValue(
+            (event.target as HTMLSelectElement).value,
+            values,
+          );
+          if (key === "color") this.color = nextSelection;
+          else if (key === "region") this.region = nextSelection;
+          else if (key === "appellation") this.appellation = nextSelection;
+          else this.vintage = nextSelection;
         }}>
-        <option value="" ?selected=${!value}>${label}</option>
-        ${values.map((item) => html`<option value=${item} ?selected=${item === value}>${item}</option>`)}
+        <option value="all" ?selected=${selection.kind === "all"}>${label}</option>
+        <option value="unknown" ?selected=${selection.kind === "unknown"}>${translate(this.hass?.language ?? "en", "filter_unknown")}</option>
+        ${values.map((item, index) => html`<option value=${`value:${index}`} ?selected=${selection.kind === "value" && selection.value === item}>${item}</option>`)}
       </select>
     `;
   }
@@ -269,7 +282,12 @@ export class PlocCellarInventoryCard extends LitElement {
     const wines = this.filteredWines;
     const total = wines.reduce((sum, wine) => sum + wine.bottles_in_cellar, 0);
     const activeFilters = Boolean(
-      this.search || this.color || this.region || this.appellation || this.vintage || this.meal,
+      this.search
+      || this.color.kind !== "all"
+      || this.region.kind !== "all"
+      || this.appellation.kind !== "all"
+      || this.vintage.kind !== "all"
+      || this.meal,
     );
 
     return html`
