@@ -39,15 +39,16 @@ In a **Sections** view, the overview card uses a default width of 12 columns wit
 
 ## Development
 
-Requires Node.js 22 or newer.
+Requires Node.js `^20.19.0` or `>=22.12.0` (the versions supported by Vite 7).
 
 ```sh
 npm ci
 npm run check
+npm test
 npm run build
 ```
 
-The production bundle is generated at `dist/ploc-cellar-card.js`, then copied to the repository root as `ploc-cellar-card.js`, the filename expected by HACS (`hacs.json`). Both files are versioned. Dependencies are bundled into the standalone JavaScript module. The frontend CI workflow runs the strict TypeScript check and production build on pushes and pull requests; on `main`, it commits both generated bundles when they change.
+The production bundle is generated at `dist/ploc-cellar-card.js`, then copied to the repository root as `ploc-cellar-card.js`, the filename expected by HACS (`hacs.json`). Both files are versioned. Dependencies are bundled into the standalone JavaScript module. The frontend CI workflow runs the strict TypeScript check, unit tests and production build on pushes and pull requests; on `main`, it commits both generated bundles when they change.
 
 ## Backend contract
 
@@ -76,4 +77,4 @@ Wine names use the locally bundled Cormorant Garamond typeface (SIL Open Font Li
 
 ## Numeric typography
 
-Cellar overview values, rack counts and diagnostic quantities use the locally bundled DJB Get Digital typeface. Bottle-position coordinates use Home Assistant's standard typography. Statistical chart totals, legends and distribution values deliberately retain the standard interface typography. DJB Get Digital is proprietary font software and is included with permission from the rights holder; it is not covered by this repository's software license.
+Cellar overview values, rack counts and diagnostic quantities use the locally bundled DJB Get Digital typeface. Bottle-position coordinates use Home Assistant's standard typography. Donut chart center totals use DJB Get Digital; chart legends and distribution values retain the standard interface typography. DJB Get Digital is proprietary font software and is included with permission from the rights holder; it is not covered by this repository's software license.
