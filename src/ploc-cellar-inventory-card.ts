@@ -45,13 +45,13 @@ export class PlocCellarInventoryCard extends LitElement {
     button { background: var(--secondary-background-color); cursor: pointer; }
     button[disabled] { opacity: .5; cursor: default; }
     input { box-sizing: border-box; width: 100%; }
-    .toolbar { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; margin: 14px 0; }
+    .toolbar { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; margin: 10px 0 0; }
     .search { grid-column: 1 / -1; }
     .summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; color: var(--secondary-text-color); font-size: .85rem; margin: 12px 0; }
     .wine-list { display: grid; gap: 8px; }
-    .wine { border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; min-width: 0; }
+    .wine { border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; }
     .wine-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.12rem; font-weight: 500; line-height: 1.25; overflow-wrap: anywhere; }
+    .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
     .wine-name-button { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: inherit; line-height: inherit; text-align: left; cursor: pointer; }
     .wine-name-button:hover { color: var(--primary-color); text-decoration: underline; }
     .wine-name-button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 2px; }
@@ -59,8 +59,9 @@ export class PlocCellarInventoryCard extends LitElement {
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
-    .details { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--divider-color); font-size: .82rem; }
-    .detail-label { color: var(--secondary-text-color); display: block; }
+    .filters { margin: 14px 0; }
+    .filters > summary { cursor: pointer; font-weight: 500; padding: 4px 0; }
+    .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
     .error { color: var(--error-color); padding: 8px 0; }
     .muted { color: var(--secondary-text-color); font-size: .85rem; }
@@ -182,27 +183,17 @@ export class PlocCellarInventoryCard extends LitElement {
     `;
   }
 
-  private detail(label: string, value: string | number | null | undefined) {
-    if (value === null || value === undefined || value === "") return nothing;
-    return html`<div><span class="detail-label">${label}</span>${value}</div>`;
-  }
-
   private renderWine(wine: Wine) {
     const t = (key: TranslationKey): string =>
       translate(this.hass?.language ?? "en", key);
-    const locationLabels = wine.locations.map((location) => {
-      const coordinates = location.row !== null && location.column !== null
-        ? ` · ${t("row")} ${location.row + 1}, ${t("column")} ${location.column + 1}`
-        : "";
-      return `${location.rack}${coordinates}`;
-    });
     const vintage = wine.vintage === null ? t("unknown_vintage") : String(wine.vintage);
-    const volume = wine.bottle_volume_l === null
-      ? null
-      : `${wine.bottle_volume_l.toLocaleString(this.hass?.language ?? undefined)} L`;
+    const color = wine.color_rgb?.every(Number.isFinite)
+      ? wine.color_rgb.map((component) => Math.round(Math.min(255, Math.max(0, component))))
+      : null;
+    const wineColor = color ? `rgb(${color.join(", ")})` : "";
 
     return html`
-      <article class="wine">
+      <article class="wine" style=${wineColor ? "--wine-color: " + wineColor : ""}>
         <div class="wine-main">
           <div>
             <div class="wine-name"><button class="wine-name-button" type="button" aria-haspopup="dialog" @click=${() => { this.selectedWine = wine; }}>${wine.name}</button></div>
@@ -220,15 +211,6 @@ export class PlocCellarInventoryCard extends LitElement {
           <span class="tag">${vintage}</span>
           ${wine.bottle_format ? html`<span class="tag">${wine.bottle_format}</span>` : nothing}
         </div>
-        <details>
-          <summary class="metadata">${t("wine_details")}</summary>
-          <div class="details">
-            ${this.detail(t("grapes"), wine.grapes)}
-            ${this.detail(t("cuvee"), wine.cuvee)}
-            ${this.detail(t("bottle_volume"), volume)}
-            ${this.detail(t("locations"), locationLabels.length ? locationLabels.join(" · ") : null)}
-          </div>
-        </details>
       </article>
     `;
   }
@@ -258,7 +240,9 @@ export class PlocCellarInventoryCard extends LitElement {
           : nothing}
         ${this.inventory?.stale ? html`<div class="warning">${t("stale")}</div>` : nothing}
         ${this.inventory ? html`
-          <div class="toolbar">
+          <details class="filters" open>
+            <summary>${t("inventory_filters")}</summary>
+            <div class="toolbar">
             <input class="search" type="search" aria-label=${t("search_wine")}
               placeholder=${t("search_placeholder")} .value=${this.search}
               @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; }} />
@@ -272,7 +256,8 @@ export class PlocCellarInventoryCard extends LitElement {
               <option value="bottles" ?selected=${this.sort === "bottles"}>${t("sort_bottles")}</option>
               <option value="vintage" ?selected=${this.sort === "vintage"}>${t("sort_vintage")}</option>
             </select>
-          </div>
+            </div>
+          </details>
           <div class="summary">
             <span>${t("inventory_results").replace("{count}", String(wines.length))}</span>
             <span>${t("inventory_bottle_total").replace("{count}", String(total))}</span>
