@@ -28,6 +28,7 @@
   "not_mapped": "Not mapped",
   "no_racks": "No racks available.",
   "missing_rack": "position(s) reference a missing rack.",
+  "inventory_filters": "Filters",
   "inventory_title": "Wine inventory",
   "filter_color": "All colors",
   "filter_region": "All regions",

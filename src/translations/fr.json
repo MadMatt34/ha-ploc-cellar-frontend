@@ -28,6 +28,7 @@
   "not_mapped": "Non renseigné",
   "no_racks": "Aucun casier disponible.",
   "missing_rack": "emplacement(s) référencent un casier absent.",
+  "inventory_filters": "Filtres",
   "inventory_title": "Inventaire des vins",
   "filter_color": "Toutes les couleurs",
   "filter_region": "Toutes les régions",
