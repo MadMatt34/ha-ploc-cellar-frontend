@@ -110,6 +110,7 @@
   "editor_rack_picker_buttons": "Buttons",
   "editor_rack_picker_dropdown": "Dropdown list",
   "wine_detail_stock": "Stock",
+  "wine_detail_bottles_in_stock": "bottles in stock",
   "wine_detail_physical": "Physically in cellar",
   "wine_detail_reconstructed": "Reconstructed stock",
   "wine_detail_effective": "Effective stock",
