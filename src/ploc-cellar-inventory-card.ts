@@ -236,7 +236,7 @@ export class PlocCellarInventoryCard extends LitElement {
           else this.vintage = nextSelection;
         }}>
         <option value="all">${label}</option>
-        <option value="unknown">${translate(this.hass?.language ?? "en", "unknown_value")}</option>
+        <option value="unknown">${translate(this.hass?.language ?? "en", "filter_unknown")}</option>
         ${values.map((item, index) => html`<option value=${`value:${index}`}>${item}</option>`)}
       </select>
     `;
