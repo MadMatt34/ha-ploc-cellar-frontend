@@ -67,7 +67,7 @@ Le français et l'anglais sont pris en charge.
 
 ## Caractéristiques des vins
 
-La modale de détail présente les caractéristiques sous forme de lignes associant une icône, un libellé et sa valeur. Les cépages sont regroupés dans un encart dédié ; les pourcentages explicitement présents dans les données source sont représentés par des barres proportionnelles. Lorsque PLOUD ne fournit que les noms des cépages, la carte les affiche sans inventer de proportions.
+La modale de détail utilise des sections repliables indépendantes pour le stock, les accords mets-vins, les caractéristiques, les emplacements et les notes. Les mouvements de stock disposent de leur propre sous-section repliable. Les caractéristiques sont regroupées entre origine/identification et dégustation/composition, sous forme de lignes associant une icône, un libellé et sa valeur. Les cépages sont regroupés dans un encart dédié ; les pourcentages explicitement présents dans les données source sont représentés par des barres proportionnelles. Lorsque PLOUD ne fournit que les noms des cépages, la carte les affiche sans inventer de proportions.
 
 ## Photos des vins
 

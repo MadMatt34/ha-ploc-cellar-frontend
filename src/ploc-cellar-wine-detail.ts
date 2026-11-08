@@ -24,7 +24,19 @@ export class PlocCellarWineDetail extends LitElement {
       --mdc-dialog-max-width: min(760px, calc(100vw - 32px));
     }
     :host { --ploc-wine-font-family: "Cormorant Garamond", Georgia, serif; }
-    .content { display: grid; gap: 20px; min-width: 0; }
+    .content { display: grid; gap: 14px; min-width: 0; }
+    .detail-section { min-width: 0; border: 1px solid var(--divider-color); border-radius: 12px; overflow: hidden; background: var(--card-background-color, var(--ha-card-background)); }
+    .section-summary { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 11px 14px; cursor: pointer; list-style: none; font-size: .96rem; font-weight: 600; }
+    .section-summary::-webkit-details-marker { display: none; }
+    .section-summary::after { content: ""; width: 8px; height: 8px; margin-left: auto; border-right: 2px solid var(--secondary-text-color); border-bottom: 2px solid var(--secondary-text-color); transform: rotate(45deg); transition: transform .16s ease; }
+    details[open] > .section-summary::after { transform: rotate(225deg); }
+    .section-summary ha-icon { --mdc-icon-size: 20px; color: var(--secondary-text-color); }
+    .section-body { padding: 0 14px 14px; min-width: 0; }
+    .section-subtitle { margin: 12px 0 5px; color: var(--secondary-text-color); font-size: .78rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .section-subtitle:first-child { margin-top: 2px; }
+    .nested-details { margin-top: 14px; border-top: 1px solid var(--divider-color); }
+    .nested-details > .section-summary { min-height: 42px; padding: 9px 0; font-size: .88rem; }
+    .nested-details > .section-body { padding: 0 0 4px; }
     .wine-dialog-title { font-family: var(--ploc-wine-font-family); font-size: 1.45rem; font-weight: 500; line-height: 1.2; white-space: normal; }
     .wine-image-container { display: flex; justify-content: center; min-width: 0; max-height: 320px; overflow: hidden; }
     .wine-image { display: block; max-width: 100%; max-height: 320px; object-fit: contain; border-radius: 10px; }
@@ -101,6 +113,11 @@ export class PlocCellarWineDetail extends LitElement {
     .location-coordinate { color: var(--secondary-text-color); font-size: .88rem; line-height: 1.4; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
+    @media (max-width: 560px) {
+      .content { gap: 11px; }
+      .characteristic-copy { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+      .characteristic { padding: 10px 2px; }
+    }
     @media (max-width: 480px) {
       .content { gap: 16px; }
       dl { grid-template-columns: minmax(0, 1fr); }
@@ -207,7 +224,7 @@ export class PlocCellarWineDetail extends LitElement {
   }
 
   private renderIdentity(wine: Wine) {
-    const metadata = [wine.domain, wine.appellation, wine.region, wine.country]
+    const metadata = [wine.domain]
       .filter((value): value is string => Boolean(value));
     const tags = [
       wine.vintage === null ? this.t("unknown_vintage") : String(wine.vintage),
@@ -236,8 +253,9 @@ export class PlocCellarWineDetail extends LitElement {
       wine.unlocated_bottles !== null;
 
     return html`
-      <section>
-        <h3>${this.t("wine_detail_stock")}</h3>
+      <details class="detail-section" open>
+        <summary class="section-summary"><ha-icon icon="mdi:chart-box-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_stock")}</summary>
+        <div class="section-body">
         <div class="stock">
           ${this.stockItem("wine_detail_physical", wine.bottles_in_cellar)}
           ${this.stockItem("wine_detail_reconstructed", wine.bottles)}
@@ -245,8 +263,9 @@ export class PlocCellarWineDetail extends LitElement {
           ${this.stockItem("wine_detail_source_stock", wine.ploud_bottles)}
         </div>
         ${hasMovementData ? html`
-          <h3 style="margin-top: 16px">${this.t("wine_detail_movements")}</h3>
-          <dl>
+          <details class="nested-details">
+            <summary class="section-summary"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>${this.t("wine_detail_movements")}</summary>
+            <div class="section-body"><dl>
             ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", wine.purchased)}
             ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", wine.consumed)}
             ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", wine.movement_balance)}
@@ -254,9 +273,11 @@ export class PlocCellarWineDetail extends LitElement {
             ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", wine.unlocated_bottles)}
             ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", wine.negative_movement_bottles)}
             ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", wine.physical_surplus_bottles)}
-          </dl>
+          </dl></div>
+          </details>
         ` : nothing}
-      </section>
+        </div>
+      </details>
     `;
   }
 
@@ -264,12 +285,12 @@ export class PlocCellarWineDetail extends LitElement {
     const mealKeys = getMealTranslationKeys(wine.meals);
     if (!mealKeys.length) return nothing;
     return html`
-      <section>
-        <h3>${this.t("wine_detail_meals")}</h3>
-        <div class="tags">
+      <details class="detail-section" open>
+        <summary class="section-summary"><ha-icon icon="mdi:food-apple-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_meals")}</summary>
+        <div class="section-body"><div class="tags">
           ${mealKeys.map((key) => html`<span class="tag meal-tag"><ha-icon icon=${getMealIcon(key)} aria-hidden="true"></ha-icon><span>${this.t(key)}</span></span>`)}
-        </div>
-      </section>
+        </div></div>
+      </details>
     `;
   }
 
@@ -326,16 +347,19 @@ export class PlocCellarWineDetail extends LitElement {
           ${this.renderIdentity(wine)}
           ${this.renderStock(wine)}
           ${this.renderMeals(wine)}
-          <section>
-            <h3>${this.t("wine_detail_characteristics")}</h3>
+          <details class="detail-section" open>
+            <summary class="section-summary"><ha-icon icon="mdi:clipboard-list-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_characteristics")}</summary>
+            <div class="section-body">
+            <div class="section-subtitle">${this.t("wine_detail_origin")}</div>
             <div class="characteristics">
-              ${this.characteristic("mdi:domain", "tooltip_domain", wine.domain)}
-              ${this.characteristic("mdi:calendar", "tooltip_vintage", wine.vintage)}
-              ${this.characteristic("mdi:map-marker-radius", "tooltip_appellation", wine.appellation)}
               ${this.characteristic("mdi:medal-outline", "tooltip_classification", wine.classification)}
-              ${this.characteristic("mdi:palette-outline", "tooltip_color", wine.color)}
+              ${this.characteristic("mdi:map-marker-radius", "tooltip_appellation", wine.appellation)}
               ${this.characteristic("mdi:map-outline", "tooltip_region", wine.region)}
               ${this.characteristic("mdi:earth", "tooltip_country", wine.country)}
+            </div>
+            <div class="section-subtitle">${this.t("wine_detail_tasting")}</div>
+            <div class="characteristics">
+              ${this.characteristic("mdi:palette-outline", "tooltip_color", wine.color)}
               ${this.renderGrapes(wine.grapes)}
               ${this.characteristic("mdi:tag-outline", "tooltip_cuvee", wine.cuvee)}
               ${this.characteristic("mdi:bottle-wine-outline", "tooltip_format", wine.bottle_format)}
@@ -343,16 +367,17 @@ export class PlocCellarWineDetail extends LitElement {
               ${this.characteristic("mdi:percent-outline", "wine_detail_alcohol", wine.alcohol_percent === null ? null : `${this.formatNumber(wine.alcohol_percent)} %`)}
               ${this.characteristic("mdi:thermometer", "tooltip_temperature", temperature)}
             </div>
-          </section>
-          <section>
-            <h3>${this.t("locations")}</h3>
-            ${this.renderLocations(wine)}
-          </section>
+            </div>
+          </details>
+          <details class="detail-section">
+            <summary class="section-summary"><ha-icon icon="mdi:map-marker-multiple-outline" aria-hidden="true"></ha-icon>${this.t("locations")}</summary>
+            <div class="section-body">${this.renderLocations(wine)}</div>
+          </details>
           ${wine.comment ? html`
-            <section>
-              <h3>${this.t("wine_detail_comment")}</h3>
-              <div class="comment">${wine.comment}</div>
-            </section>
+            <details class="detail-section">
+              <summary class="section-summary"><ha-icon icon="mdi:note-text-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_comment")}</summary>
+              <div class="section-body"><div class="comment">${wine.comment}</div></div>
+            </details>
           ` : nothing}
         </div>
       </ha-dialog>
