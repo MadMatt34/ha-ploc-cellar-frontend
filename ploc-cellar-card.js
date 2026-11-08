@@ -1003,19 +1003,19 @@ function Qe(e) {
 }
 // src/grape-composition.ts
 function $e(e) {
-	return e.split(/[;,\n]+/).map((e) => e.trim()).filter(Boolean).map((e) => {
-		let t = /^(.*?)\s*(?:\(\s*)?(\d+(?:[.,]\d+)?)\s*%\s*\)?$/.exec(e);
-		if (!t) return {
+	return e.split(/(?<!\d),(?!\d)|[;\n]+/).map((e) => e.trim()).filter(Boolean).map((e) => {
+		let t = /^(\d+(?:[.,]\d+)?)\s*%\s*(.+)$/.exec(e), n = /^(.*?)\s*(?:\(\s*)?(\d+(?:[.,]\d+)?)\s*%\s*\)?$/.exec(e), r = t ?? n;
+		if (!r) return {
 			name: e,
 			percentage: /%/.test(e) ? null : 100
 		};
-		let n = t[1].trim().replace(/[:\-–—]+$/, "").trim(), r = Number(t[2].replace(",", "."));
-		return !n || !Number.isFinite(r) || r < 0 || r > 100 ? {
+		let i = (t ? r[2] : r[1]).trim().replace(/^[:\-–—]+|[:\-–—]+$/g, "").trim(), a = Number((t ? r[1] : r[2]).replace(",", "."));
+		return !i || !Number.isFinite(a) || a < 0 || a > 100 ? {
 			name: e,
 			percentage: null
 		} : {
-			name: n,
-			percentage: r
+			name: i,
+			percentage: a
 		};
 	});
 }
@@ -1124,8 +1124,8 @@ var tt = class extends je {
     .grape-name { min-width: 0; overflow-wrap: anywhere; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .grape-percentage { flex: 0 0 42px; text-align: right; font-variant-numeric: tabular-nums; }
-    .grape-track { flex: 1 1 auto; width: 100%; min-width: 0; height: 7px; overflow: hidden; border-radius: 999px; background: var(--divider-color); }
-    .grape-fill { height: 100%; background: var(--wine-accent, var(--error-color)); }
+    .grape-track { display: block; flex: 1 1 0; width: 100%; min-width: 0; height: 7px; overflow: hidden; border-radius: 999px; background: var(--divider-color); }
+    .grape-fill { height: 100%; background: var(--wine-accent, var(--secondary-text-color)); }
     .grape-row:not(.has-percentage) { grid-template-columns: minmax(0, 1fr); }
     .grape-row:not(.has-percentage) .grape-composition { display: none; }
     .stock { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px; }
@@ -1192,6 +1192,10 @@ var tt = class extends je {
       </div>
     `;
 	}
+	get grapeAccentStyle() {
+		let e = this.wine?.color_rgb;
+		return !e || e.length !== 3 || !e.every((e) => Number.isInteger(e) && e >= 0 && e <= 255) ? "" : `--wine-accent: rgb(${e[0]} ${e[1]} ${e[2]});`;
+	}
 	renderGrapes(e) {
 		if (!e?.trim()) return P;
 		let t = $e(e);
@@ -1200,7 +1204,7 @@ var tt = class extends je {
         <ha-icon icon="mdi:grape" aria-hidden="true"></ha-icon>
         <div class="characteristic-value">
           <span class="characteristic-label">${this.t("tooltip_grapes")}</span>
-          <div class="grapes-card">
+          <div class="grapes-card" style=${this.grapeAccentStyle}>
             ${t.map((e) => N`
               <div class="grape-row ${e.percentage === null ? "" : "has-percentage"}">
                 <span class="grape-name">${e.name}</span>
