@@ -1069,15 +1069,15 @@ var nt = class extends je {
       --mdc-dialog-max-width: min(760px, calc(100vw - 32px));
     }
     :host { --ploc-wine-font-family: "Cormorant Garamond", Georgia, serif; }
-    .content { display: grid; gap: 14px; min-width: 0; }
+    .content { display: grid; gap: 10px; min-width: 0; }
     .detail-section { min-width: 0; border: 1px solid var(--divider-color); border-radius: 12px; overflow: hidden; background: var(--card-background-color, var(--ha-card-background)); }
-    .section-summary { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 11px 14px; cursor: pointer; list-style: none; font-size: .96rem; font-weight: 600; }
+    .section-summary { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 4px 14px; cursor: pointer; list-style: none; font-size: 1rem; font-weight: 600; }
     .section-summary::-webkit-details-marker { display: none; }
     .section-summary::after { content: ""; width: 8px; height: 8px; margin-left: auto; border-right: 2px solid var(--secondary-text-color); border-bottom: 2px solid var(--secondary-text-color); transform: rotate(45deg); transition: transform .16s ease; }
     details[open] > .section-summary::after { transform: rotate(225deg); }
-    .section-summary ha-icon { --mdc-icon-size: 20px; color: var(--secondary-text-color); }
+    .section-summary ha-icon { color: var(--secondary-text-color); }
     .section-body { padding: 0 14px 14px; min-width: 0; }
-    .section-subtitle { margin: 12px 0 5px; color: var(--secondary-text-color); font-size: .78rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .section-subtitle { margin: 12px 0 5px; color: var(--secondary-text-color); font-size: .78rem; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; }
     .section-subtitle:first-child { margin-top: 2px; }
     .nested-details { margin-top: 14px; border-top: 1px solid var(--divider-color); }
     .nested-details > .section-summary { min-height: 42px; padding: 9px 0; font-size: .88rem; }
@@ -1086,15 +1086,15 @@ var nt = class extends je {
     .wine-hero { display: grid; grid-template-columns: 8px minmax(0, 1fr); align-items: stretch; gap: 14px; min-width: 0; }
     .wine-hero-banner { width: 8px; min-height: 120px; border-radius: 999px; }
     .wine-hero-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 32%); align-items: center; gap: 14px; min-width: 0; }
-    .wine-image-container { display: flex; justify-content: flex-end; align-items: center; min-width: 0; max-height: 180px; overflow: hidden; }
-    .wine-image { display: block; max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 10px; }
+    .wine-image-container { display: flex; justify-content: flex-end; align-items: center; min-width: 0; max-height: 160px; overflow: hidden; padding-right: 10px; border-radius: 20px; background: var(--secondary-background-color); }
+    .wine-image { display: block; max-width: 100%; max-height: 160px; object-fit: contain; border-radius: 10px; }
     .identity { min-width: 0; }
     .identity-text { min-width: 0; }
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-    .wine-vintage { margin-top: 5px; font-family: var(--ploc-wine-font-family); font-size: 1.2rem; font-weight: 600; line-height: 1.2; }
-    .wine-stock-line { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--secondary-text-color); font-size: .86rem; }
-    .wine-stock-line ha-icon { --mdc-icon-size: 19px; flex: 0 0 auto; }
+    .wine-vintage { margin: 5px 10px 0 20px; font-family: var(--ploc-wine-font-family); font-size: 2.3rem; font-weight: 600; line-height: 1.2; }
+    .wine-stock-line { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--secondary-text-color); font-size: 1rem; }
+    .wine-stock-line ha-icon { flex: 0 0 auto; }
     .wine-stock-count { font-family: var(--ploc-numeric-font-family); font-size: 1rem; font-variant-numeric: tabular-nums; color: var(--primary-text-color); }
     .tag {
       padding: 4px 9px;
@@ -1104,8 +1104,8 @@ var nt = class extends je {
     }
     .meal-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px; }
     .meal-tile { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 11px 12px; border: 1px solid var(--divider-color); border-radius: 10px; background: var(--secondary-background-color); }
-    .meal-tile ha-icon { flex: 0 0 auto; --mdc-icon-size: 21px; color: var(--secondary-text-color); }
-    .meal-tile span { min-width: 0; overflow-wrap: anywhere; font-size: .88rem; }
+    .meal-tile ha-icon { flex: 0 0 auto; }
+    .meal-tile span { min-width: 0; overflow-wrap: anywhere; font-size: 1rem; }
     section { min-width: 0; }
     h3 {
       margin: 0 0 10px;
@@ -1119,14 +1119,14 @@ var nt = class extends je {
       margin: 0;
     }
     .characteristics { display: grid; gap: 0; }
-    .characteristic { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 12px; min-width: 0; padding: 13px 2px; border-bottom: 1px solid var(--divider-color); }
+    .characteristic { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 12px; min-width: 0; padding: 10px 2px; border-bottom: 1px solid var(--divider-color); }
     .characteristic:last-child { border-bottom: 0; }
     .characteristic ha-icon { --mdc-icon-size: 21px; color: var(--secondary-text-color); }
     .characteristic-copy { display: grid; grid-template-columns: minmax(100px, .8fr) minmax(0, 1.4fr); align-items: baseline; gap: 12px; min-width: 0; }
-    .characteristic-label { color: var(--secondary-text-color); font-size: .84rem; }
+    .characteristic-label { color: var(--secondary-text-color); font-size: .9rem; }
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
-    .grapes-list { display: grid; gap: 2px; margin-top: 4px; }
-    .grape-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 16px; padding: 7px 0; }
+    .grapes-list { display: grid; gap: 2px; }
+    .grape-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 16px; padding: 0 0 7px 0; }
     .grape-name { min-width: 0; overflow-wrap: anywhere; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .grape-percentage { flex: 0 0 42px; text-align: right; font-variant-numeric: tabular-nums; }
