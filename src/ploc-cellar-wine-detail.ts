@@ -7,6 +7,7 @@ import { translate, type TranslationKey } from "./translations";
 import { WineImageLoader } from "./wine-image";
 import { getMealIcon, getMealTranslationKeys } from "./meals";
 import { parseGrapeComposition } from "./grape-composition";
+import { groupWineLocations } from "./wine-locations";
 
 @customElement("ploc-cellar-wine-detail")
 export class PlocCellarWineDetail extends LitElement {
@@ -93,8 +94,11 @@ export class PlocCellarWineDetail extends LitElement {
     }
     .stock-value { display: block; font-size: 1.2rem; font-weight: 600; font-variant-numeric: tabular-nums; }
     .stock-label { display: block; margin-top: 3px; color: var(--secondary-text-color); font-size: .8rem; }
-    .locations { display: grid; gap: 7px; }
-    .location { padding: 8px 10px; border: 1px solid var(--divider-color); border-radius: 8px; }
+    .locations { display: grid; gap: 9px; }
+    .location { padding: 10px 12px; border: 1px solid var(--divider-color); border-radius: 9px; }
+    .location-name { display: block; }
+    .location-coordinates { display: grid; gap: 5px; margin-top: 7px; }
+    .location-coordinate { color: var(--secondary-text-color); font-size: .88rem; line-height: 1.4; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
     @media (max-width: 480px) {
@@ -273,13 +277,20 @@ export class PlocCellarWineDetail extends LitElement {
     if (!wine.locations.length) {
       return html`<p class="muted">${this.t("wine_detail_no_locations")}</p>`;
     }
+    const racks = groupWineLocations(wine.locations);
     return html`
       <div class="locations">
-        ${wine.locations.map((location) => html`
+        ${racks.map((rack) => html`
           <div class="location">
-            <strong>${location.rack}</strong>
-            ${location.row !== null && location.column !== null
-              ? html`<span class="muted"> · ${this.t("row")} ${location.row + 1}, ${this.t("column")} ${location.column + 1}</span>`
+            <strong class="location-name">${rack.rack}</strong>
+            ${rack.coordinates.some(({ row, column }) => row !== null && column !== null)
+              ? html`
+                <div class="location-coordinates">
+                  ${rack.coordinates.map(({ row, column }) => row !== null && column !== null
+                    ? html`<span class="location-coordinate">${this.t("row")} ${row + 1}, ${this.t("column")} ${column + 1}</span>`
+                    : nothing)}
+                </div>
+              `
               : nothing}
           </div>
         `)}
