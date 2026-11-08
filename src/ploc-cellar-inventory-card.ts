@@ -312,7 +312,6 @@ export class PlocCellarInventoryCard extends LitElement {
                 <option value="vintage-desc">${t("sort_vintage_desc")}</option>
               </select>
             </label>
-            </div>
           </details>
           <div class="summary">
             <span>${t("inventory_results").replace("{count}", String(wines.length))}</span>
