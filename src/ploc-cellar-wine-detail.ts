@@ -100,6 +100,7 @@ export class PlocCellarWineDetail extends LitElement {
     .location { padding: 10px 12px; border: 1px solid var(--divider-color); border-radius: 9px; }
     .location-name { display: block; }
     .location-coordinates { display: grid; gap: 6px; margin-top: 8px; }
+    .location-coordinate-row { display: flex; flex-wrap: wrap; gap: 6px; }
     .location-coordinate { display: block; width: fit-content; max-width: 100%; padding: 4px 9px; border-radius: 999px; background: var(--secondary-background-color); color: var(--secondary-text-color); font-size: .82rem; line-height: 1.4; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
@@ -303,9 +304,11 @@ export class PlocCellarWineDetail extends LitElement {
             ${rack.coordinates.some(({ row, column }) => row !== null && column !== null)
               ? html`
                 <div class="location-coordinates">
-                  ${rack.coordinates.map(({ row, column }) => row !== null && column !== null
-                    ? html`<span class="location-coordinate">${this.t("row")} ${row + 1}, ${this.t("column")} ${column + 1}</span>`
-                    : nothing)}
+                  ${groupCoordinatesByRow(rack.coordinates).map(({ row, columns }) => html`
+                    <div class="location-coordinate-row">
+                      ${columns.map((column) => html`<span class="location-coordinate">${this.t("row")} ${row + 1}, ${this.t("column")} ${column + 1}</span>`)}
+                    </div>
+                  `)}
                 </div>
               `
               : nothing}
