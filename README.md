@@ -42,7 +42,7 @@ In a **Sections** view, the overview card uses a default width of 12 columns wit
 
 ## Development
 
-Requires Node.js `^20.19.0` or `>=22.12.0` (the versions supported by Vite 7).
+Requires Node.js `^20.19.0` or `>=22.12.0` (the versions supported by Vite 8).
 
 ```sh
 npm ci
