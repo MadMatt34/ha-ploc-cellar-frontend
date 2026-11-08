@@ -1077,21 +1077,17 @@ var tt = class extends je {
     .identity-text { min-width: 0; }
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .wine-vintage { margin-top: 5px; font-family: var(--ploc-wine-font-family); font-size: 1.2rem; font-weight: 600; line-height: 1.2; }
     .tag {
       padding: 4px 9px;
       border-radius: 999px;
       background: var(--secondary-background-color);
       font-size: .82rem;
     }
-    .meal-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .meal-tag ha-icon {
-      --mdc-icon-size: 17px;
-      color: var(--secondary-text-color);
-    }
+    .meal-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px; }
+    .meal-tile { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 11px 12px; border: 1px solid var(--divider-color); border-radius: 10px; background: var(--secondary-background-color); }
+    .meal-tile ha-icon { flex: 0 0 auto; --mdc-icon-size: 21px; color: var(--secondary-text-color); }
+    .meal-tile span { min-width: 0; overflow-wrap: anywhere; font-size: .88rem; }
     section { min-width: 0; }
     h3 {
       margin: 0 0 10px;
@@ -1127,13 +1123,14 @@ var tt = class extends je {
       border-radius: 9px;
       background: var(--secondary-background-color);
     }
-    .stock-value { display: block; font-size: 1.2rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .stock-value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.2rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .stock-details .characteristic-value { font-family: var(--ploc-numeric-font-family); font-variant-numeric: tabular-nums; }
     .stock-label { display: block; margin-top: 3px; color: var(--secondary-text-color); font-size: .8rem; }
     .locations { display: grid; gap: 9px; }
     .location { padding: 10px 12px; border: 1px solid var(--divider-color); border-radius: 9px; }
     .location-name { display: block; }
-    .location-coordinates { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .location-coordinate { padding: 4px 9px; border-radius: 999px; background: var(--secondary-background-color); color: var(--secondary-text-color); font-size: .82rem; line-height: 1.4; }
+    .location-coordinates { display: grid; gap: 6px; margin-top: 8px; }
+    .location-coordinate { display: block; width: fit-content; max-width: 100%; padding: 4px 9px; border-radius: 999px; background: var(--secondary-background-color); color: var(--secondary-text-color); font-size: .82rem; line-height: 1.4; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
     @media (max-width: 560px) {
@@ -1227,14 +1224,11 @@ var tt = class extends je {
 		return !e || e.length !== 3 || !e.every((e) => Number.isInteger(e) && e >= 0 && e <= 255) ? "background: var(--secondary-text-color);" : `background: rgb(${e[0]} ${e[1]} ${e[2]});`;
 	}
 	renderIdentity(e) {
-		let t = [
-			e.vintage === null ? this.t("unknown_vintage") : String(e.vintage),
-			e.color,
-			e.bottle_format
-		].filter((e) => !!e);
+		let t = [e.color, e.bottle_format].filter((e) => !!e);
 		return N`
       <div class="identity">
         <div class="identity-text">
+          ${e.vintage === null ? P : N`<div class="wine-vintage">${e.vintage}</div>`}
           ${t.length ? N`<div class="tags">${t.map((e) => N`<span class="tag">${e}</span>`)}</div>` : P}
         </div>
       </div>
@@ -1243,7 +1237,7 @@ var tt = class extends je {
 	renderStock(e) {
 		let t = e.purchased !== null || e.consumed !== null || e.movement_balance !== null || e.calculated_stock !== null || e.negative_movement_bottles !== null || e.physical_surplus_bottles !== null || e.unlocated_bottles !== null;
 		return N`
-      <details class="detail-section" open>
+      <details class="detail-section stock-details" open>
         <summary class="section-summary"><ha-icon icon="mdi:chart-box-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_stock")}</summary>
         <div class="section-body">
         <div class="stock">
@@ -1275,8 +1269,8 @@ var tt = class extends je {
 		return t.length ? N`
       <details class="detail-section" open>
         <summary class="section-summary"><ha-icon icon="mdi:food-apple-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_meals")}</summary>
-        <div class="section-body"><div class="tags">
-          ${t.map((e) => N`<span class="tag meal-tag"><ha-icon icon=${Ze(e)} aria-hidden="true"></ha-icon><span>${this.t(e)}</span></span>`)}
+        <div class="section-body"><div class="meal-tiles">
+          ${t.map((e) => N`<div class="meal-tile"><ha-icon icon=${Ze(e)} aria-hidden="true"></ha-icon><span>${this.t(e)}</span></div>`)}
         </div></div>
       </details>
     ` : P;
