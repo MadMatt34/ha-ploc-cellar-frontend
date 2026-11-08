@@ -243,13 +243,13 @@ export class PlocCellarWineDetail extends LitElement {
         ${hasMovementData ? html`
           <h3 style="margin-top: 16px">${this.t("wine_detail_movements")}</h3>
           <dl>
-            ${this.field("wine_detail_purchased", wine.purchased)}
-            ${this.field("wine_detail_consumed", wine.consumed)}
-            ${this.field("wine_detail_balance", wine.movement_balance)}
-            ${this.field("wine_detail_calculated", wine.calculated_stock)}
-            ${this.field("wine_detail_unlocated", wine.unlocated_bottles)}
-            ${this.field("wine_detail_negative", wine.negative_movement_bottles)}
-            ${this.field("wine_detail_surplus", wine.physical_surplus_bottles)}
+            ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", wine.purchased)}
+            ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", wine.consumed)}
+            ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", wine.movement_balance)}
+            ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", wine.calculated_stock)}
+            ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", wine.unlocated_bottles)}
+            ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", wine.negative_movement_bottles)}
+            ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", wine.physical_surplus_bottles)}
           </dl>
         ` : nothing}
       </section>
