@@ -1,4 +1,5 @@
 import { LitElement, css, html, nothing, type PropertyValues } from "lit";
+import "./numeric-typography";
 
 import { customElement, property, state } from "lit/decorators.js";
 
@@ -46,21 +47,17 @@ export class PlocCellarWineDetail extends LitElement {
     .identity-text { min-width: 0; }
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .wine-vintage { margin-top: 5px; font-family: var(--ploc-wine-font-family); font-size: 1.2rem; font-weight: 600; line-height: 1.2; }
     .tag {
       padding: 4px 9px;
       border-radius: 999px;
       background: var(--secondary-background-color);
       font-size: .82rem;
     }
-    .meal-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .meal-tag ha-icon {
-      --mdc-icon-size: 17px;
-      color: var(--secondary-text-color);
-    }
+    .meal-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px; }
+    .meal-tile { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 11px 12px; border: 1px solid var(--divider-color); border-radius: 10px; background: var(--secondary-background-color); }
+    .meal-tile ha-icon { flex: 0 0 auto; --mdc-icon-size: 21px; color: var(--secondary-text-color); }
+    .meal-tile span { min-width: 0; overflow-wrap: anywhere; font-size: .88rem; }
     section { min-width: 0; }
     h3 {
       margin: 0 0 10px;
@@ -96,13 +93,14 @@ export class PlocCellarWineDetail extends LitElement {
       border-radius: 9px;
       background: var(--secondary-background-color);
     }
-    .stock-value { display: block; font-size: 1.2rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .stock-value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.2rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .stock-details .characteristic-value { font-family: var(--ploc-numeric-font-family); font-variant-numeric: tabular-nums; }
     .stock-label { display: block; margin-top: 3px; color: var(--secondary-text-color); font-size: .8rem; }
     .locations { display: grid; gap: 9px; }
     .location { padding: 10px 12px; border: 1px solid var(--divider-color); border-radius: 9px; }
     .location-name { display: block; }
-    .location-coordinates { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .location-coordinate { padding: 4px 9px; border-radius: 999px; background: var(--secondary-background-color); color: var(--secondary-text-color); font-size: .82rem; line-height: 1.4; }
+    .location-coordinates { display: grid; gap: 6px; margin-top: 8px; }
+    .location-coordinate { display: block; width: fit-content; max-width: 100%; padding: 4px 9px; border-radius: 999px; background: var(--secondary-background-color); color: var(--secondary-text-color); font-size: .82rem; line-height: 1.4; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
     @media (max-width: 560px) {
@@ -229,15 +227,12 @@ export class PlocCellarWineDetail extends LitElement {
   }
 
   private renderIdentity(wine: Wine) {
-    const tags = [
-      wine.vintage === null ? this.t("unknown_vintage") : String(wine.vintage),
-      wine.color,
-      wine.bottle_format,
-    ].filter((value): value is string => Boolean(value));
+    const tags = [wine.color, wine.bottle_format].filter((value): value is string => Boolean(value));
 
     return html`
       <div class="identity">
         <div class="identity-text">
+          ${wine.vintage !== null ? html`<div class="wine-vintage">${wine.vintage}</div>` : nothing}
           ${tags.length ? html`<div class="tags">${tags.map((tag) => html`<span class="tag">${tag}</span>`)}</div>` : nothing}
         </div>
       </div>
@@ -254,7 +249,7 @@ export class PlocCellarWineDetail extends LitElement {
       wine.unlocated_bottles !== null;
 
     return html`
-      <details class="detail-section" open>
+      <details class="detail-section stock-details" open>
         <summary class="section-summary"><ha-icon icon="mdi:chart-box-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_stock")}</summary>
         <div class="section-body">
         <div class="stock">
@@ -288,8 +283,8 @@ export class PlocCellarWineDetail extends LitElement {
     return html`
       <details class="detail-section" open>
         <summary class="section-summary"><ha-icon icon="mdi:food-apple-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_meals")}</summary>
-        <div class="section-body"><div class="tags">
-          ${mealKeys.map((key) => html`<span class="tag meal-tag"><ha-icon icon=${getMealIcon(key)} aria-hidden="true"></ha-icon><span>${this.t(key)}</span></span>`)}
+        <div class="section-body"><div class="meal-tiles">
+          ${mealKeys.map((key) => html`<div class="meal-tile"><ha-icon icon=${getMealIcon(key)} aria-hidden="true"></ha-icon><span>${this.t(key)}</span></div>`)}
         </div></div>
       </details>
     `;
