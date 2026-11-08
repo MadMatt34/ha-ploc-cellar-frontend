@@ -16,6 +16,8 @@ L'ancien type de carte **Ploc Cellar Statistics** reste enregistré comme alias 
 
 Chaque carte utilise le sélecteur natif d'entrée de configuration dans son éditeur et conserve son propre `config_entry_id`. Les cartes communiquent uniquement avec Home Assistant via le service WebSocket de réponse `ploc_cellar.get_inventory` fourni par l'intégration. Elles ne communiquent jamais directement avec PLOUD. L'intégration backend doit être installée et configurée au préalable.
 
+Les cartes récupèrent l’inventaire à leur initialisation et proposent une actualisation manuelle. Elles n’interrogent pas périodiquement les événements de synchronisation du backend : utilisez **Actualiser** après une synchronisation PLOUD si le tableau de bord est resté ouvert.
+
 ## Installation
 
 1. Installez et configurez l'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar).
@@ -39,15 +41,16 @@ Dans une vue **Sections**, la carte de vue d'ensemble utilise par défaut une la
 
 ## Développement
 
-Node.js 22 ou supérieur est requis.
+Node.js `^20.19.0` ou `>=22.12.0` est requis (versions prises en charge par Vite 7).
 
 ```sh
 npm ci
 npm run check
+npm test
 npm run build
 ```
 
-Le bundle de production est généré dans `dist/ploc-cellar-card.js`, puis copié à la racine sous `ploc-cellar-card.js`, nom attendu par HACS (`hacs.json`). Les deux fichiers sont versionnés. Les dépendances sont intégrées au module JavaScript autonome. Le workflow CI du frontend exécute la vérification TypeScript stricte et la compilation de production lors des push et des pull requests ; sur `main`, il commit les deux bundles générés lorsqu'ils changent.
+Le bundle de production est généré dans `dist/ploc-cellar-card.js`, puis copié à la racine sous `ploc-cellar-card.js`, nom attendu par HACS (`hacs.json`). Les deux fichiers sont versionnés. Les dépendances sont intégrées au module JavaScript autonome. Le workflow CI du frontend exécute la vérification TypeScript stricte, les tests unitaires et la compilation de production lors des push et des pull requests ; sur `main`, il commit les deux bundles générés lorsqu'ils changent.
 
 ## Contrat backend
 
@@ -76,4 +79,4 @@ Les noms des vins utilisent la police Cormorant Garamond, intégrée localement 
 
 ## Typographie des chiffres
 
-Les valeurs de la vue d’ensemble, les nombres de bouteilles par casier et les valeurs des diagnostics utilisent la police DJB Get Digital intégrée localement. Les coordonnées des emplacements de bouteilles utilisent la typographie standard de Home Assistant. Les totaux, légendes et valeurs des graphiques statistiques conservent volontairement la typographie standard de l’interface. DJB Get Digital est une police propriétaire intégrée avec l’autorisation du titulaire des droits ; elle n’est pas couverte par la licence logicielle de ce dépôt.
+Les valeurs de la vue d’ensemble, les nombres de bouteilles par casier et les valeurs des diagnostics utilisent la police DJB Get Digital intégrée localement. Les coordonnées des emplacements de bouteilles utilisent la typographie standard de Home Assistant. Les totaux au centre des graphiques en anneau utilisent DJB Get Digital ; les légendes et les valeurs de répartition conservent la typographie standard de l’interface. DJB Get Digital est une police propriétaire intégrée avec l’autorisation du titulaire des droits ; elle n’est pas couverte par la licence logicielle de ce dépôt.

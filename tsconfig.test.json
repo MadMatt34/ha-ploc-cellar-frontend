@@ -9,6 +9,7 @@
   "include": [
     "src/rack-grid.ts",
     "src/wine-image.ts",
-    "src/meals.ts"
+    "src/meals.ts",
+    "src/inventory-client.ts"
   ]
 }

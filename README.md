@@ -16,6 +16,8 @@ The former **Ploc Cellar Statistics** card type remains registered as a compatib
 
 Each card uses the native configuration-entry selector in its editor and stores its own `config_entry_id`. The cards communicate only with Home Assistant through the integration's `ploc_cellar.get_inventory` WebSocket response service. They do not connect to PLOUD directly. The backend integration must be installed and configured before the cards can display data.
 
+The cards request the inventory when they are initialized and expose a manual refresh action. They do not poll for backend synchronization events, so use **Refresh** after a PLOUD synchronization when a dashboard has remained open.
+
 ## Installation
 
 1. Install and configure the [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar).
@@ -39,15 +41,16 @@ In a **Sections** view, the overview card uses a default width of 12 columns wit
 
 ## Development
 
-Requires Node.js 22 or newer.
+Requires Node.js `^20.19.0` or `>=22.12.0` (the versions supported by Vite 7).
 
 ```sh
 npm ci
 npm run check
+npm test
 npm run build
 ```
 
-The production bundle is generated at `dist/ploc-cellar-card.js`, then copied to the repository root as `ploc-cellar-card.js`, the filename expected by HACS (`hacs.json`). Both files are versioned. Dependencies are bundled into the standalone JavaScript module. The frontend CI workflow runs the strict TypeScript check and production build on pushes and pull requests; on `main`, it commits both generated bundles when they change.
+The production bundle is generated at `dist/ploc-cellar-card.js`, then copied to the repository root as `ploc-cellar-card.js`, the filename expected by HACS (`hacs.json`). Both files are versioned. Dependencies are bundled into the standalone JavaScript module. The frontend CI workflow runs the strict TypeScript check, unit tests and production build on pushes and pull requests; on `main`, it commits both generated bundles when they change.
 
 ## Backend contract
 
@@ -76,4 +79,4 @@ Wine names use the locally bundled Cormorant Garamond typeface (SIL Open Font Li
 
 ## Numeric typography
 
-Cellar overview values, rack counts and diagnostic quantities use the locally bundled DJB Get Digital typeface. Bottle-position coordinates use Home Assistant's standard typography. Statistical chart totals, legends and distribution values deliberately retain the standard interface typography. DJB Get Digital is proprietary font software and is included with permission from the rights holder; it is not covered by this repository's software license.
+Cellar overview values, rack counts and diagnostic quantities use the locally bundled DJB Get Digital typeface. Bottle-position coordinates use Home Assistant's standard typography. Donut chart center totals use DJB Get Digital; chart legends and distribution values retain the standard interface typography. DJB Get Digital is proprietary font software and is included with permission from the rights holder; it is not covered by this repository's software license.
