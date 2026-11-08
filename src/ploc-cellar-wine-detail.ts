@@ -14,6 +14,7 @@ import { groupCoordinatesByRow, groupWineLocations } from "./wine-locations";
 export class PlocCellarWineDetail extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
   @property({ attribute: false }) wine?: Wine;
+  @property({ attribute: false }) selectedLocation?: { rackId: string; row: number; column: number };
   @state() private imageUrl: string | null = null;
 
   private readonly imageLoader = new WineImageLoader();
@@ -105,7 +106,9 @@ export class PlocCellarWineDetail extends LitElement {
     .location-name { display: block; }
     .location-coordinates { display: grid; gap: 6px; margin-top: 8px; }
     .location-coordinate-row { display: flex; flex-wrap: wrap; gap: 6px; }
-    .location-coordinate { display: block; width: fit-content; max-width: 100%; padding: 4px 9px; border-radius: 999px; background: var(--primary-background-color); color: var(--primary-text-color); font-size: .82rem; line-height: 1.4; }
+    .location-coordinate { display: inline-flex; align-items: center; gap: 5px; width: fit-content; max-width: 100%; padding: 4px 9px; border-radius: 999px; background: var(--primary-background-color); color: var(--primary-text-color); font-size: .82rem; line-height: 1.4; }
+    .location-coordinate.selected { background: var(--primary-color); color: var(--text-primary-color, white); box-shadow: 0 0 0 2px var(--primary-color); font-weight: 600; }
+    .location-coordinate.selected ha-icon { --mdc-icon-size: 16px; color: inherit; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
     @media (max-width: 560px) {
@@ -308,6 +311,14 @@ export class PlocCellarWineDetail extends LitElement {
     `;
   }
 
+  private isSelectedLocation(rackId: string, row: number, column: number): boolean {
+    const selected = this.selectedLocation;
+    return selected !== undefined &&
+      selected.rackId === rackId &&
+      selected.row === row &&
+      selected.column === column;
+  }
+
   private renderLocations(wine: Wine) {
     if (!wine.locations.length) {
       return html`<p class="muted">${this.t("wine_detail_no_locations")}</p>`;
@@ -323,7 +334,13 @@ export class PlocCellarWineDetail extends LitElement {
                 <div class="location-coordinates">
                   ${groupCoordinatesByRow(rack.coordinates).map(({ row, columns }) => html`
                     <div class="location-coordinate-row">
-                      ${columns.map((column) => html`<span class="location-coordinate">${this.t("row")} ${row + 1}, ${this.t("column")} ${column + 1}</span>`)}
+                      ${columns.map((column) => {
+                            const selected = this.isSelectedLocation(rack.rackId, row, column);
+                            return html`<span class="location-coordinate ${selected ? "selected" : ""}">
+                              ${selected ? html`<ha-icon icon="mdi:target" aria-hidden="true"></ha-icon>` : nothing}
+                              ${this.t("row")} ${row + 1}, ${this.t("column")} ${column + 1}
+                            </span>`;
+                          })}
                     </div>
                   `)}
                 </div>
