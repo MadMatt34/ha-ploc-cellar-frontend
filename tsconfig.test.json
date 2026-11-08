@@ -11,6 +11,7 @@
     "src/wine-image.ts",
     "src/meals.ts",
     "src/inventory-filters.ts",
-    "src/inventory-client.ts"
+    "src/inventory-client.ts",
+    "src/grape-composition.ts"
   ]
 }
