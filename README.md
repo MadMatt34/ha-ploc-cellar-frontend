@@ -67,7 +67,7 @@ English and French are supported.
 
 ## Wine characteristics
 
-The wine detail dialog uses independently collapsible sections for stock, food pairings, characteristics, locations and notes. Stock movements are nested in their own collapsible subsection. Characteristics are grouped into origin/identification and tasting/composition, with icon-led rows. Grape varieties are displayed in a separate composition panel; explicit percentages in the source text are represented by proportional bars. When a grape has no explicit percentage, it is treated as 100% and shown with a full bar. Invalid explicit percentages remain unknown.
+The wine detail dialog uses independently collapsible sections for stock, food pairings, characteristics, locations and notes. Rack locations are grouped into one tile per rack; known row/column components remain visible when the other coordinate is missing. Stock movements are nested in their own collapsible subsection. Characteristics are grouped into origin/identification and tasting/composition, with icon-led rows. Grape varieties are displayed in a separate composition panel; explicit percentages in the source text are represented by proportional bars. When a grape has no explicit percentage, it is treated as 100% and shown with a full bar. Invalid explicit percentages remain unknown.
 
 ## Wine photos
 
