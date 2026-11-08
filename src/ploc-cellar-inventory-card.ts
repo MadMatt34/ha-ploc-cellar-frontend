@@ -9,6 +9,7 @@ import type {
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
 import { fetchInventory } from "./inventory-client";
+import { getMealTranslationKeys } from "./meals";
 import "./ploc-cellar-wine-detail";
 
 type SortMode = "name" | "bottles" | "vintage";
@@ -25,6 +26,7 @@ export class PlocCellarInventoryCard extends LitElement {
   @state() private region = "";
   @state() private appellation = "";
   @state() private vintage = "";
+  @state() private meal: TranslationKey | "" = "";
   @state() private sort: SortMode = "name";
   @state() private selectedWine?: Wine;
   private requestGeneration = 0;
@@ -60,7 +62,9 @@ export class PlocCellarInventoryCard extends LitElement {
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
     .filters { margin: 14px 0; }
-    .filters > summary { cursor: pointer; font-weight: 500; padding: 4px 0; }
+    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }
+    .filters > summary::-webkit-details-marker { display: none; }
+    .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
     .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
     .error { color: var(--error-color); padding: 8px 0; }
@@ -131,6 +135,7 @@ export class PlocCellarInventoryCard extends LitElement {
       if (this.region && wine.region !== this.region) return false;
       if (this.appellation && wine.appellation !== this.appellation) return false;
       if (this.vintage && String(wine.vintage ?? "") !== this.vintage) return false;
+      if (this.meal && !getMealTranslationKeys(wine.meals).includes(this.meal)) return false;
       if (!query) return true;
       return [
         wine.name, wine.domain, wine.appellation, wine.region, wine.country,
@@ -159,7 +164,35 @@ export class PlocCellarInventoryCard extends LitElement {
     this.region = "";
     this.appellation = "";
     this.vintage = "";
+    this.meal = "";
     this.sort = "name";
+  }
+
+  private mealValues(): TranslationKey[] {
+    const values = new Set<TranslationKey>();
+    for (const wine of this.inventory?.wines ?? []) {
+      for (const key of getMealTranslationKeys(wine.meals)) values.add(key);
+    }
+    return [...values].sort((a, b) =>
+      translate(this.hass?.language ?? "en", a).localeCompare(
+        translate(this.hass?.language ?? "en", b),
+        this.hass?.language ?? undefined,
+        { sensitivity: "base" },
+      ),
+    );
+  }
+
+  private selectMealFilter() {
+    const t = (key: TranslationKey): string => translate(this.hass?.language ?? "en", key);
+    return html`
+      <select aria-label=${t("filter_meal")} .value=${this.meal}
+        @change=${(event: Event) => {
+          this.meal = (event.target as HTMLSelectElement).value as TranslationKey | "";
+        }}>
+        <option value="" ?selected=${!this.meal}>${t("filter_meal")}</option>
+        ${this.mealValues().map((key) => html`<option value=${key} ?selected=${key === this.meal}>${t(key)}</option>`)}
+      </select>
+    `;
   }
 
   private selectFilter(
@@ -198,7 +231,6 @@ export class PlocCellarInventoryCard extends LitElement {
           <div>
             <div class="wine-name"><button class="wine-name-button" type="button" aria-haspopup="dialog" @click=${() => { this.selectedWine = wine; }}>${wine.name}</button></div>
             <div class="metadata">${[
-              wine.domain,
               wine.appellation,
               wine.region,
               wine.country,
@@ -221,7 +253,7 @@ export class PlocCellarInventoryCard extends LitElement {
     const wines = this.filteredWines;
     const total = wines.reduce((sum, wine) => sum + wine.bottles_in_cellar, 0);
     const activeFilters = Boolean(
-      this.search || this.color || this.region || this.appellation || this.vintage,
+      this.search || this.color || this.region || this.appellation || this.vintage || this.meal,
     );
 
     return html`
@@ -240,16 +272,17 @@ export class PlocCellarInventoryCard extends LitElement {
           : nothing}
         ${this.inventory?.stale ? html`<div class="warning">${t("stale")}</div>` : nothing}
         ${this.inventory ? html`
-          <details class="filters" open>
-            <summary>${t("inventory_filters")}</summary>
+          <input class="search" type="search" aria-label=${t("search_wine")}
+            placeholder=${t("search_placeholder")} .value=${this.search}
+            @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; }} />
+          <details class="filters">
+            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span></summary>
             <div class="toolbar">
-              <input class="search" type="search" aria-label=${t("search_wine")}
-                placeholder=${t("search_placeholder")} .value=${this.search}
-                @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; }} />
               ${this.selectFilter("color", t("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", t("filter_region"), this.region, this.valuesFor("region"))}
               ${this.selectFilter("appellation", t("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
               ${this.selectFilter("vintage", t("filter_vintage"), this.vintage, this.valuesFor("vintage"))}
+              ${this.selectMealFilter()}
               <select aria-label=${t("sort_by")} .value=${this.sort}
                 @change=${(event: Event) => { this.sort = (event.target as HTMLSelectElement).value as SortMode; }}>
                 <option value="name" ?selected=${this.sort === "name"}>${t("sort_name")}</option>
