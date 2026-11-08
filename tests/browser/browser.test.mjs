@@ -12,7 +12,7 @@ async function waitForServer() {
   const deadline = Date.now() + 20_000;
   while (Date.now() < deadline) {
     try {
-      const response = await fetch(BASE_URL);
+      const response = await fetch(`${BASE_URL}/tests/browser/fixture.html`);
       if (response.ok) return;
     } catch {
       // Vite is still starting.
