@@ -114,6 +114,7 @@ window.__plocFixture = {
   inventory,
   fail: false,
   calls: 0,
+  imageFetches: 0,
 };
 
 window.testHass = {
@@ -125,7 +126,12 @@ window.testHass = {
     }
     return { response: window.__plocFixture.inventory };
   },
-  fetchWithAuth: async () => new Response(new Blob(["image"], { type: "image/jpeg" })),
+  fetchWithAuth: async () => {
+    window.__plocFixture.imageFetches += 1;
+    return new Response(new Blob([
+      '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="red"/></svg>',
+    ], { type: "image/svg+xml" }));
+  },
 };
 
 window.mountPlocCard = async (tag, config) => {
