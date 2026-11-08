@@ -45,16 +45,14 @@ test("missing paths and absent fetchers do not create object URLs", async () => 
   assert.deepEqual(changes, [null]);
 });
 
-test("HTTP and network errors are not retried on every host update", async () => {
+test("HTTP errors are not retried on every host update", async () => {
   const revoked = [];
   const loader = new WineImageLoader(() => "blob:retry", (url) => revoked.push(url));
   const changes = [];
   let attempts = 0;
   const fetchImage = async () => {
     attempts += 1;
-    if (attempts === 1) return response(new Blob(), false);
-    if (attempts === 2) throw new Error("network unavailable");
-    return response();
+    return response(new Blob(), false);
   };
 
   await loader.load("/image.jpg", fetchImage, (url) => changes.push(url));
@@ -64,6 +62,25 @@ test("HTTP and network errors are not retried on every host update", async () =>
   assert.equal(attempts, 1);
   assert.deepEqual(changes, [null]);
   assert.deepEqual(revoked, []);
+});
+
+test("network errors are not retried on every host update", async () => {
+  const loader = new WineImageLoader(() => "blob:network", () => {});
+  let attempts = 0;
+
+  const firstHostFetcher = async () => {
+    attempts += 1;
+    throw new Error("network unavailable");
+  };
+  const replacementHostFetcher = async () => {
+    attempts += 1;
+    return response();
+  };
+
+  await loader.load("/image.jpg", firstHostFetcher, () => {});
+  await loader.load("/image.jpg", replacementHostFetcher, () => {});
+
+  assert.equal(attempts, 1);
 });
 
 test("a path is fetched when Home Assistant becomes available after the detail mounts", async () => {
