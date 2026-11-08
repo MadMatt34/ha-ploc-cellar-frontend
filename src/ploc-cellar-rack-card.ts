@@ -8,6 +8,7 @@ import type {
   Wine,
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
+import { fetchInventory } from "./inventory-client";
 import "./ploc-cellar-wine-detail";
 import "./numeric-typography";
 import { buildRackGridLayout, clampTooltipPosition } from "./rack-grid";
@@ -102,15 +103,9 @@ export class PlocCellarRackCard extends LitElement {
     this.loading = true;
     this.error = undefined;
     try {
-      const result = await hass.callWS<{ response: InventoryResponse }>({
-        type: "call_service",
-        domain: "ploc_cellar",
-        service: "get_inventory",
-        service_data: { config_entry_id: configEntryId },
-        return_response: true,
-      });
+      const inventory = await fetchInventory(hass, configEntryId);
       if (generation === this.requestGeneration) {
-        this.inventory = result.response;
+        this.inventory = inventory;
         if (!this.selectedRackId || !this.inventory.racks.some((rack) => rack.id === this.selectedRackId)) {
           this.selectedRackId = this.inventory.racks[0]?.id;
         }
