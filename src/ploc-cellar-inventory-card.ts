@@ -10,7 +10,7 @@ import type {
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
 import { fetchInventory } from "./inventory-client";
-import { getMealTranslationKeys } from "./meals";
+import { getMealTranslationKeys, type MealTranslationKey } from "./meals";
 import {
   ALL_FILTER_VALUES,
   getInventoryFilterOptionValue,
@@ -35,7 +35,7 @@ export class PlocCellarInventoryCard extends LitElement {
   @state() private region: InventoryFilterSelection = ALL_FILTER_VALUES;
   @state() private appellation: InventoryFilterSelection = ALL_FILTER_VALUES;
   @state() private vintage: InventoryFilterSelection = ALL_FILTER_VALUES;
-  @state() private meal: TranslationKey | "" = "";
+  @state() private meal: MealTranslationKey | "" = "";
   @state() private sort: SortMode = "name-asc";
   @state() private selectedWine?: Wine;
   private requestGeneration = 0;
@@ -189,8 +189,8 @@ export class PlocCellarInventoryCard extends LitElement {
     this.sort = "name-asc";
   }
 
-  private mealValues(): TranslationKey[] {
-    const values = new Set<TranslationKey>();
+  private mealValues(): MealTranslationKey[] {
+    const values = new Set<MealTranslationKey>();
     for (const wine of this.inventory?.wines ?? []) {
       for (const key of getMealTranslationKeys(wine.meals)) values.add(key);
     }
@@ -208,7 +208,7 @@ export class PlocCellarInventoryCard extends LitElement {
     return html`
       <select aria-label=${t("filter_meal")} .value=${this.meal}
         @change=${(event: Event) => {
-          this.meal = (event.target as HTMLSelectElement).value as TranslationKey | "";
+          this.meal = (event.target as HTMLSelectElement).value as MealTranslationKey | "";
         }}>
         <option value="" ?selected=${!this.meal}>${t("filter_meal")}</option>
         ${this.mealValues().map((key) => html`<option value=${key} ?selected=${key === this.meal}>${t(key)}</option>`)}
