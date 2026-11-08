@@ -279,15 +279,15 @@ export class PlocCellarWineDetail extends LitElement {
           ${this.stockItem("wine_detail_effective", wine.effective_stock)}
         </div>
         ${hasMovementData ? html`
-          <div class="section-summary"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></div>
+          <div class="section-subtitle"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>${this.t("wine_detail_movements")}</div>
           <div class="section-body"><dl>
           ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", wine.purchased)}
           ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", wine.consumed)}
           ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", wine.movement_balance)}
           ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", wine.calculated_stock)}
-          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", wine.unlocated_bottles)}
           ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", wine.negative_movement_bottles)}
           ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", wine.physical_surplus_bottles)}
+          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", wine.unlocated_bottles)}
           </dl></div>
         ` : nothing}
         </div>
