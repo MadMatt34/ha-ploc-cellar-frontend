@@ -35,6 +35,7 @@
   "filter_appellation": "All appellations",
   "filter_meal": "All food pairings",
   "filter_vintage": "All vintages",
+  "filter_unknown": "Unknown",
   "sort_by": "Sort by:",
   "inventory_results": "{count} wine(s)",
   "inventory_bottle_total": "{count} bottle(s)",
