@@ -24,6 +24,7 @@ export class PlocCellarRackCard extends LitElement {
   @state() private activeTooltip?: { wine?: Wine; color: string };
   private tooltipPosition?: { left: number; top: number };
   @state() private selectedWine?: Wine;
+  @state() private selectedLocation?: { rackId: string; row: number; column: number };
   private requestGeneration = 0;
 
   static styles = css`
@@ -319,11 +320,23 @@ export class PlocCellarRackCard extends LitElement {
                       role=${wine ? "button" : occupied ? "img" : nothing}
                       aria-haspopup=${wine ? "dialog" : nothing}
                       tabindex=${occupied ? "0" : nothing}
-                      @click=${wine ? () => { this.selectedWine = wine; } : nothing}
+                      @click=${wine ? () => {
+                        this.selectedWine = wine;
+                        this.selectedLocation = {
+                          rackId: item.rack_id,
+                          row: item.row as number,
+                          column: item.column as number,
+                        };
+                      } : nothing}
                       @keydown=${wine ? (event: KeyboardEvent) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
                           this.selectedWine = wine;
+                          this.selectedLocation = {
+                            rackId: item.rack_id,
+                            row: item.row as number,
+                            column: item.column as number,
+                          };
                         }
                       } : nothing}
                       @pointerenter=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
@@ -377,7 +390,11 @@ export class PlocCellarRackCard extends LitElement {
           <ploc-cellar-wine-detail
             .hass=${this.hass}
             .wine=${this.selectedWine}
-            @wine-detail-closed=${() => { this.selectedWine = undefined; }}>
+            .selectedLocation=${this.selectedLocation}
+            @wine-detail-closed=${() => {
+              this.selectedWine = undefined;
+              this.selectedLocation = undefined;
+            }}>
           </ploc-cellar-wine-detail>
         ` : nothing}
       </ha-card>
