@@ -243,19 +243,19 @@ export class PlocCellarInventoryCard extends LitElement {
           <details class="filters" open>
             <summary>${t("inventory_filters")}</summary>
             <div class="toolbar">
-            <input class="search" type="search" aria-label=${t("search_wine")}
-              placeholder=${t("search_placeholder")} .value=${this.search}
-              @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; }} />
-            ${this.selectFilter("color", t("filter_color"), this.color, this.valuesFor("color"))}
-            ${this.selectFilter("region", t("filter_region"), this.region, this.valuesFor("region"))}
-            ${this.selectFilter("appellation", t("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
-            ${this.selectFilter("vintage", t("filter_vintage"), this.vintage, this.valuesFor("vintage"))}
-            <select aria-label=${t("sort_by")} .value=${this.sort}
-              @change=${(event: Event) => { this.sort = (event.target as HTMLSelectElement).value as SortMode; }}>
-              <option value="name" ?selected=${this.sort === "name"}>${t("sort_name")}</option>
-              <option value="bottles" ?selected=${this.sort === "bottles"}>${t("sort_bottles")}</option>
-              <option value="vintage" ?selected=${this.sort === "vintage"}>${t("sort_vintage")}</option>
-            </select>
+              <input class="search" type="search" aria-label=${t("search_wine")}
+                placeholder=${t("search_placeholder")} .value=${this.search}
+                @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; }} />
+              ${this.selectFilter("color", t("filter_color"), this.color, this.valuesFor("color"))}
+              ${this.selectFilter("region", t("filter_region"), this.region, this.valuesFor("region"))}
+              ${this.selectFilter("appellation", t("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
+              ${this.selectFilter("vintage", t("filter_vintage"), this.vintage, this.valuesFor("vintage"))}
+              <select aria-label=${t("sort_by")} .value=${this.sort}
+                @change=${(event: Event) => { this.sort = (event.target as HTMLSelectElement).value as SortMode; }}>
+                <option value="name" ?selected=${this.sort === "name"}>${t("sort_name")}</option>
+                <option value="bottles" ?selected=${this.sort === "bottles"}>${t("sort_bottles")}</option>
+                <option value="vintage" ?selected=${this.sort === "vintage"}>${t("sort_vintage")}</option>
+              </select>
             </div>
           </details>
           <div class="summary">
