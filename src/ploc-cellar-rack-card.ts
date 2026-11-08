@@ -293,7 +293,7 @@ export class PlocCellarRackCard extends LitElement {
             aria-valuetext=${`${selectedItems.length} ${t("positions")}, ${occupiedCount} ${t("occupied")}, ${freeCount} ${t("free")}`}>
             <div class="rack-occupancy-fill" style=${`width: ${occupancyPercent}%;`}></div>
             <div class="rack-occupancy-label">
-              <span class="numeric-value">${selectedItems.length}</span>&nsp;${t("positions")}&nbsp;·&nbsp;<span class="numeric-value">${occupiedCount}</span>&nbsp;${t("occupied")}&nbsp;·&nbsp;<span class="numeric-value">${freeCount}</span>&nbsp;${t("free")}
+              <span class="numeric-value">${selectedItems.length}</span>&nbsp;${t("positions")}&nbsp;·&nbsp;<span class="numeric-value">${occupiedCount}</span>&nbsp;${t("occupied")}&nbsp;·&nbsp;<span class="numeric-value">${freeCount}</span>&nbsp;${t("free")}
             </div>
           </div>
           ${items.length ? html`
