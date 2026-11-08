@@ -312,7 +312,7 @@ describe("Ploc Cellar browser interactions", () => {
       await detail.getByText("(4 in effective stock)", { exact: true }).waitFor();
       const heroAlert = detail.locator(".wine-hero-alert");
       await heroAlert.waitFor();
-      assert.match(await heroAlert.getAttribute("aria-label"), /Unlocated bottles: 2.*Negative balance: 1 bottle\\(s\\)/);
+      assert.match(await heroAlert.getAttribute("aria-label"), /Unlocated bottles: 2.*Negative balance: 1 bottle\(s\)/);
       assert.equal(await heroAlert.locator("ha-icon[icon='mdi:alert-circle']").count(), 1);
       assert.equal(await heroAlert.evaluate((element) => getComputedStyle(element).position), "absolute");
       const hero = detail.locator(".wine-hero");
