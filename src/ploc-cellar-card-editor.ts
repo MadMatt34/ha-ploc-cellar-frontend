@@ -8,6 +8,7 @@ type EditorField =
   | "config_entry_id"
   | "title"
   | "rack_picker_mode"
+  | "show_rack_occupancy"
   | "show_occupancy"
   | "show_diagnostics"
   | "show_statistics"
@@ -55,6 +56,7 @@ export class PlocCellarCardEditor extends LitElement {
     } else if (this.isRackCard) {
       fields.push(
         { name: "title", selector: { text: {} } },
+        { name: "show_rack_occupancy", selector: { boolean: {} } },
         {
           name: "rack_picker_mode",
           selector: {
@@ -89,6 +91,7 @@ export class PlocCellarCardEditor extends LitElement {
       nextConfig.show_statistics_legends = config.show_statistics_legends !== false;
     } else if (config.type === "custom:ploc-cellar-rack-card") {
       nextConfig.rack_picker_mode = config.rack_picker_mode ?? "buttons";
+      nextConfig.show_rack_occupancy = config.show_rack_occupancy !== false;
     }
 
     this.config = nextConfig;
@@ -106,6 +109,7 @@ export class PlocCellarCardEditor extends LitElement {
       config_entry_id: "editor_configuration",
       title: "editor_title",
       rack_picker_mode: "editor_rack_picker_mode",
+      show_rack_occupancy: "editor_show_rack_occupancy",
       show_occupancy: "editor_show_occupancy",
       show_diagnostics: "editor_show_diagnostics",
       show_statistics: "editor_show_statistics",
