@@ -65,6 +65,10 @@ The optional `Wine.meals` field contains PLOUD food-pairing flags as a raw bitma
 
 English and French are supported.
 
+## Wine characteristics
+
+The wine detail dialog presents wine characteristics as icon-led rows. Grape varieties are displayed in a separate composition panel; explicit percentages in the source text are represented by proportional bars. When PLOUD provides grape names without percentages, the card displays the names without inventing proportions.
+
 ## Wine photos
 
 The wine detail dialog displays the cached PLOUD wine image when the backend provides a non-null `image_url`. The backend selects the primary image first and falls back to the cover image when the primary image is unavailable locally.

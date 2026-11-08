@@ -6,6 +6,7 @@ import type { HomeAssistant, Wine } from "./types";
 import { translate, type TranslationKey } from "./translations";
 import { WineImageLoader } from "./wine-image";
 import { getMealIcon, getMealTranslationKeys } from "./meals";
+import { parseGrapeComposition } from "./grape-composition";
 
 @customElement("ploc-cellar-wine-detail")
 export class PlocCellarWineDetail extends LitElement {
@@ -67,9 +68,22 @@ export class PlocCellarWineDetail extends LitElement {
       gap: 12px 20px;
       margin: 0;
     }
-    .field { min-width: 0; }
-    dt { color: var(--secondary-text-color); font-size: .82rem; }
-    dd { margin: 3px 0 0; overflow-wrap: anywhere; line-height: 1.4; }
+    .characteristics { display: grid; gap: 0; }
+    .characteristic { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 12px; min-width: 0; padding: 13px 2px; border-bottom: 1px solid var(--divider-color); }
+    .characteristic:last-child { border-bottom: 0; }
+    .characteristic ha-icon { --mdc-icon-size: 21px; color: var(--secondary-text-color); }
+    .characteristic-copy { display: grid; grid-template-columns: minmax(100px, .8fr) minmax(0, 1.4fr); align-items: baseline; gap: 12px; min-width: 0; }
+    .characteristic-label { color: var(--secondary-text-color); font-size: .84rem; }
+    .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
+    .grapes-card { margin-top: 10px; padding: 14px 16px; border: 1px solid var(--divider-color); border-radius: 14px; background: var(--card-background-color, var(--ha-card-background)); box-shadow: 0 4px 18px rgb(0 0 0 / 5%); }
+    .grape-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 16px; padding: 9px 0; }
+    .grape-name { min-width: 0; overflow-wrap: anywhere; }
+    .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .grape-percentage { flex: 0 0 42px; text-align: right; font-variant-numeric: tabular-nums; }
+    .grape-track { height: 7px; overflow: hidden; border-radius: 2px; background: var(--divider-color); }
+    .grape-fill { height: 100%; background: var(--wine-accent, var(--error-color)); }
+    .grape-row:not(.has-percentage) { grid-template-columns: minmax(0, 1fr); }
+    .grape-row:not(.has-percentage) .grape-composition { display: none; }
     .stock { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px; }
     .stock-item {
       min-width: 0;
@@ -126,12 +140,42 @@ export class PlocCellarWineDetail extends LitElement {
     return new Intl.NumberFormat(this.language, { maximumFractionDigits: 2 }).format(value);
   }
 
-  private field(label: TranslationKey, value: string | number | null | undefined) {
+  private characteristic(icon: string, label: TranslationKey, value: string | number | null | undefined) {
     if (value === null || value === undefined || value === "") return nothing;
     return html`
-      <div class="field">
-        <dt>${this.t(label)}</dt>
-        <dd>${value}</dd>
+      <div class="characteristic">
+        <ha-icon icon=${icon} aria-hidden="true"></ha-icon>
+        <div class="characteristic-copy">
+          <span class="characteristic-label">${this.t(label)}</span>
+          <span class="characteristic-value">${value}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  private renderGrapes(value: string | null) {
+    if (!value?.trim()) return nothing;
+    const grapes = parseGrapeComposition(value);
+    if (!grapes.length) return nothing;
+    return html`
+      <div class="characteristic">
+        <ha-icon icon="mdi:grape" aria-hidden="true"></ha-icon>
+        <div class="characteristic-value">
+          <span class="characteristic-label">${this.t("tooltip_grapes")}</span>
+          <div class="grapes-card">
+            ${grapes.map((grape) => html`
+              <div class="grape-row ${grape.percentage !== null ? "has-percentage" : ""}">
+                <span class="grape-name">${grape.name}</span>
+                <div class="grape-composition">
+                  <span class="grape-percentage">${grape.percentage === null ? "" : `${this.formatNumber(grape.percentage)}%`}</span>
+                  <div class="grape-track" role="img" aria-label=${grape.percentage === null ? "" : `${this.formatNumber(grape.percentage)}%`}>
+                    <div class="grape-fill" style=${grape.percentage === null ? "" : `width: ${grape.percentage}%`}></div>
+                  </div>
+                </div>
+              </div>
+            `)}
+          </div>
+        </div>
       </div>
     `;
   }
@@ -199,13 +243,13 @@ export class PlocCellarWineDetail extends LitElement {
         ${hasMovementData ? html`
           <h3 style="margin-top: 16px">${this.t("wine_detail_movements")}</h3>
           <dl>
-            ${this.field("wine_detail_purchased", wine.purchased)}
-            ${this.field("wine_detail_consumed", wine.consumed)}
-            ${this.field("wine_detail_balance", wine.movement_balance)}
-            ${this.field("wine_detail_calculated", wine.calculated_stock)}
-            ${this.field("wine_detail_unlocated", wine.unlocated_bottles)}
-            ${this.field("wine_detail_negative", wine.negative_movement_bottles)}
-            ${this.field("wine_detail_surplus", wine.physical_surplus_bottles)}
+            ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", wine.purchased)}
+            ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", wine.consumed)}
+            ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", wine.movement_balance)}
+            ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", wine.calculated_stock)}
+            ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", wine.unlocated_bottles)}
+            ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", wine.negative_movement_bottles)}
+            ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", wine.physical_surplus_bottles)}
           </dl>
         ` : nothing}
       </section>
@@ -273,21 +317,21 @@ export class PlocCellarWineDetail extends LitElement {
           ${this.renderMeals(wine)}
           <section>
             <h3>${this.t("wine_detail_characteristics")}</h3>
-            <dl>
-              ${this.field("tooltip_domain", wine.domain)}
-              ${this.field("tooltip_vintage", wine.vintage)}
-              ${this.field("tooltip_appellation", wine.appellation)}
-              ${this.field("tooltip_classification", wine.classification)}
-              ${this.field("tooltip_color", wine.color)}
-              ${this.field("tooltip_region", wine.region)}
-              ${this.field("tooltip_country", wine.country)}
-              ${this.field("tooltip_grapes", wine.grapes)}
-              ${this.field("tooltip_cuvee", wine.cuvee)}
-              ${this.field("tooltip_format", wine.bottle_format)}
-              ${this.field("tooltip_volume", wine.bottle_volume_l === null ? null : `${this.formatNumber(wine.bottle_volume_l)} L`)}
-              ${this.field("wine_detail_alcohol", wine.alcohol_percent === null ? null : `${this.formatNumber(wine.alcohol_percent)} %`)}
-              ${this.field("tooltip_temperature", temperature)}
-            </dl>
+            <div class="characteristics">
+              ${this.characteristic("mdi:domain", "tooltip_domain", wine.domain)}
+              ${this.characteristic("mdi:calendar", "tooltip_vintage", wine.vintage)}
+              ${this.characteristic("mdi:map-marker-radius", "tooltip_appellation", wine.appellation)}
+              ${this.characteristic("mdi:medal-outline", "tooltip_classification", wine.classification)}
+              ${this.characteristic("mdi:palette-outline", "tooltip_color", wine.color)}
+              ${this.characteristic("mdi:map-outline", "tooltip_region", wine.region)}
+              ${this.characteristic("mdi:earth", "tooltip_country", wine.country)}
+              ${this.renderGrapes(wine.grapes)}
+              ${this.characteristic("mdi:tag-outline", "tooltip_cuvee", wine.cuvee)}
+              ${this.characteristic("mdi:bottle-wine-outline", "tooltip_format", wine.bottle_format)}
+              ${this.characteristic("mdi:cup-water", "tooltip_volume", wine.bottle_volume_l === null ? null : `${this.formatNumber(wine.bottle_volume_l)} L`)}
+              ${this.characteristic("mdi:percent-outline", "wine_detail_alcohol", wine.alcohol_percent === null ? null : `${this.formatNumber(wine.alcohol_percent)} %`)}
+              ${this.characteristic("mdi:thermometer", "tooltip_temperature", temperature)}
+            </div>
           </section>
           <section>
             <h3>${this.t("locations")}</h3>

@@ -65,6 +65,10 @@ Le champ facultatif `Wine.meals` contient les indicateurs d'accords mets-vins PL
 
 Le français et l'anglais sont pris en charge.
 
+## Caractéristiques des vins
+
+La modale de détail présente les caractéristiques sous forme de lignes associant une icône, un libellé et sa valeur. Les cépages sont regroupés dans un encart dédié ; les pourcentages explicitement présents dans les données source sont représentés par des barres proportionnelles. Lorsque PLOUD ne fournit que les noms des cépages, la carte les affiche sans inventer de proportions.
+
 ## Photos des vins
 
 La fenêtre de détail d'un vin affiche la photo PLOUD mise en cache lorsque le backend fournit un champ `image_url` non nul. Le backend privilégie l'image principale et utilise l'image de couverture si l'image principale n'est pas disponible localement.
