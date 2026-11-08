@@ -82,6 +82,7 @@ export class PlocCellarWineDetail extends LitElement {
     .characteristic-copy { display: grid; grid-template-columns: minmax(100px, .8fr) minmax(0, 1.4fr); align-items: baseline; gap: 12px; min-width: 0; }
     .characteristic-label { color: var(--secondary-text-color); font-size: .9rem; }
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
+    .characteristic-value.is-error { color: var(--error-color); }
     .grapes-list { display: grid; gap: 2px; }
     .grape-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 16px; padding: 0 0 7px 0; }
     .grape-name { min-width: 0; overflow-wrap: anywhere; }
@@ -166,14 +167,14 @@ export class PlocCellarWineDetail extends LitElement {
     return new Intl.NumberFormat(this.language, { maximumFractionDigits: 2 }).format(value);
   }
 
-  private characteristic(icon: string, label: TranslationKey, value: string | number | null | undefined) {
+  private characteristic(icon: string, label: TranslationKey, value: string | number | null | undefined, errorWhenPositive = false) {
     if (value === null || value === undefined || value === "") return nothing;
     return html`
       <div class="characteristic">
         <ha-icon icon=${icon} aria-hidden="true"></ha-icon>
         <div class="characteristic-copy">
           <span class="characteristic-label">${this.t(label)}</span>
-          <span class="characteristic-value">${value}</span>
+          <span class="characteristic-value ${errorWhenPositive && typeof value === "number" && value > 0 ? "is-error" : ""}">${value}</span>
         </div>
       </div>
     `;
@@ -307,9 +308,9 @@ export class PlocCellarWineDetail extends LitElement {
           ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", wine.consumed)}
           ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", wine.movement_balance)}
           ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", wine.calculated_stock)}
-          ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", wine.negative_movement_bottles)}
-          ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", wine.physical_surplus_bottles)}
-          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", wine.unlocated_bottles)}
+          ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", wine.negative_movement_bottles, true)}
+          ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", wine.physical_surplus_bottles, true)}
+          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", wine.unlocated_bottles, true)}
           </dl></div>
         ` : nothing}
         </div>
