@@ -9,7 +9,7 @@ Independent Home Assistant Lovelace frontend for the [Ploc Cellar integration](h
 This repository contains three custom cards:
 
 - **Ploc Cellar overview** (`custom:ploc-cellar-card`): cellar overview and statistics, including physical and reconstructed stock, rack occupancy, stock diagnostics, and donut charts for distributions by color, region, appellation, vintage and bottle format. Chart breakdowns cover known wine references; unresolved wine positions remain included in global physical totals and are reported separately.
-- **Ploc Cellar inventory** (`custom:ploc-cellar-inventory-card`): searchable wine list with collapsible color, region, appellation, vintage and food-pairing filters, sorting and quantities. Wine details remain available by selecting a wine name.
+- **Ploc Cellar inventory** (`custom:ploc-cellar-inventory-card`): searchable wine list with collapsible color, region, appellation, vintage and food-pairing filters, sorting and quantities. Color, region, appellation and vintage filters also offer an **Unknown** option to find wines whose property is missing or blank. Wine details remain available by selecting a wine name.
 - **Ploc Cellar rack** (`custom:ploc-cellar-rack-card`): rack selector and a position map based on the actual PLOUD row/column coordinates. Occupied positions are represented individually and use the wine color when available.
   The editor lets you hide the rack occupancy bar; it is shown by default and matches the width of the position map.
 
