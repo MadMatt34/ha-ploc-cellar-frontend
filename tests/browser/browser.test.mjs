@@ -310,6 +310,15 @@ describe("Ploc Cellar browser interactions", () => {
       await detail.waitFor();
       await detail.locator(".wine-stock-line").getByText("bottles in cellar", { exact: true }).waitFor();
       await detail.getByText("(4 in effective stock)", { exact: true }).waitFor();
+      const heroAlert = detail.locator(".wine-hero-alert");
+      await heroAlert.waitFor();
+      assert.match(await heroAlert.getAttribute("aria-label"), /Unlocated bottles: 2.*Negative balance: 1 bottle\(s\)/);
+      assert.equal(await heroAlert.locator("ha-icon[icon='mdi:alert-circle']").count(), 1);
+      assert.equal(await heroAlert.evaluate((element) => getComputedStyle(element).position), "absolute");
+      const hero = detail.locator(".wine-hero");
+      assert.equal(await hero.evaluate((element) => getComputedStyle(element).position), "relative");
+      const heroMainBefore = await detail.locator(".wine-hero-main").boundingBox();
+      const scrollYBefore = await page.evaluate(() => window.scrollY);
       const stock = detail.locator(".stock-details");
       await stock.locator("summary").click();
       await stock.locator(".stock-issues[role='alert']").getByText("Unlocated bottles: 2 · Negative balance: 1 bottle(s)").waitFor();
@@ -325,6 +334,12 @@ describe("Ploc Cellar browser interactions", () => {
       const alertColor = await stock.evaluate((element) => getComputedStyle(element).getPropertyValue("--error-color").trim());
       assert.equal(borderColor, alertColor);
       assert.equal(await card.locator(".wine").count(), inventoryCount);
+      const heroMainAfter = await detail.locator(".wine-hero-main").boundingBox();
+      const scrollYAfter = await page.evaluate(() => window.scrollY);
+      assert.deepEqual(
+        { ...heroMainAfter, y: heroMainAfter.y + scrollYAfter },
+        { ...heroMainBefore, y: heroMainBefore.y + scrollYBefore },
+      );
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();

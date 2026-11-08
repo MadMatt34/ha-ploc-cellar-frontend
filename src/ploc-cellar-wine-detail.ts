@@ -40,7 +40,9 @@ export class PlocCellarWineDetail extends LitElement {
     .nested-details > .section-summary { min-height: 42px; padding: 9px 0; font-size: .88rem; }
     .nested-details > .section-body { padding: 0 0 4px; }
     .wine-dialog-title { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; white-space: normal; }
-    .wine-hero { display: grid; grid-template-columns: 8px minmax(0, 1fr); align-items: stretch; gap: 14px; min-width: 0; }
+    .wine-hero { position: relative; display: grid; grid-template-columns: 8px minmax(0, 1fr); align-items: stretch; gap: 14px; min-width: 0; }
+.wine-hero-alert { position: absolute; top: 4px; right: 4px; z-index: 1; display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--error-color); border-radius: 50%; background: var(--card-background-color, var(--ha-card-background, var(--primary-background-color))); color: var(--error-color); }
+.wine-hero-alert ha-icon { --mdc-icon-size: 20px; }
     .wine-hero-banner { width: 8px; min-height: 120px; border-radius: 999px; }
     .wine-hero-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 32%); align-items: center; gap: 14px; min-width: 0; }
     .wine-image-container { display: flex; justify-content: flex-end; align-items: center; min-width: 0; max-height: 160px; overflow: hidden; padding-right: 10px; border-radius: 20px; }
@@ -250,6 +252,25 @@ export class PlocCellarWineDetail extends LitElement {
     return `background: rgb(${rgb[0]} ${rgb[1]} ${rgb[2]});`;
   }
 
+  private renderHeroAlert(wine: Wine) {
+    const issues = [
+      { key: "wine_detail_issue_unlocated" as const, count: wine.unlocated_bottles ?? 0 },
+      { key: "wine_detail_issue_negative" as const, count: wine.negative_movement_bottles ?? 0 },
+      { key: "wine_detail_issue_surplus" as const, count: wine.physical_surplus_bottles ?? 0 },
+    ].filter((issue) => issue.count > 0);
+    if (!issues.length) return nothing;
+
+    const description = issues
+      .map((issue) => this.t(issue.key).replace("{count}", this.formatNumber(issue.count)))
+      .join(" · ");
+
+    return html`
+      <span class="wine-hero-alert" role="img" aria-label="${description}" title="${description}">
+        <ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon>
+      </span>
+    `;
+  }
+
   private renderIdentity(wine: Wine) {
     const tags = [wine.color, wine.bottle_format].filter((value): value is string => Boolean(value));
 
@@ -400,6 +421,7 @@ export class PlocCellarWineDetail extends LitElement {
         <span slot="headerTitle" class="wine-dialog-title">${wine.name}</span>
         <div class="content">
           <div class="wine-hero">
+            ${this.renderHeroAlert(wine)}
             <div class="wine-hero-banner" style=${this.colorStyle} aria-hidden="true"></div>
             <div class="wine-hero-main">
               ${this.renderIdentity(wine)}
