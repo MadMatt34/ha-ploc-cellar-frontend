@@ -129,7 +129,7 @@ describe("Ploc Cellar browser interactions", () => {
       const selected = detail.locator(".location-coordinate.selected");
       await selected.waitFor();
       assert.match(await selected.innerText(), /row\s*1.*column\s*1/i);
-      await selected.locator('ha-icon[icon="mdi:target"]').waitFor();
+      assert.equal(await selected.locator('ha-icon[icon="mdi:target"]').count(), 1);
       await detail.locator("ha-dialog").evaluate((dialog) => {
         dialog.dispatchEvent(new Event("closed", { bubbles: true }));
       });
@@ -137,10 +137,10 @@ describe("Ploc Cellar browser interactions", () => {
 
       const secondSlot = card.locator(".slot.occupied").nth(1);
       await secondSlot.focus();
-      await secondSlot.press("Enter");
+      await secondSlot.press("Space");
       detail = card.locator("ploc-cellar-wine-detail");
       await detail.waitFor();
-      await detail.locator(".location-coordinate.selected ha-icon[icon='mdi:target']").waitFor();
+      assert.equal(await detail.locator(".location-coordinate.selected ha-icon[icon='mdi:target']").count(), 1);
       await detail.locator("ha-dialog").evaluate((dialog) => {
         dialog.dispatchEvent(new Event("closed", { bubbles: true }));
       });
@@ -216,6 +216,35 @@ describe("Ploc Cellar browser interactions", () => {
       const config = await page.evaluate(() => window.__editorConfig);
       assert.equal(config.title, "Test cellar");
       assert.equal(config.config_entry_id, "fixture-entry");
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
+
+  it("loads wine photos and revokes the object URL when the dialog closes", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => {
+        window.__plocFixture.inventory.wines[0].image_url = "/api/ploc-cellar/image/wine-a?v=1";
+        return window.mountPlocCard("ploc-cellar-inventory-card", {});
+      });
+      const card = page.locator("ploc-cellar-inventory-card");
+      await card.locator(".wine").first().waitFor();
+      await card.locator(".wine").filter({ hasText: "Château A" }).click();
+      const detail = card.locator("ploc-cellar-wine-detail");
+      const image = detail.locator("img.wine-image");
+      await image.waitFor();
+      const imageUrl = await image.getAttribute("src");
+      assert.ok(imageUrl?.startsWith("blob:"));
+      assert.equal(await page.evaluate(() => window.__plocFixture.imageFetches), 1);
+
+      await detail.locator("ha-dialog").evaluate((dialog) => {
+        dialog.dispatchEvent(new Event("closed", { bubbles: true }));
+      });
+      await detail.waitFor({ state: "detached" });
+      await page.waitForFunction((url) => window.__objectUrlStats.revoked.includes(url), imageUrl);
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();
