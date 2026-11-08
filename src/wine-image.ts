@@ -6,6 +6,7 @@ export class WineImageLoader {
   private objectUrl: string | null = null;
   private loadedPath: string | null = null;
   private pendingPath: string | null = null;
+  private attemptedPath: string | null = null;
   private request = 0;
 
   constructor(
@@ -22,7 +23,9 @@ export class WineImageLoader {
   ): Promise<void> {
     if (
       imagePath === this.loadedPath &&
-      (this.objectUrl !== null || this.pendingPath === imagePath)
+      (this.objectUrl !== null ||
+        this.pendingPath === imagePath ||
+        this.attemptedPath === imagePath)
     ) return;
 
     const request = ++this.request;
@@ -30,11 +33,19 @@ export class WineImageLoader {
     onChange(null);
     this.loadedPath = imagePath;
     this.pendingPath = imagePath;
-    if (!imagePath || !fetchImage) {
+    this.attemptedPath = null;
+    if (!imagePath) {
+      this.pendingPath = null;
+      return;
+    }
+    if (!fetchImage) {
+      // Do not mark the path as attempted until Home Assistant can fetch it.
+      this.loadedPath = null;
       this.pendingPath = null;
       return;
     }
 
+    this.attemptedPath = imagePath;
     try {
       const response = await fetchImage(imagePath);
       if (!response.ok) return;
@@ -54,6 +65,7 @@ export class WineImageLoader {
     this.request += 1;
     this.loadedPath = null;
     this.pendingPath = null;
+    this.attemptedPath = null;
     this.revokeCurrent();
     onChange?.(null);
   }

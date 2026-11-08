@@ -45,25 +45,66 @@ test("missing paths and absent fetchers do not create object URLs", async () => 
   assert.deepEqual(changes, [null]);
 });
 
-test("HTTP and network errors leave the image optional and can be retried", async () => {
+test("HTTP errors are not retried on every host update", async () => {
   const revoked = [];
   const loader = new WineImageLoader(() => "blob:retry", (url) => revoked.push(url));
   const changes = [];
   let attempts = 0;
   const fetchImage = async () => {
     attempts += 1;
-    if (attempts === 1) return response(new Blob(), false);
-    if (attempts === 2) throw new Error("network unavailable");
-    return response();
+    return response(new Blob(), false);
   };
 
   await loader.load("/image.jpg", fetchImage, (url) => changes.push(url));
   await loader.load("/image.jpg", fetchImage, (url) => changes.push(url));
   await loader.load("/image.jpg", fetchImage, (url) => changes.push(url));
 
-  assert.equal(attempts, 3);
-  assert.deepEqual(changes, [null, null, null, "blob:retry"]);
+  assert.equal(attempts, 1);
+  assert.deepEqual(changes, [null]);
   assert.deepEqual(revoked, []);
+});
+
+test("network errors are not retried on every host update", async () => {
+  const loader = new WineImageLoader(() => "blob:network", () => {});
+  let attempts = 0;
+
+  const firstHostFetcher = async () => {
+    attempts += 1;
+    throw new Error("network unavailable");
+  };
+  const replacementHostFetcher = async () => {
+    attempts += 1;
+    return response();
+  };
+
+  await loader.load("/image.jpg", firstHostFetcher, () => {});
+  await loader.load("/image.jpg", replacementHostFetcher, () => {});
+
+  assert.equal(attempts, 1);
+});
+
+test("a path is fetched when Home Assistant becomes available after the detail mounts", async () => {
+  const loader = new WineImageLoader(() => "blob:late-hass", () => {});
+  const changes = [];
+
+  await loader.load("/image.jpg", undefined, (url) => changes.push(url));
+  await loader.load("/image.jpg", async () => response(), (url) => changes.push(url));
+
+  assert.deepEqual(changes, [null, null, "blob:late-hass"]);
+});
+
+test("a failed request is not repeated when the Home Assistant object changes", async () => {
+  const loader = new WineImageLoader(() => "blob:once", () => {});
+  let requests = 0;
+  const fetchImage = async () => {
+    requests += 1;
+    return response(new Blob(), false);
+  };
+
+  await loader.load("/image.jpg", fetchImage, () => {});
+  await loader.load("/image.jpg", fetchImage, () => {});
+
+  assert.equal(requests, 1);
 });
 
 test("replacing an image revokes the previous object URL", async () => {
