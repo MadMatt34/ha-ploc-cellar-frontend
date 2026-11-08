@@ -1091,8 +1091,8 @@ var nt = class extends je {
     .identity { min-width: 0; }
     .identity-text { min-width: 0; }
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-    .wine-vintage { margin: 5px 10px 0 20px; font-family: var(--ploc-wine-font-family); font-size: 2.5rem; font-weight: 600; line-height: 1.2; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .wine-vintage { margin: 5px 20px; font-family: var(--ploc-wine-font-family); font-size: 2.5rem; font-weight: 600; line-height: 1.2; }
     .wine-stock-line { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--secondary-text-color); font-size: 1rem; }
     .wine-stock-line ha-icon { --mdc-icon-size: 30px; flex: 0 0 auto; }
     .wine-stock-count { font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-variant-numeric: tabular-nums; color: var(--primary-text-color); }
@@ -1275,7 +1275,7 @@ var nt = class extends je {
           ${this.stockItem("wine_detail_effective", e.effective_stock)}
         </div>
         ${t ? N`
-          <div class="section-summary"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>${this.t("wine_detail_movements")}</div>
+          <div class="section-summary"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></div>
           <div class="section-body"><dl>
           ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", e.purchased)}
           ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", e.consumed)}
@@ -1369,16 +1369,16 @@ var nt = class extends je {
             </div>
           </details>
           ${this.renderMeals(e)}
-          <details class="detail-section">
-            <summary class="section-summary"><ha-icon icon="mdi:map-marker-multiple-outline" aria-hidden="true"></ha-icon>${this.t("locations")}</summary>
-            <div class="section-body">${this.renderLocations(e)}</div>
-          </details>
           ${e.comment ? N`
             <details class="detail-section">
               <summary class="section-summary"><ha-icon icon="mdi:note-text-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_comment")}</summary>
               <div class="section-body"><div class="comment">${e.comment}</div></div>
             </details>
           ` : P}
+          <details class="detail-section" open>
+            <summary class="section-summary"><ha-icon icon="mdi:map-marker-multiple-outline" aria-hidden="true"></ha-icon>${this.t("locations")}</summary>
+            <div class="section-body">${this.renderLocations(e)}</div>
+          </details>
           ${this.renderStock(e)}
         </div>
       </ha-dialog>
