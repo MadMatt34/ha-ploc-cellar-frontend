@@ -19123,6 +19123,8 @@ var AO = [
     .label, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .section { margin-top: 16px; }
     .section-title { margin: 0 0 8px; font-size: .95rem; font-weight: 500; }
+    details.section > summary { display: list-item; cursor: pointer; }
+    details.section > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .occupancy-bar { position: relative; height: 20px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
     .occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
@@ -19385,8 +19387,8 @@ var AO = [
             </section>
           ` : P}
           ${i && u ? N`
-            <section class="section">
-              <h3 class="section-title">${e("inventory_diagnostics")}</h3>
+            <details class="section" open>
+              <summary class="section-title">${e("inventory_diagnostics")}</summary>
               ${t.stock_reconstruction_complete ? P : N`<div class="warning">${e("reconstruction_incomplete")}</div>`}
               ${l.length ? N`
                 <div class="diagnostics">
@@ -19406,11 +19408,11 @@ var AO = [
                 </div>
               ` : P}
               ${t.positions_with_unknown_wine > 0 ? N`<div class="warning">${e("statistics_unknown_wine_positions").replace("{count}", this.formatNumber(t.positions_with_unknown_wine))}</div>` : P}
-            </section>
+            </details>
           ` : P}
           ${a ? N`
-            <section class="section">
-              <h3 class="section-title">${e("statistics_title")}</h3>
+            <details class="section" open>
+              <summary class="section-title">${e("statistics_title")}</summary>
               <p class="muted">${e("statistics_distribution_scope")}</p>
               <div class="groups">
                 ${this.renderDistribution("color", "statistics_color")}
@@ -19419,7 +19421,7 @@ var AO = [
                 ${this.renderDistribution("vintage", "statistics_vintage")}
                 ${this.renderDistribution("bottle_format", "statistics_format")}
               </div>
-            </section>
+            </details>
           ` : P}
           <div class="muted section">${e("last_sync")}: ${this.formatSync(t.last_sync)}</div>
           ${this.renderDiagnosticDialog()}
