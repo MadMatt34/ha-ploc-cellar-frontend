@@ -1140,6 +1140,7 @@ var rt = class extends je {
     .characteristic-copy { display: grid; grid-template-columns: minmax(100px, .8fr) minmax(0, 1.4fr); align-items: baseline; gap: 12px; min-width: 0; }
     .characteristic-label { color: var(--secondary-text-color); font-size: .9rem; }
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
+    .characteristic-value.is-error { color: var(--error-color); }
     .grapes-list { display: grid; gap: 2px; }
     .grape-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 16px; padding: 0 0 7px 0; }
     .grape-name { min-width: 0; overflow-wrap: anywhere; }
@@ -1213,13 +1214,13 @@ var rt = class extends je {
 	formatNumber(e) {
 		return new Intl.NumberFormat(this.language, { maximumFractionDigits: 2 }).format(e);
 	}
-	characteristic(e, t, n) {
+	characteristic(e, t, n, r = !1) {
 		return n == null || n === "" ? P : N`
       <div class="characteristic">
         <ha-icon icon=${e} aria-hidden="true"></ha-icon>
         <div class="characteristic-copy">
           <span class="characteristic-label">${this.t(t)}</span>
-          <span class="characteristic-value">${n}</span>
+          <span class="characteristic-value ${r && typeof n == "number" && n > 0 ? "is-error" : ""}">${n}</span>
         </div>
       </div>
     `;
@@ -1322,9 +1323,9 @@ var rt = class extends je {
           ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", e.consumed)}
           ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", e.movement_balance)}
           ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", e.calculated_stock)}
-          ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", e.negative_movement_bottles)}
-          ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", e.physical_surplus_bottles)}
-          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", e.unlocated_bottles)}
+          ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", e.negative_movement_bottles, !0)}
+          ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", e.physical_surplus_bottles, !0)}
+          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", e.unlocated_bottles, !0)}
           </dl></div>
         ` : P}
         </div>
@@ -19433,7 +19434,7 @@ var HO = [
     .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; cursor: pointer; }
     .diagnostic:hover { background: var(--secondary-background-color); }
     .diagnostic:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
-    .diagnostic-value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .diagnostic-value { display: block; color: var(--error-color); font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .diagnostic-hint { display: block; align-self: flex-end; margin-top: auto; padding-top: 8px; color: var(--secondary-text-color); font-size: .75rem; text-align: right; }
     .diagnostic-detail-list { display: grid; gap: 12px; max-height: min(60vh, 520px); overflow: auto; }
     .diagnostic-detail-item { border-bottom: 1px solid var(--divider-color); padding: 0 0 10px; }
