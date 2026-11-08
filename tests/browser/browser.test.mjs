@@ -302,6 +302,7 @@ describe("Ploc Cellar browser interactions", () => {
       await detail.locator(".wine-stock-line").getByText("bottles in cellar", { exact: true }).waitFor();
       await detail.getByText("(4 in effective stock)", { exact: true }).waitFor();
       const stock = detail.locator(".stock-details");
+      await stock.locator("summary").click();
       await stock.locator(".stock-issues[role='alert']").getByText("Unlocated bottles: 2 · Negative balance: 1 bottle(s)").waitFor();
       assert.equal(await stock.locator(".stock-issues ha-icon[icon='mdi:alert-circle']").count(), 1);
       assert.equal(await stock.evaluate((element) => element.classList.contains("has-inventory-issues")), true);
