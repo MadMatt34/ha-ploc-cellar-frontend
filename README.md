@@ -11,6 +11,7 @@ This repository contains three custom cards:
 - **Ploc Cellar overview** (`custom:ploc-cellar-card`): cellar overview and statistics, including physical and reconstructed stock, rack occupancy, stock diagnostics, and donut charts for distributions by color, region, appellation, vintage and bottle format. Chart breakdowns cover known wine references; unresolved wine positions remain included in global physical totals and are reported separately.
 - **Ploc Cellar inventory** (`custom:ploc-cellar-inventory-card`): searchable wine list with collapsible color, region, appellation, vintage and food-pairing filters, sorting and quantities. Wine details remain available by selecting a wine name.
 - **Ploc Cellar rack** (`custom:ploc-cellar-rack-card`): rack selector and a position map based on the actual PLOUD row/column coordinates. Occupied positions are represented individually and use the wine color when available.
+  The editor lets you hide the rack occupancy bar; it is shown by default and matches the width of the position map.
 
 The former **Ploc Cellar Statistics** card type remains registered as a compatibility alias: existing dashboards using `custom:ploc-cellar-statistics-card` continue to display the unified overview. New dashboards should use `custom:ploc-cellar-card`.
 
