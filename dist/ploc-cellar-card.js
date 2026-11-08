@@ -985,10 +985,10 @@ var Je = class {
 	meal_soup: "mdi:soup",
 	meal_entry: "mdi:food-apple",
 	meal_pork_butchery: "mdi:pig",
-	meal_seafood: "mdi:shrimp",
+	meal_seafood: "mdi:waves",
 	meal_fish: "mdi:fish",
 	meal_white_meat: "mdi:food-drumstick",
-	meal_game: "mdi:deer",
+	meal_game: "mdi:cow",
 	meal_poultry: "mdi:turkey",
 	meal_red_meat: "mdi:food-steak",
 	meal_dish_vegetable: "mdi:carrot",
@@ -1068,20 +1068,12 @@ var tt = class extends je {
     .nested-details { margin-top: 14px; border-top: 1px solid var(--divider-color); }
     .nested-details > .section-summary { min-height: 42px; padding: 9px 0; font-size: .88rem; }
     .nested-details > .section-body { padding: 0 0 4px; }
-    .wine-dialog-title { font-family: var(--ploc-wine-font-family); font-size: 1.45rem; font-weight: 500; line-height: 1.2; white-space: normal; }
-    .wine-image-container { display: flex; justify-content: center; min-width: 0; max-height: 320px; overflow: hidden; }
-    .wine-image { display: block; max-width: 100%; max-height: 320px; object-fit: contain; border-radius: 10px; }
-    .identity { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
-    .color-swatch {
-      display: block;
-      flex: 0 0 24px;
-      width: 24px;
-      height: 24px;
-      border: 2px solid var(--divider-color);
-      border-radius: 50%;
-      box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%);
-      box-sizing: border-box;
-    }
+    .wine-dialog-title { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; white-space: normal; }
+    .wine-color-banner { height: 8px; min-width: 0; border-radius: 999px; }
+    .wine-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 32%); align-items: center; gap: 14px; min-width: 0; }
+    .wine-image-container { display: flex; justify-content: flex-end; align-items: center; min-width: 0; max-height: 180px; overflow: hidden; }
+    .wine-image { display: block; max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 10px; }
+    .identity { min-width: 0; }
     .identity-text { min-width: 0; }
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
@@ -1119,8 +1111,8 @@ var tt = class extends je {
     .characteristic-copy { display: grid; grid-template-columns: minmax(100px, .8fr) minmax(0, 1.4fr); align-items: baseline; gap: 12px; min-width: 0; }
     .characteristic-label { color: var(--secondary-text-color); font-size: .84rem; }
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
-    .grapes-card { margin-top: 10px; padding: 14px 16px; border: 1px solid var(--divider-color); border-radius: 14px; background: var(--card-background-color, var(--ha-card-background)); box-shadow: 0 4px 18px rgb(0 0 0 / 5%); }
-    .grape-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 16px; padding: 9px 0; }
+    .grapes-list { display: grid; gap: 2px; margin-top: 4px; }
+    .grape-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 16px; padding: 7px 0; }
     .grape-name { min-width: 0; overflow-wrap: anywhere; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .grape-percentage { flex: 0 0 42px; text-align: right; font-variant-numeric: tabular-nums; }
@@ -1140,14 +1132,16 @@ var tt = class extends je {
     .locations { display: grid; gap: 9px; }
     .location { padding: 10px 12px; border: 1px solid var(--divider-color); border-radius: 9px; }
     .location-name { display: block; }
-    .location-coordinates { display: grid; gap: 5px; margin-top: 7px; }
-    .location-coordinate { color: var(--secondary-text-color); font-size: .88rem; line-height: 1.4; }
+    .location-coordinates { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .location-coordinate { padding: 4px 9px; border-radius: 999px; background: var(--secondary-background-color); color: var(--secondary-text-color); font-size: .82rem; line-height: 1.4; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
     @media (max-width: 560px) {
       .content { gap: 11px; }
       .characteristic-copy { grid-template-columns: minmax(0, 1fr); gap: 2px; }
       .characteristic { padding: 10px 2px; }
+      .wine-hero { grid-template-columns: minmax(0, 1fr) minmax(88px, 34%); gap: 9px; }
+      .wine-image-container, .wine-image { max-height: 145px; }
     }
     @media (max-width: 480px) {
       .content { gap: 16px; }
@@ -1203,8 +1197,7 @@ var tt = class extends je {
       <div class="characteristic">
         <ha-icon icon="mdi:grape" aria-hidden="true"></ha-icon>
         <div class="characteristic-value">
-          <span class="characteristic-label">${this.t("tooltip_grapes")}</span>
-          <div class="grapes-card" style=${this.grapeAccentStyle}>
+          <div class="grapes-list" style=${this.grapeAccentStyle}>
             ${t.map((e) => N`
               <div class="grape-row ${e.percentage === null ? "" : "has-percentage"}">
                 <span class="grape-name">${e.name}</span>
@@ -1234,17 +1227,15 @@ var tt = class extends je {
 		return !e || e.length !== 3 || !e.every((e) => Number.isInteger(e) && e >= 0 && e <= 255) ? "background: var(--secondary-text-color);" : `background: rgb(${e[0]} ${e[1]} ${e[2]});`;
 	}
 	renderIdentity(e) {
-		let t = [e.domain].filter((e) => !!e), n = [
+		let t = [
 			e.vintage === null ? this.t("unknown_vintage") : String(e.vintage),
 			e.color,
 			e.bottle_format
 		].filter((e) => !!e);
 		return N`
       <div class="identity">
-        <span class="color-swatch" style=${this.colorStyle} aria-hidden="true"></span>
         <div class="identity-text">
-          ${t.length ? N`<div class="subtitle">${t.join(" · ")}</div>` : P}
-          ${n.length ? N`<div class="tags">${n.map((e) => N`<span class="tag">${e}</span>`)}</div>` : P}
+          ${t.length ? N`<div class="tags">${t.map((e) => N`<span class="tag">${e}</span>`)}</div>` : P}
         </div>
       </div>
     `;
@@ -1320,12 +1311,15 @@ var tt = class extends je {
       <ha-dialog .open=${!0} .accessibleLabel=${e.name} @closed=${() => this.onDialogClosed()}>
         <span slot="headerTitle" class="wine-dialog-title">${e.name}</span>
         <div class="content">
-          ${this.imageUrl ? N`
-            <div class="wine-image-container">
-              <img class="wine-image" src=${this.imageUrl} alt=${e.name} />
-            </div>
-          ` : P}
-          ${this.renderIdentity(e)}
+          <div class="wine-color-banner" style=${this.colorStyle} aria-hidden="true"></div>
+          <div class="wine-hero">
+            ${this.renderIdentity(e)}
+            ${this.imageUrl ? N`
+              <div class="wine-image-container">
+                <img class="wine-image" src=${this.imageUrl} alt=${e.name} />
+              </div>
+            ` : P}
+          </div>
           ${this.renderStock(e)}
           ${this.renderMeals(e)}
           <details class="detail-section" open>
@@ -1334,6 +1328,7 @@ var tt = class extends je {
             <div class="section-subtitle">${this.t("wine_detail_origin")}</div>
             <div class="characteristics">
               ${this.characteristic("mdi:medal-outline", "tooltip_classification", e.classification)}
+              ${this.characteristic("mdi:account-outline", "tooltip_domain", e.domain)}
               ${this.characteristic("mdi:map-marker-radius", "tooltip_appellation", e.appellation)}
               ${this.characteristic("mdi:map-outline", "tooltip_region", e.region)}
               ${this.characteristic("mdi:earth", "tooltip_country", e.country)}
@@ -1343,8 +1338,7 @@ var tt = class extends je {
               ${this.characteristic("mdi:palette-outline", "tooltip_color", e.color)}
               ${this.renderGrapes(e.grapes)}
               ${this.characteristic("mdi:tag-outline", "tooltip_cuvee", e.cuvee)}
-              ${this.characteristic("mdi:bottle-wine-outline", "tooltip_format", e.bottle_format)}
-              ${this.characteristic("mdi:cup-water", "tooltip_volume", e.bottle_volume_l === null ? null : `${this.formatNumber(e.bottle_volume_l)} L`)}
+              ${this.characteristic("mdi:bottle-wine-outline", "tooltip_format", e.bottle_format ? `${e.bottle_format}${e.bottle_volume_l === null ? "" : ` (${this.formatNumber(e.bottle_volume_l)} L)`}` : null)}
               ${this.characteristic("mdi:percent-outline", "wine_detail_alcohol", e.alcohol_percent === null ? null : `${this.formatNumber(e.alcohol_percent)} %`)}
               ${this.characteristic("mdi:thermometer", "tooltip_temperature", t)}
             </div>
