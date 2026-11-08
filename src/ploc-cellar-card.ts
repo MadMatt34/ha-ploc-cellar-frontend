@@ -417,7 +417,8 @@ export class PlocCellarCard extends LitElement {
               <div class="occupancy-bar" role="progressbar"
                 aria-label=${t("rack_occupancy")}
                 aria-valuemin="0" aria-valuemax=${data.total_positions}
-                aria-valuenow=${occupiedPositions}>
+                aria-valuenow=${occupiedPositions}
+                aria-valuetext=${`${occupiedPositions} ${t("occupied")}, ${freePositions} ${t("free")}, ${data.total_positions} ${t("positions")}`}>
                 <div class="occupancy-fill" style=${`width: ${occupancy}%`}></div>
                 <div class="occupancy-label">
                   <span>${t("rack_occupancy")}:</span>
