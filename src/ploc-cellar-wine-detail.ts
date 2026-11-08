@@ -189,7 +189,7 @@ export class PlocCellarWineDetail extends LitElement {
                 <span class="grape-name">${grape.name}</span>
                 <div class="grape-composition">
                   <span class="grape-percentage">${grape.percentage === null ? "" : `${this.formatNumber(grape.percentage)}%`}</span>
-                  <div class="grape-track" role="img" aria-label=${grape.percentage === null ? this.t("unknown") : `${this.formatNumber(grape.percentage)}%`}>
+                  <div class="grape-track" role="img" aria-label=${grape.percentage === null ? "" : `${this.formatNumber(grape.percentage)}%`}>
                     <div class="grape-fill" style=${grape.percentage === null ? "" : `width: ${grape.percentage}%`}></div>
                   </div>
                 </div>
