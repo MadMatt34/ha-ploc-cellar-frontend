@@ -48,10 +48,10 @@ export class PlocCellarWineDetail extends LitElement {
     .identity-text { min-width: 0; }
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-    .wine-vintage { margin: 5px 10px 0 20px; font-family: var(--ploc-wine-font-family); font-size: 2.3rem; font-weight: 600; line-height: 1.2; }
+    .wine-vintage { margin: 5px 10px 0 20px; font-family: var(--ploc-wine-font-family); font-size: 2.5rem; font-weight: 600; line-height: 1.2; }
     .wine-stock-line { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--secondary-text-color); font-size: 1rem; }
-    .wine-stock-line ha-icon { flex: 0 0 auto; }
-    .wine-stock-count { font-family: var(--ploc-numeric-font-family); font-size: 1rem; font-variant-numeric: tabular-nums; color: var(--primary-text-color); }
+    .wine-stock-line ha-icon { --mdc-icon-size: 30px; flex: 0 0 auto; }
+    .wine-stock-count { font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-variant-numeric: tabular-nums; color: var(--primary-text-color); }
     .tag {
       padding: 4px 9px;
       border-radius: 999px;
@@ -97,7 +97,7 @@ export class PlocCellarWineDetail extends LitElement {
       border-radius: 9px;
       background: var(--secondary-background-color);
     }
-    .stock-value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.2rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .stock-value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .stock-details .characteristic-value { font-family: var(--ploc-numeric-font-family); font-variant-numeric: tabular-nums; }
     .stock-label { display: block; margin-top: 3px; color: var(--secondary-text-color); font-size: .8rem; }
     .locations { display: grid; gap: 9px; }
@@ -277,7 +277,6 @@ export class PlocCellarWineDetail extends LitElement {
           ${this.stockItem("wine_detail_physical", wine.bottles_in_cellar)}
           ${this.stockItem("wine_detail_reconstructed", wine.bottles)}
           ${this.stockItem("wine_detail_effective", wine.effective_stock)}
-          ${this.stockItem("wine_detail_source_stock", wine.ploud_bottles)}
         </div>
         ${hasMovementData ? html`
           <details class="nested-details">
@@ -369,8 +368,6 @@ export class PlocCellarWineDetail extends LitElement {
               ` : nothing}
             </div>
           </div>
-          ${this.renderStock(wine)}
-          ${this.renderMeals(wine)}
           <details class="detail-section" open>
             <summary class="section-summary"><ha-icon icon="mdi:clipboard-list-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_characteristics")}</summary>
             <div class="section-body">
@@ -393,6 +390,7 @@ export class PlocCellarWineDetail extends LitElement {
             </div>
             </div>
           </details>
+          ${this.renderMeals(wine)}
           <details class="detail-section">
             <summary class="section-summary"><ha-icon icon="mdi:map-marker-multiple-outline" aria-hidden="true"></ha-icon>${this.t("locations")}</summary>
             <div class="section-body">${this.renderLocations(wine)}</div>
@@ -403,6 +401,7 @@ export class PlocCellarWineDetail extends LitElement {
               <div class="section-body"><div class="comment">${wine.comment}</div></div>
             </details>
           ` : nothing}
+          ${this.renderStock(wine)}
         </div>
       </ha-dialog>
     `;
