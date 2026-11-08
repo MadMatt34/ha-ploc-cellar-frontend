@@ -1149,7 +1149,9 @@ var nt = class extends je {
     .location-name { display: block; }
     .location-coordinates { display: grid; gap: 6px; margin-top: 8px; }
     .location-coordinate-row { display: flex; flex-wrap: wrap; gap: 6px; }
-    .location-coordinate { display: block; width: fit-content; max-width: 100%; padding: 4px 9px; border-radius: 999px; background: var(--primary-background-color); color: var(--primary-text-color); font-size: .82rem; line-height: 1.4; }
+    .location-coordinate { display: inline-flex; align-items: center; gap: 5px; width: fit-content; max-width: 100%; padding: 4px 9px; border-radius: 999px; background: var(--primary-background-color); color: var(--primary-text-color); font-size: .82rem; line-height: 1.4; }
+    .location-coordinate.selected { background: var(--primary-color); color: var(--text-primary-color, white); box-shadow: 0 0 0 2px var(--primary-color); font-weight: 600; }
+    .location-coordinate.selected ha-icon { --mdc-icon-size: 16px; color: inherit; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
     @media (max-width: 560px) {
@@ -1301,6 +1303,10 @@ var nt = class extends je {
       </details>
     ` : P;
 	}
+	isSelectedLocation(e, t, n) {
+		let r = this.selectedLocation;
+		return r !== void 0 && r.rackId === e && r.row === t && r.column === n;
+	}
 	renderLocations(e) {
 		return e.locations.length ? N`
       <div class="locations">
@@ -1309,9 +1315,15 @@ var nt = class extends je {
             <strong class="location-name">${e.rack}</strong>
             ${e.coordinates.some(({ row: e, column: t }) => e !== null && t !== null) ? N`
                 <div class="location-coordinates">
-                  ${tt(e.coordinates).map(({ row: e, columns: t }) => N`
+                  ${tt(e.coordinates).map(({ row: t, columns: n }) => N`
                     <div class="location-coordinate-row">
-                      ${t.map((t) => N`<span class="location-coordinate">${this.t("row")} ${e + 1}, ${this.t("column")} ${t + 1}</span>`)}
+                      ${n.map((n) => {
+			let r = this.isSelectedLocation(e.rackId, t, n);
+			return N`<span class="location-coordinate ${r ? "selected" : ""}">
+                              ${r ? N`<ha-icon icon="mdi:target" aria-hidden="true"></ha-icon>` : P}
+                              ${this.t("row")} ${t + 1}, ${this.t("column")} ${n + 1}
+                            </span>`;
+		})}
                     </div>
                   `)}
                 </div>
@@ -1385,7 +1397,7 @@ var nt = class extends je {
     `;
 	}
 };
-I([Ve({ attribute: !1 })], nt.prototype, "hass", void 0), I([Ve({ attribute: !1 })], nt.prototype, "wine", void 0), I([F()], nt.prototype, "imageUrl", void 0), nt = I([Re("ploc-cellar-wine-detail")], nt);
+I([Ve({ attribute: !1 })], nt.prototype, "hass", void 0), I([Ve({ attribute: !1 })], nt.prototype, "wine", void 0), I([Ve({ attribute: !1 })], nt.prototype, "selectedLocation", void 0), I([F()], nt.prototype, "imageUrl", void 0), nt = I([Re("ploc-cellar-wine-detail")], nt);
 var rt = 4;
 function it(e) {
 	if (e.length === 0) return {
@@ -1644,10 +1656,18 @@ var ot = class extends je {
                       aria-haspopup=${a ? "dialog" : P}
                       tabindex=${r ? "0" : P}
                       @click=${a ? () => {
-				this.selectedWine = a;
+				this.selectedWine = a, this.selectedLocation = {
+					rackId: t.rack_id,
+					row: t.row,
+					column: t.column
+				};
 			} : P}
                       @keydown=${a ? (e) => {
-				(e.key === "Enter" || e.key === " ") && (e.preventDefault(), this.selectedWine = a);
+				(e.key === "Enter" || e.key === " ") && (e.preventDefault(), this.selectedWine = a, this.selectedLocation = {
+					rackId: t.rack_id,
+					row: t.row,
+					column: t.column
+				});
 			} : P}
                       @pointerenter=${r ? (e) => this.showWineTooltip(e, a) : P}
                       @pointermove=${r ? (e) => this.moveWineTooltip(e) : P}
@@ -1700,8 +1720,9 @@ var ot = class extends je {
           <ploc-cellar-wine-detail
             .hass=${this.hass}
             .wine=${this.selectedWine}
+            .selectedLocation=${this.selectedLocation}
             @wine-detail-closed=${() => {
-			this.selectedWine = void 0;
+			this.selectedWine = void 0, this.selectedLocation = void 0;
 		}}>
           </ploc-cellar-wine-detail>
         ` : P}
@@ -1719,7 +1740,7 @@ var ot = class extends je {
 		};
 	}
 };
-I([Ve({ attribute: !1 })], ot.prototype, "hass", void 0), I([F()], ot.prototype, "config", void 0), I([F()], ot.prototype, "inventory", void 0), I([F()], ot.prototype, "selectedRackId", void 0), I([F()], ot.prototype, "loading", void 0), I([F()], ot.prototype, "error", void 0), I([F()], ot.prototype, "activeTooltip", void 0), I([F()], ot.prototype, "selectedWine", void 0), ot = I([Re("ploc-cellar-rack-card")], ot), window.customCards ??= [], window.customCards.push({
+I([Ve({ attribute: !1 })], ot.prototype, "hass", void 0), I([F()], ot.prototype, "config", void 0), I([F()], ot.prototype, "inventory", void 0), I([F()], ot.prototype, "selectedRackId", void 0), I([F()], ot.prototype, "loading", void 0), I([F()], ot.prototype, "error", void 0), I([F()], ot.prototype, "activeTooltip", void 0), I([F()], ot.prototype, "selectedWine", void 0), I([F()], ot.prototype, "selectedLocation", void 0), ot = I([Re("ploc-cellar-rack-card")], ot), window.customCards ??= [], window.customCards.push({
 	type: "ploc-cellar-rack-card",
 	name: Ge("picker_rack_name"),
 	description: Ge("picker_rack_description")
