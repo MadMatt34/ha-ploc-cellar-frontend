@@ -29,6 +29,20 @@ export class PlocCellarDonutChart extends LitElement {
   `;
 
   protected firstUpdated(): void {
+    this.initializeChart();
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    if (this.hasUpdated) {
+      void this.updateComplete.then(() => {
+        if (this.isConnected) this.initializeChart();
+      });
+    }
+  }
+
+  private initializeChart(): void {
+    if (!this.isConnected || this.chart) return;
     const container = this.renderRoot.querySelector<HTMLElement>(".chart");
     if (!container) return;
 
