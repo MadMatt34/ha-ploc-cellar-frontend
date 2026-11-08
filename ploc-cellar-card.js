@@ -720,6 +720,7 @@ var He = {
 	editor_rack_picker_buttons: "Buttons",
 	editor_rack_picker_dropdown: "Dropdown list",
 	wine_detail_stock: "Stock",
+	wine_detail_bottles_in_stock: "bottles in stock",
 	wine_detail_physical: "Physically in cellar",
 	wine_detail_reconstructed: "Reconstructed stock",
 	wine_detail_effective: "Effective stock",
@@ -871,6 +872,7 @@ var He = {
 	editor_rack_picker_buttons: "Boutons",
 	editor_rack_picker_dropdown: "Liste déroulante",
 	wine_detail_stock: "Stock",
+	wine_detail_bottles_in_stock: "bouteilles en stock",
 	wine_detail_physical: "En cave physiquement",
 	wine_detail_reconstructed: "Stock reconstitué",
 	wine_detail_effective: "Stock effectif",
@@ -1081,8 +1083,9 @@ var nt = class extends je {
     .nested-details > .section-summary { min-height: 42px; padding: 9px 0; font-size: .88rem; }
     .nested-details > .section-body { padding: 0 0 4px; }
     .wine-dialog-title { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; white-space: normal; }
-    .wine-color-banner { height: 8px; min-width: 0; border-radius: 999px; }
-    .wine-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 32%); align-items: center; gap: 14px; min-width: 0; }
+    .wine-hero { display: grid; grid-template-columns: 8px minmax(0, 1fr); align-items: stretch; gap: 14px; min-width: 0; }
+    .wine-hero-banner { width: 8px; min-height: 120px; border-radius: 999px; }
+    .wine-hero-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 32%); align-items: center; gap: 14px; min-width: 0; }
     .wine-image-container { display: flex; justify-content: flex-end; align-items: center; min-width: 0; max-height: 180px; overflow: hidden; }
     .wine-image { display: block; max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 10px; }
     .identity { min-width: 0; }
@@ -1090,6 +1093,9 @@ var nt = class extends je {
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .wine-vintage { margin-top: 5px; font-family: var(--ploc-wine-font-family); font-size: 1.2rem; font-weight: 600; line-height: 1.2; }
+    .wine-stock-line { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--secondary-text-color); font-size: .86rem; }
+    .wine-stock-line ha-icon { --mdc-icon-size: 19px; flex: 0 0 auto; }
+    .wine-stock-count { font-family: var(--ploc-numeric-font-family); font-size: 1rem; font-variant-numeric: tabular-nums; color: var(--primary-text-color); }
     .tag {
       padding: 4px 9px;
       border-radius: 999px;
@@ -1150,7 +1156,8 @@ var nt = class extends je {
       .content { gap: 11px; }
       .characteristic-copy { grid-template-columns: minmax(0, 1fr); gap: 2px; }
       .characteristic { padding: 10px 2px; }
-      .wine-hero { grid-template-columns: minmax(0, 1fr) minmax(88px, 34%); gap: 9px; }
+      .wine-hero { gap: 9px; }
+      .wine-hero-main { grid-template-columns: minmax(0, 1fr) minmax(88px, 34%); gap: 9px; }
       .wine-image-container, .wine-image { max-height: 145px; }
     }
     @media (max-width: 480px) {
@@ -1232,6 +1239,10 @@ var nt = class extends je {
       </div>
     `;
 	}
+	get bottleColorStyle() {
+		let e = this.wine?.color_rgb;
+		return !e || e.length !== 3 || !e.every((e) => Number.isInteger(e) && e >= 0 && e <= 255) ? "color: var(--secondary-text-color);" : `color: rgb(${e[0]} ${e[1]} ${e[2]});`;
+	}
 	get colorStyle() {
 		let e = this.wine?.color_rgb;
 		return !e || e.length !== 3 || !e.every((e) => Number.isInteger(e) && e >= 0 && e <= 255) ? "background: var(--secondary-text-color);" : `background: rgb(${e[0]} ${e[1]} ${e[2]});`;
@@ -1242,6 +1253,11 @@ var nt = class extends je {
       <div class="identity">
         <div class="identity-text">
           ${e.vintage === null ? P : N`<div class="wine-vintage">${e.vintage}</div>`}
+          <div class="wine-stock-line">
+            <ha-icon icon="mdi:bottle-wine" style=${this.bottleColorStyle} aria-hidden="true"></ha-icon>
+            <span class="wine-stock-count">${this.formatNumber(e.bottles_in_cellar)}</span>
+            <span>${this.t("wine_detail_bottles_in_stock")}</span>
+          </div>
           ${t.length ? N`<div class="tags">${t.map((e) => N`<span class="tag">${e}</span>`)}</div>` : P}
         </div>
       </div>
@@ -1322,14 +1338,16 @@ var nt = class extends je {
       <ha-dialog .open=${!0} .accessibleLabel=${e.name} @closed=${() => this.onDialogClosed()}>
         <span slot="headerTitle" class="wine-dialog-title">${e.name}</span>
         <div class="content">
-          <div class="wine-color-banner" style=${this.colorStyle} aria-hidden="true"></div>
           <div class="wine-hero">
-            ${this.renderIdentity(e)}
-            ${this.imageUrl ? N`
-              <div class="wine-image-container">
-                <img class="wine-image" src=${this.imageUrl} alt=${e.name} />
-              </div>
-            ` : P}
+            <div class="wine-hero-banner" style=${this.colorStyle} aria-hidden="true"></div>
+            <div class="wine-hero-main">
+              ${this.renderIdentity(e)}
+              ${this.imageUrl ? N`
+                <div class="wine-image-container">
+                  <img class="wine-image" src=${this.imageUrl} alt=${e.name} />
+                </div>
+              ` : P}
+            </div>
           </div>
           ${this.renderStock(e)}
           ${this.renderMeals(e)}
