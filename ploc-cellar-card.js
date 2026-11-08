@@ -638,6 +638,7 @@ var He = {
 	not_mapped: "Not mapped",
 	no_racks: "No racks available.",
 	missing_rack: "position(s) reference a missing rack.",
+	inventory_filters: "Filters",
 	inventory_title: "Wine inventory",
 	filter_color: "All colors",
 	filter_region: "All regions",
@@ -780,6 +781,7 @@ var He = {
 	not_mapped: "Non renseigné",
 	no_racks: "Aucun casier disponible.",
 	missing_rack: "emplacement(s) référencent un casier absent.",
+	inventory_filters: "Filtres",
 	inventory_title: "Inventaire des vins",
 	filter_color: "Toutes les couleurs",
 	filter_region: "Toutes les régions",
@@ -1568,13 +1570,13 @@ var nt = class extends je {
     button { background: var(--secondary-background-color); cursor: pointer; }
     button[disabled] { opacity: .5; cursor: default; }
     input { box-sizing: border-box; width: 100%; }
-    .toolbar { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; margin: 14px 0; }
+    .toolbar { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; margin: 10px 0 0; }
     .search { grid-column: 1 / -1; }
     .summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; color: var(--secondary-text-color); font-size: .85rem; margin: 12px 0; }
     .wine-list { display: grid; gap: 8px; }
-    .wine { border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; min-width: 0; }
+    .wine { border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; }
     .wine-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.12rem; font-weight: 500; line-height: 1.25; overflow-wrap: anywhere; }
+    .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
     .wine-name-button { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: inherit; line-height: inherit; text-align: left; cursor: pointer; }
     .wine-name-button:hover { color: var(--primary-color); text-decoration: underline; }
     .wine-name-button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 2px; }
@@ -1582,8 +1584,9 @@ var nt = class extends je {
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
-    .details { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--divider-color); font-size: .82rem; }
-    .detail-label { color: var(--secondary-text-color); display: block; }
+    .filters { margin: 14px 0; }
+    .filters > summary { cursor: pointer; font-weight: 500; padding: 4px 0; }
+    .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
     .error { color: var(--error-color); padding: 8px 0; }
     .muted { color: var(--secondary-text-color); font-size: .85rem; }
@@ -1660,16 +1663,10 @@ var nt = class extends je {
       </select>
     `;
 	}
-	detail(e, t) {
-		return t == null || t === "" ? P : N`<div><span class="detail-label">${e}</span>${t}</div>`;
-	}
 	renderWine(e) {
-		let t = (e) => We(this.hass?.language ?? "en", e), n = e.locations.map((e) => {
-			let n = e.row !== null && e.column !== null ? ` · ${t("row")} ${e.row + 1}, ${t("column")} ${e.column + 1}` : "";
-			return `${e.rack}${n}`;
-		}), r = e.vintage === null ? t("unknown_vintage") : String(e.vintage), i = e.bottle_volume_l === null ? null : `${e.bottle_volume_l.toLocaleString(this.hass?.language ?? void 0)} L`;
+		let t = (e) => We(this.hass?.language ?? "en", e), n = e.vintage === null ? t("unknown_vintage") : String(e.vintage), r = e.color_rgb?.every(Number.isFinite) ? e.color_rgb.map((e) => Math.round(Math.min(255, Math.max(0, e)))) : null, i = r ? `rgb(${r.join(", ")})` : "";
 		return N`
-      <article class="wine">
+      <article class="wine" style=${i ? "--wine-color: " + i : ""}>
         <div class="wine-main">
           <div>
             <div class="wine-name"><button class="wine-name-button" type="button" aria-haspopup="dialog" @click=${() => {
@@ -1686,18 +1683,9 @@ var nt = class extends je {
         </div>
         <div class="tags">
           ${e.color ? N`<span class="tag">${e.color}</span>` : P}
-          <span class="tag">${r}</span>
+          <span class="tag">${n}</span>
           ${e.bottle_format ? N`<span class="tag">${e.bottle_format}</span>` : P}
         </div>
-        <details>
-          <summary class="metadata">${t("wine_details")}</summary>
-          <div class="details">
-            ${this.detail(t("grapes"), e.grapes)}
-            ${this.detail(t("cuvee"), e.cuvee)}
-            ${this.detail(t("bottle_volume"), i)}
-            ${this.detail(t("locations"), n.length ? n.join(" · ") : null)}
-          </div>
-        </details>
       </article>
     `;
 	}
@@ -1717,25 +1705,28 @@ var nt = class extends je {
         ${this.config?.config_entry_id ? P : N`<div class="muted">${e("select_config")}</div>`}
         ${this.inventory?.stale ? N`<div class="warning">${e("stale")}</div>` : P}
         ${this.inventory ? N`
-          <div class="toolbar">
-            <input class="search" type="search" aria-label=${e("search_wine")}
-              placeholder=${e("search_placeholder")} .value=${this.search}
-              @input=${(e) => {
+          <details class="filters" open>
+            <summary>${e("inventory_filters")}</summary>
+            <div class="toolbar">
+              <input class="search" type="search" aria-label=${e("search_wine")}
+                placeholder=${e("search_placeholder")} .value=${this.search}
+                @input=${(e) => {
 			this.search = e.target.value;
 		}} />
-            ${this.selectFilter("color", e("filter_color"), this.color, this.valuesFor("color"))}
-            ${this.selectFilter("region", e("filter_region"), this.region, this.valuesFor("region"))}
-            ${this.selectFilter("appellation", e("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
-            ${this.selectFilter("vintage", e("filter_vintage"), this.vintage, this.valuesFor("vintage"))}
-            <select aria-label=${e("sort_by")} .value=${this.sort}
-              @change=${(e) => {
+              ${this.selectFilter("color", e("filter_color"), this.color, this.valuesFor("color"))}
+              ${this.selectFilter("region", e("filter_region"), this.region, this.valuesFor("region"))}
+              ${this.selectFilter("appellation", e("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
+              ${this.selectFilter("vintage", e("filter_vintage"), this.vintage, this.valuesFor("vintage"))}
+              <select aria-label=${e("sort_by")} .value=${this.sort}
+                @change=${(e) => {
 			this.sort = e.target.value;
 		}}>
-              <option value="name" ?selected=${this.sort === "name"}>${e("sort_name")}</option>
-              <option value="bottles" ?selected=${this.sort === "bottles"}>${e("sort_bottles")}</option>
-              <option value="vintage" ?selected=${this.sort === "vintage"}>${e("sort_vintage")}</option>
-            </select>
-          </div>
+                <option value="name" ?selected=${this.sort === "name"}>${e("sort_name")}</option>
+                <option value="bottles" ?selected=${this.sort === "bottles"}>${e("sort_bottles")}</option>
+                <option value="vintage" ?selected=${this.sort === "vintage"}>${e("sort_vintage")}</option>
+              </select>
+            </div>
+          </details>
           <div class="summary">
             <span>${e("inventory_results").replace("{count}", String(t.length))}</span>
             <span>${e("inventory_bottle_total").replace("{count}", String(n))}</span>
