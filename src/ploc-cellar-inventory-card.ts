@@ -65,6 +65,8 @@ export class PlocCellarInventoryCard extends LitElement {
     .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }
     .filters > summary::-webkit-details-marker { display: none; }
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
+    .filters-chevron { --mdc-icon-size: 18px; margin-left: auto; color: var(--secondary-text-color); transition: transform 120ms ease; }
+    .filters[open] .filters-chevron { transform: rotate(90deg); }
     .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
     .error { color: var(--error-color); padding: 8px 0; }
@@ -276,7 +278,7 @@ export class PlocCellarInventoryCard extends LitElement {
             placeholder=${t("search_placeholder")} .value=${this.search}
             @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; }} />
           <details class="filters">
-            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span></summary>
+            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
             <div class="toolbar">
               ${this.selectFilter("color", t("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", t("filter_region"), this.region, this.valuesFor("region"))}
