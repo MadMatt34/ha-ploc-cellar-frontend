@@ -15,6 +15,7 @@ const MEAL_FLAGS = [
   [1024, "meal_dish_vegetable"],
   [2048, "meal_cheese"],
   [4096, "meal_dessert"],
+  [8192, "meal_spicy"],
 ] as const satisfies ReadonlyArray<readonly [number, TranslationKey]>;
 
 export type MealTranslationKey = (typeof MEAL_FLAGS)[number][1];
@@ -34,6 +35,7 @@ const MEAL_ICONS: Record<MealTranslationKey, string> = {
   meal_dish_vegetable: "mdi:carrot",
   meal_cheese: "mdi:cheese",
   meal_dessert: "mdi:cupcake",
+  meal_spicy: "mdi:chili-hot",
 };
 
 /** Return the icon associated with a known food-pairing translation key. */

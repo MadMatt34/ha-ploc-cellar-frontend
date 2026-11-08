@@ -101,10 +101,11 @@ Le champ PLOUD `ml` est exposé sous la forme de l'entier brut facultatif `Wine.
 | `1024` | Plats et légumes |
 | `2048` | Fromage |
 | `4096` | Dessert |
+| `8192` | Épicés |
 
 Le frontend décode et affiche les catégories connues dans la fenêtre de détail du vin, dans la langue de Home Assistant (français ou anglais). Le backend doit conserver la valeur brute, y compris les bits qu'il ne connaît pas ; le frontend ignore les bits inconnus et doit rester compatible lorsque `meals` est absent ou nul.
 
-**Indicateur inconnu :** l'APK contient une ressource `foodtype8192`, mais `8192` ne figure pas dans l'énumération publique `Meals` du serveur. Sa signification n'est pas confirmée : aucune catégorie ni aucun libellé ne lui sont donc attribués. Ne pas déduire son sens du seul nom de la ressource APK.
+L'indicateur `8192` est confirmé par l'application PLOUD comme la catégorie des plats épicés. Par exemple, la valeur `10341` combine `1 + 4 + 32 + 64 + 2048 + 8192`, soit apéritif, entrée, poissons, viandes blanches, fromages et plats épicés.
 ### Image du vin
 
 La réponse `Wine` peut contenir le champ facultatif `image_url: string | null`.

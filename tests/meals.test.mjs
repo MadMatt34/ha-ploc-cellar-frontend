@@ -11,8 +11,20 @@ test("decodes combined food pairing flags in enum order", () => {
   assert.deepEqual(getMealTranslationKeys(2080), ["meal_fish", "meal_cheese"]);
 });
 
+test("decodes the PLOUD spicy-food flag", () => {
+  assert.deepEqual(getMealTranslationKeys(8192), ["meal_spicy"]);
+  assert.deepEqual(getMealTranslationKeys(10341), [
+    "meal_aperitif",
+    "meal_entry",
+    "meal_fish",
+    "meal_white_meat",
+    "meal_cheese",
+    "meal_spicy",
+  ]);
+});
+
 test("ignores unknown flags without hiding known associations", () => {
-  assert.deepEqual(getMealTranslationKeys(8192 | 2048 | 32), ["meal_fish", "meal_cheese"]);
+  assert.deepEqual(getMealTranslationKeys(16384 | 2048 | 32), ["meal_fish", "meal_cheese"]);
 });
 
 test("associates a specific Material Design icon with every known food pairing", () => {
@@ -30,6 +42,7 @@ test("associates a specific Material Design icon with every known food pairing",
     meal_dish_vegetable: "mdi:carrot",
     meal_cheese: "mdi:cheese",
     meal_dessert: "mdi:cupcake",
+    meal_spicy: "mdi:chili-hot",
   };
 
   for (const [key, icon] of Object.entries(expectedIcons)) {

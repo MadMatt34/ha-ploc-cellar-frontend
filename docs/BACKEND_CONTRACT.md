@@ -101,10 +101,11 @@ The PLOUD `ml` field is exposed as the optional raw integer `Wine.meals`. It is 
 | `1024` | Dishes with vegetables |
 | `2048` | Cheese |
 | `4096` | Dessert |
+| `8192` | Spicy dishes |
 
 The frontend decodes and displays the known categories in the wine detail dialog using the Home Assistant language (English or French). The backend must preserve the raw value, including bits it does not recognize; the frontend ignores unknown bits and must remain compatible when `meals` is absent or null.
 
-**Unknown flag:** the APK contains a `foodtype8192` resource, but `8192` is not part of the public server `Meals` enum. Its meaning is unconfirmed, so it is deliberately not assigned a category or displayed label. Do not infer a label from the APK resource name alone.
+The `8192` flag is confirmed by the PLOUD application as the spicy-food pairing category. For example, the value `10341` combines `1 + 4 + 32 + 64 + 2048 + 8192`, corresponding to aperitif, starter, fish, white meat, cheese and spicy dishes.
 ### Wine image
 
 The `Wine` response may include the optional field `image_url: string | null`.
