@@ -224,7 +224,7 @@ export class PlocCellarWineDetail extends LitElement {
   }
 
   private renderIdentity(wine: Wine) {
-    const metadata = [wine.domain, wine.appellation, wine.region, wine.country]
+    const metadata = [wine.domain]
       .filter((value): value is string => Boolean(value));
     const tags = [
       wine.vintage === null ? this.t("unknown_vintage") : String(wine.vintage),
@@ -350,12 +350,16 @@ export class PlocCellarWineDetail extends LitElement {
           <details class="detail-section" open>
             <summary class="section-summary"><ha-icon icon="mdi:clipboard-list-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_characteristics")}</summary>
             <div class="section-body">
+            <div class="section-subtitle">${this.t("wine_detail_origin")}</div>
             <div class="characteristics">
               ${this.characteristic("mdi:medal-outline", "tooltip_classification", wine.classification)}
               ${this.characteristic("mdi:map-marker-radius", "tooltip_appellation", wine.appellation)}
-              ${this.characteristic("mdi:palette-outline", "tooltip_color", wine.color)}
               ${this.characteristic("mdi:map-outline", "tooltip_region", wine.region)}
               ${this.characteristic("mdi:earth", "tooltip_country", wine.country)}
+            </div>
+            <div class="section-subtitle">${this.t("wine_detail_tasting")}</div>
+            <div class="characteristics">
+              ${this.characteristic("mdi:palette-outline", "tooltip_color", wine.color)}
               ${this.renderGrapes(wine.grapes)}
               ${this.characteristic("mdi:tag-outline", "tooltip_cuvee", wine.cuvee)}
               ${this.characteristic("mdi:bottle-wine-outline", "tooltip_format", wine.bottle_format)}
