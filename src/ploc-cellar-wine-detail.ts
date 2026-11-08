@@ -91,7 +91,10 @@ export class PlocCellarWineDetail extends LitElement {
     .grape-fill { height: 100%; background: var(--wine-accent, var(--secondary-text-color)); }
     .grape-row:not(.has-percentage) { grid-template-columns: minmax(0, 1fr); }
     .grape-row:not(.has-percentage) .grape-composition { display: none; }
-    .stock-details.has-inventory-issues { border-color: var(--error-color, #db4437); }\n    .stock-issues { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 12px; color: var(--error-color, #db4437); font-size: .88rem; line-height: 1.4; }\n    .stock-issues ha-icon { --mdc-icon-size: 19px; flex: 0 0 auto; }\n    .stock { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px; }
+    .stock-details.has-inventory-issues { border-color: var(--error-color, #db4437); }
+    .stock-issues { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 12px; color: var(--error-color, #db4437); font-size: .88rem; line-height: 1.4; }
+    .stock-issues ha-icon { --mdc-icon-size: 19px; flex: 0 0 auto; }
+    .stock { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px; }
     .stock-item {
       min-width: 0;
       padding: 10px 12px;
@@ -256,7 +259,10 @@ export class PlocCellarWineDetail extends LitElement {
           <div class="wine-stock-line">
             <ha-icon icon="mdi:bottle-wine" style=${this.bottleColorStyle} aria-hidden="true"></ha-icon>
             <span class="wine-stock-count">${this.formatNumber(wine.bottles_in_cellar)}</span>
-            <span>${this.t("wine_detail_bottles_in_stock")}</span>\n            ${wine.bottles_in_cellar === 0 && wine.effective_stock !== null\n              ? html`<span>(${this.t("wine_detail_effective_stock_suffix").replace("{count}", this.formatNumber(wine.effective_stock))})</span>`\n              : nothing}
+            <span>${this.t("wine_detail_bottles_in_stock")}</span>
+            ${wine.bottles_in_cellar === 0 && wine.effective_stock !== null
+              ? html`<span>(${this.t("wine_detail_effective_stock_suffix").replace("{count}", this.formatNumber(wine.effective_stock))})</span>`
+              : nothing}
           </div>
           ${tags.length ? html`<div class="tags">${tags.map((tag) => html`<span class="tag">${tag}</span>`)}</div>` : nothing}
         </div>
