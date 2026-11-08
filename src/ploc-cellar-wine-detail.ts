@@ -271,6 +271,12 @@ export class PlocCellarWineDetail extends LitElement {
   }
 
   private renderStock(wine: Wine) {
+    const inventoryIssues = [
+      { key: "wine_detail_issue_unlocated" as const, count: wine.unlocated_bottles ?? 0 },
+      { key: "wine_detail_issue_negative" as const, count: wine.negative_movement_bottles ?? 0 },
+      { key: "wine_detail_issue_surplus" as const, count: wine.physical_surplus_bottles ?? 0 },
+    ].filter((issue) => issue.count > 0);
+    const hasInventoryIssues = inventoryIssues.length > 0;
     const hasMovementData = wine.purchased !== null ||
       wine.consumed !== null ||
       wine.movement_balance !== null ||
@@ -280,9 +286,15 @@ export class PlocCellarWineDetail extends LitElement {
       wine.unlocated_bottles !== null;
 
     return html`
-      <details class="detail-section stock-details">
+      <details class="detail-section stock-details ${hasInventoryIssues ? "has-inventory-issues" : ""}">
         <summary class="section-summary"><ha-icon icon="mdi:chart-box-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_stock")}</summary>
         <div class="section-body">
+        ${hasInventoryIssues ? html`
+          <div class="stock-issues" role="alert">
+            <ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon>
+            <span>${inventoryIssues.map((issue) => this.t(issue.key).replace("{count}", this.formatNumber(issue.count))).join(" · ")}</span>
+          </div>
+        ` : nothing}
         <div class="stock">
           ${this.stockItem("wine_detail_physical", wine.bottles_in_cellar)}
           ${this.stockItem("wine_detail_reconstructed", wine.bottles)}
