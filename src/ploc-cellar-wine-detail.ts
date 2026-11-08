@@ -5,7 +5,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import type { HomeAssistant, Wine } from "./types";
 import { translate, type TranslationKey } from "./translations";
 import { WineImageLoader } from "./wine-image";
-import { getMealTranslationKeys } from "./meals";
+import { getMealIcon, getMealTranslationKeys } from "./meals";
 
 @customElement("ploc-cellar-wine-detail")
 export class PlocCellarWineDetail extends LitElement {
@@ -45,6 +45,15 @@ export class PlocCellarWineDetail extends LitElement {
       border-radius: 999px;
       background: var(--secondary-background-color);
       font-size: .82rem;
+    }
+    .meal-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .meal-tag ha-icon {
+      --mdc-icon-size: 17px;
+      color: var(--secondary-text-color);
     }
     section { min-width: 0; }
     h3 {
@@ -210,7 +219,7 @@ export class PlocCellarWineDetail extends LitElement {
       <section>
         <h3>${this.t("wine_detail_meals")}</h3>
         <div class="tags">
-          ${mealKeys.map((key) => html`<span class="tag">${this.t(key)}</span>`)}
+          ${mealKeys.map((key) => html`<span class="tag meal-tag"><ha-icon icon=${getMealIcon(key)} aria-hidden="true"></ha-icon><span>${this.t(key)}</span></span>`)}
         </div>
       </section>
     `;
