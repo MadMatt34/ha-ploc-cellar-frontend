@@ -107,7 +107,8 @@ export class PlocCellarWineDetail extends LitElement {
     .location-coordinates { display: grid; gap: 6px; margin-top: 8px; }
     .location-coordinate-row { display: flex; flex-wrap: wrap; gap: 6px; }
     .location-coordinate { display: inline-flex; align-items: center; gap: 5px; width: fit-content; max-width: 100%; padding: 4px 9px; border-radius: 999px; background: var(--primary-background-color); color: var(--primary-text-color); font-size: .82rem; line-height: 1.4; }
-    .location-coordinate.incomplete { border: 1px dashed var(--divider-color); color: var(--secondary-text-color); }\n    .location-coordinate.selected { background: var(--primary-color); color: var(--text-primary-color, white); box-shadow: 0 0 0 2px var(--primary-color); font-weight: 600; }
+    .location-coordinate.incomplete { border: 1px dashed var(--divider-color); color: var(--secondary-text-color); }
+    .location-coordinate.selected { background: var(--primary-color); color: var(--text-primary-color, white); box-shadow: 0 0 0 2px var(--primary-color); font-weight: 600; }
     .location-coordinate.selected ha-icon { --mdc-icon-size: 16px; color: inherit; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
