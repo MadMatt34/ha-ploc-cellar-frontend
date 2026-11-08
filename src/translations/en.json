@@ -146,5 +146,7 @@
   "sort_bottles_asc": "Quantity ascending",
   "sort_bottles_desc": "Quantity descending",
   "sort_vintage_asc": "Vintage ascending",
-  "sort_vintage_desc": "Vintage descending"
+  "sort_vintage_desc": "Vintage descending",
+  "wine_detail_origin": "Origin and identification",
+  "wine_detail_tasting": "Tasting and composition"
 }
