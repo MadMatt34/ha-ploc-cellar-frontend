@@ -643,6 +643,7 @@ var He = {
 	filter_color: "All colors",
 	filter_region: "All regions",
 	filter_appellation: "All appellations",
+	filter_meal: "All food pairings",
 	filter_vintage: "All vintages",
 	sort_by: "Sort by",
 	sort_name: "Name",
@@ -786,6 +787,7 @@ var He = {
 	filter_color: "Toutes les couleurs",
 	filter_region: "Toutes les régions",
 	filter_appellation: "Toutes les appellations",
+	filter_meal: "Tous les mets",
 	filter_vintage: "Tous les millésimes",
 	sort_by: "Trier par",
 	sort_name: "Nom",
@@ -1551,7 +1553,7 @@ I([Ve({ attribute: !1 })], tt.prototype, "hass", void 0), I([F()], tt.prototype,
 // src/ploc-cellar-inventory-card.ts
 var nt = class extends je {
 	constructor(...e) {
-		super(...e), this.loading = !1, this.search = "", this.color = "", this.region = "", this.appellation = "", this.vintage = "", this.sort = "name", this.requestGeneration = 0;
+		super(...e), this.loading = !1, this.search = "", this.color = "", this.region = "", this.appellation = "", this.vintage = "", this.meal = "", this.sort = "name", this.requestGeneration = 0;
 	}
 	static {
 		this.styles = c`
@@ -1585,7 +1587,11 @@ var nt = class extends je {
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
     .filters { margin: 14px 0; }
-    .filters > summary { cursor: pointer; font-weight: 500; padding: 4px 0; }
+    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }
+    .filters > summary::-webkit-details-marker { display: none; }
+    .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
+    .filters-chevron { --mdc-icon-size: 18px; margin-left: auto; color: var(--secondary-text-color); transition: transform 120ms ease; }
+    .filters[open] .filters-chevron { transform: rotate(90deg); }
     .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
     .error { color: var(--error-color); padding: 8px 0; }
@@ -1631,7 +1637,7 @@ var nt = class extends je {
 		}));
 	}
 	get filteredWines() {
-		let e = this.search.trim().toLocaleLowerCase(), t = (this.inventory?.wines ?? []).filter((t) => this.color && t.color !== this.color || this.region && t.region !== this.region || this.appellation && t.appellation !== this.appellation || this.vintage && String(t.vintage ?? "") !== this.vintage ? !1 : !e || [
+		let e = this.search.trim().toLocaleLowerCase(), t = (this.inventory?.wines ?? []).filter((t) => this.color && t.color !== this.color || this.region && t.region !== this.region || this.appellation && t.appellation !== this.appellation || this.vintage && String(t.vintage ?? "") !== this.vintage || this.meal && !Xe(t.meals).includes(this.meal) ? !1 : !e || [
 			t.name,
 			t.domain,
 			t.appellation,
@@ -1649,7 +1655,24 @@ var nt = class extends je {
 		return [...t].sort((e, t) => this.sort === "bottles" ? t.bottles_in_cellar - e.bottles_in_cellar || n.compare(e.name, t.name) : this.sort === "vintage" && (t.vintage ?? 0) - (e.vintage ?? 0) || n.compare(e.name, t.name));
 	}
 	clearFilters() {
-		this.search = "", this.color = "", this.region = "", this.appellation = "", this.vintage = "", this.sort = "name";
+		this.search = "", this.color = "", this.region = "", this.appellation = "", this.vintage = "", this.meal = "", this.sort = "name";
+	}
+	mealValues() {
+		let e = /* @__PURE__ */ new Set();
+		for (let t of this.inventory?.wines ?? []) for (let n of Xe(t.meals)) e.add(n);
+		return [...e].sort((e, t) => We(this.hass?.language ?? "en", e).localeCompare(We(this.hass?.language ?? "en", t), this.hass?.language ?? void 0, { sensitivity: "base" }));
+	}
+	selectMealFilter() {
+		let e = (e) => We(this.hass?.language ?? "en", e);
+		return N`
+      <select aria-label=${e("filter_meal")} .value=${this.meal}
+        @change=${(e) => {
+			this.meal = e.target.value;
+		}}>
+        <option value="" ?selected=${!this.meal}>${e("filter_meal")}</option>
+        ${this.mealValues().map((t) => N`<option value=${t} ?selected=${t === this.meal}>${e(t)}</option>`)}
+      </select>
+    `;
 	}
 	selectFilter(e, t, n, r) {
 		return N`
@@ -1673,7 +1696,6 @@ var nt = class extends je {
 			this.selectedWine = e;
 		}}>${e.name}</button></div>
             <div class="metadata">${[
-			e.domain,
 			e.appellation,
 			e.region,
 			e.country
@@ -1690,7 +1712,7 @@ var nt = class extends je {
     `;
 	}
 	render() {
-		let e = (e) => We(this.hass?.language ?? "en", e), t = this.filteredWines, n = t.reduce((e, t) => e + t.bottles_in_cellar, 0), r = !!(this.search || this.color || this.region || this.appellation || this.vintage);
+		let e = (e) => We(this.hass?.language ?? "en", e), t = this.filteredWines, n = t.reduce((e, t) => e + t.bottles_in_cellar, 0), r = !!(this.search || this.color || this.region || this.appellation || this.vintage || this.meal);
 		return N`
       <ha-card>
         <header>
@@ -1705,18 +1727,19 @@ var nt = class extends je {
         ${this.config?.config_entry_id ? P : N`<div class="muted">${e("select_config")}</div>`}
         ${this.inventory?.stale ? N`<div class="warning">${e("stale")}</div>` : P}
         ${this.inventory ? N`
-          <details class="filters" open>
-            <summary>${e("inventory_filters")}</summary>
-            <div class="toolbar">
-              <input class="search" type="search" aria-label=${e("search_wine")}
-                placeholder=${e("search_placeholder")} .value=${this.search}
-                @input=${(e) => {
+          <input class="search" type="search" aria-label=${e("search_wine")}
+            placeholder=${e("search_placeholder")} .value=${this.search}
+            @input=${(e) => {
 			this.search = e.target.value;
 		}} />
+          <details class="filters">
+            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
+            <div class="toolbar">
               ${this.selectFilter("color", e("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", e("filter_region"), this.region, this.valuesFor("region"))}
               ${this.selectFilter("appellation", e("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
               ${this.selectFilter("vintage", e("filter_vintage"), this.vintage, this.valuesFor("vintage"))}
+              ${this.selectMealFilter()}
               <select aria-label=${e("sort_by")} .value=${this.sort}
                 @change=${(e) => {
 			this.sort = e.target.value;
@@ -1761,7 +1784,7 @@ var nt = class extends je {
 		};
 	}
 };
-I([Ve({ attribute: !1 })], nt.prototype, "hass", void 0), I([F()], nt.prototype, "config", void 0), I([F()], nt.prototype, "inventory", void 0), I([F()], nt.prototype, "loading", void 0), I([F()], nt.prototype, "error", void 0), I([F()], nt.prototype, "search", void 0), I([F()], nt.prototype, "color", void 0), I([F()], nt.prototype, "region", void 0), I([F()], nt.prototype, "appellation", void 0), I([F()], nt.prototype, "vintage", void 0), I([F()], nt.prototype, "sort", void 0), I([F()], nt.prototype, "selectedWine", void 0), nt = I([Re("ploc-cellar-inventory-card")], nt), window.customCards ??= [], window.customCards.push({
+I([Ve({ attribute: !1 })], nt.prototype, "hass", void 0), I([F()], nt.prototype, "config", void 0), I([F()], nt.prototype, "inventory", void 0), I([F()], nt.prototype, "loading", void 0), I([F()], nt.prototype, "error", void 0), I([F()], nt.prototype, "search", void 0), I([F()], nt.prototype, "color", void 0), I([F()], nt.prototype, "region", void 0), I([F()], nt.prototype, "appellation", void 0), I([F()], nt.prototype, "vintage", void 0), I([F()], nt.prototype, "meal", void 0), I([F()], nt.prototype, "sort", void 0), I([F()], nt.prototype, "selectedWine", void 0), nt = I([Re("ploc-cellar-inventory-card")], nt), window.customCards ??= [], window.customCards.push({
 	type: "ploc-cellar-inventory-card",
 	name: Ge("picker_inventory_name"),
 	description: Ge("picker_inventory_description")
