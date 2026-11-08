@@ -756,7 +756,9 @@ var He = {
 	sort_bottles_asc: "Quantity ascending",
 	sort_bottles_desc: "Quantity descending",
 	sort_vintage_asc: "Vintage ascending",
-	sort_vintage_desc: "Vintage descending"
+	sort_vintage_desc: "Vintage descending",
+	wine_detail_origin: "Origin and identification",
+	wine_detail_tasting: "Tasting and composition"
 }, Ue = {
 	card_title: "Cave Ploc",
 	rack_title: "Rangement de la cave",
@@ -905,7 +907,9 @@ var He = {
 	sort_bottles_asc: "Quantité ascendante",
 	sort_bottles_desc: "Quantité descendante",
 	sort_vintage_asc: "Millésime ascendant",
-	sort_vintage_desc: "Millésime descendant"
+	sort_vintage_desc: "Millésime descendant",
+	wine_detail_origin: "Origine et identification",
+	wine_detail_tasting: "Dégustation et composition"
 };
 // src/translations.ts
 function We(e, t) {
@@ -1051,7 +1055,19 @@ var tt = class extends je {
       --mdc-dialog-max-width: min(760px, calc(100vw - 32px));
     }
     :host { --ploc-wine-font-family: "Cormorant Garamond", Georgia, serif; }
-    .content { display: grid; gap: 20px; min-width: 0; }
+    .content { display: grid; gap: 14px; min-width: 0; }
+    .detail-section { min-width: 0; border: 1px solid var(--divider-color); border-radius: 12px; overflow: hidden; background: var(--card-background-color, var(--ha-card-background)); }
+    .section-summary { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 11px 14px; cursor: pointer; list-style: none; font-size: .96rem; font-weight: 600; }
+    .section-summary::-webkit-details-marker { display: none; }
+    .section-summary::after { content: ""; width: 8px; height: 8px; margin-left: auto; border-right: 2px solid var(--secondary-text-color); border-bottom: 2px solid var(--secondary-text-color); transform: rotate(45deg); transition: transform .16s ease; }
+    details[open] > .section-summary::after { transform: rotate(225deg); }
+    .section-summary ha-icon { --mdc-icon-size: 20px; color: var(--secondary-text-color); }
+    .section-body { padding: 0 14px 14px; min-width: 0; }
+    .section-subtitle { margin: 12px 0 5px; color: var(--secondary-text-color); font-size: .78rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .section-subtitle:first-child { margin-top: 2px; }
+    .nested-details { margin-top: 14px; border-top: 1px solid var(--divider-color); }
+    .nested-details > .section-summary { min-height: 42px; padding: 9px 0; font-size: .88rem; }
+    .nested-details > .section-body { padding: 0 0 4px; }
     .wine-dialog-title { font-family: var(--ploc-wine-font-family); font-size: 1.45rem; font-weight: 500; line-height: 1.2; white-space: normal; }
     .wine-image-container { display: flex; justify-content: center; min-width: 0; max-height: 320px; overflow: hidden; }
     .wine-image { display: block; max-width: 100%; max-height: 320px; object-fit: contain; border-radius: 10px; }
@@ -1128,6 +1144,11 @@ var tt = class extends je {
     .location-coordinate { color: var(--secondary-text-color); font-size: .88rem; line-height: 1.4; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
+    @media (max-width: 560px) {
+      .content { gap: 11px; }
+      .characteristic-copy { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+      .characteristic { padding: 10px 2px; }
+    }
     @media (max-width: 480px) {
       .content { gap: 16px; }
       dl { grid-template-columns: minmax(0, 1fr); }
@@ -1209,12 +1230,7 @@ var tt = class extends je {
 		return !e || e.length !== 3 || !e.every((e) => Number.isInteger(e) && e >= 0 && e <= 255) ? "background: var(--secondary-text-color);" : `background: rgb(${e[0]} ${e[1]} ${e[2]});`;
 	}
 	renderIdentity(e) {
-		let t = [
-			e.domain,
-			e.appellation,
-			e.region,
-			e.country
-		].filter((e) => !!e), n = [
+		let t = [e.domain].filter((e) => !!e), n = [
 			e.vintage === null ? this.t("unknown_vintage") : String(e.vintage),
 			e.color,
 			e.bottle_format
@@ -1232,8 +1248,9 @@ var tt = class extends je {
 	renderStock(e) {
 		let t = e.purchased !== null || e.consumed !== null || e.movement_balance !== null || e.calculated_stock !== null || e.negative_movement_bottles !== null || e.physical_surplus_bottles !== null || e.unlocated_bottles !== null;
 		return N`
-      <section>
-        <h3>${this.t("wine_detail_stock")}</h3>
+      <details class="detail-section" open>
+        <summary class="section-summary"><ha-icon icon="mdi:chart-box-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_stock")}</summary>
+        <div class="section-body">
         <div class="stock">
           ${this.stockItem("wine_detail_physical", e.bottles_in_cellar)}
           ${this.stockItem("wine_detail_reconstructed", e.bottles)}
@@ -1241,8 +1258,9 @@ var tt = class extends je {
           ${this.stockItem("wine_detail_source_stock", e.ploud_bottles)}
         </div>
         ${t ? N`
-          <h3 style="margin-top: 16px">${this.t("wine_detail_movements")}</h3>
-          <dl>
+          <details class="nested-details">
+            <summary class="section-summary"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>${this.t("wine_detail_movements")}</summary>
+            <div class="section-body"><dl>
             ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", e.purchased)}
             ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", e.consumed)}
             ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", e.movement_balance)}
@@ -1250,20 +1268,22 @@ var tt = class extends je {
             ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", e.unlocated_bottles)}
             ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", e.negative_movement_bottles)}
             ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", e.physical_surplus_bottles)}
-          </dl>
+          </dl></div>
+          </details>
         ` : P}
-      </section>
+        </div>
+      </details>
     `;
 	}
 	renderMeals(e) {
 		let t = Qe(e.meals);
 		return t.length ? N`
-      <section>
-        <h3>${this.t("wine_detail_meals")}</h3>
-        <div class="tags">
+      <details class="detail-section" open>
+        <summary class="section-summary"><ha-icon icon="mdi:food-apple-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_meals")}</summary>
+        <div class="section-body"><div class="tags">
           ${t.map((e) => N`<span class="tag meal-tag"><ha-icon icon=${Ze(e)} aria-hidden="true"></ha-icon><span>${this.t(e)}</span></span>`)}
-        </div>
-      </section>
+        </div></div>
+      </details>
     ` : P;
 	}
 	renderLocations(e) {
@@ -1304,16 +1324,19 @@ var tt = class extends je {
           ${this.renderIdentity(e)}
           ${this.renderStock(e)}
           ${this.renderMeals(e)}
-          <section>
-            <h3>${this.t("wine_detail_characteristics")}</h3>
+          <details class="detail-section" open>
+            <summary class="section-summary"><ha-icon icon="mdi:clipboard-list-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_characteristics")}</summary>
+            <div class="section-body">
+            <div class="section-subtitle">${this.t("wine_detail_origin")}</div>
             <div class="characteristics">
-              ${this.characteristic("mdi:domain", "tooltip_domain", e.domain)}
-              ${this.characteristic("mdi:calendar", "tooltip_vintage", e.vintage)}
-              ${this.characteristic("mdi:map-marker-radius", "tooltip_appellation", e.appellation)}
               ${this.characteristic("mdi:medal-outline", "tooltip_classification", e.classification)}
-              ${this.characteristic("mdi:palette-outline", "tooltip_color", e.color)}
+              ${this.characteristic("mdi:map-marker-radius", "tooltip_appellation", e.appellation)}
               ${this.characteristic("mdi:map-outline", "tooltip_region", e.region)}
               ${this.characteristic("mdi:earth", "tooltip_country", e.country)}
+            </div>
+            <div class="section-subtitle">${this.t("wine_detail_tasting")}</div>
+            <div class="characteristics">
+              ${this.characteristic("mdi:palette-outline", "tooltip_color", e.color)}
               ${this.renderGrapes(e.grapes)}
               ${this.characteristic("mdi:tag-outline", "tooltip_cuvee", e.cuvee)}
               ${this.characteristic("mdi:bottle-wine-outline", "tooltip_format", e.bottle_format)}
@@ -1321,16 +1344,17 @@ var tt = class extends je {
               ${this.characteristic("mdi:percent-outline", "wine_detail_alcohol", e.alcohol_percent === null ? null : `${this.formatNumber(e.alcohol_percent)} %`)}
               ${this.characteristic("mdi:thermometer", "tooltip_temperature", t)}
             </div>
-          </section>
-          <section>
-            <h3>${this.t("locations")}</h3>
-            ${this.renderLocations(e)}
-          </section>
+            </div>
+          </details>
+          <details class="detail-section">
+            <summary class="section-summary"><ha-icon icon="mdi:map-marker-multiple-outline" aria-hidden="true"></ha-icon>${this.t("locations")}</summary>
+            <div class="section-body">${this.renderLocations(e)}</div>
+          </details>
           ${e.comment ? N`
-            <section>
-              <h3>${this.t("wine_detail_comment")}</h3>
-              <div class="comment">${e.comment}</div>
-            </section>
+            <details class="detail-section">
+              <summary class="section-summary"><ha-icon icon="mdi:note-text-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_comment")}</summary>
+              <div class="section-body"><div class="comment">${e.comment}</div></div>
+            </details>
           ` : P}
         </div>
       </ha-dialog>
