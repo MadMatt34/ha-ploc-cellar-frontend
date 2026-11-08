@@ -110,7 +110,7 @@
   "editor_rack_picker_buttons": "Buttons",
   "editor_rack_picker_dropdown": "Dropdown list",
   "wine_detail_stock": "Stock",
-  "wine_detail_bottles_in_stock": "bottles in stock",
+  "wine_detail_bottles_in_stock": "bottles in cellar",\n  "wine_detail_effective_stock_suffix": "{count} effective stock",\n  "wine_detail_issue_unlocated": "{count} unlocated bottle(s)",\n  "wine_detail_issue_negative": "{count} bottle(s) with a negative balance",\n  "wine_detail_issue_surplus": "{count} bottle(s) in physical surplus",
   "wine_detail_physical": "Physically in cellar",
   "wine_detail_reconstructed": "Reconstructed stock",
   "wine_detail_effective": "Effective stock",
