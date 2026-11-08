@@ -1411,7 +1411,7 @@ let ve = class extends ke {
             aria-valuetext=${`${i.length} ${e("positions")}, ${a} ${e("occupied")}, ${o} ${e("free")}`}>
             <div class="rack-occupancy-fill" style=${`width: ${s}%;`}></div>
             <div class="rack-occupancy-label">
-              <span class="numeric-value">${a}</span>&nbsp;${e("occupied")}&nbsp;·&nbsp;<span class="numeric-value">${o}</span>&nbsp;${e("free")}
+              <span class="numeric-value">${i.length}</span>&nsp;${e("positions")}&nbsp;·&nbsp;<span class="numeric-value">${a}</span>&nbsp;${e("occupied")}&nbsp;·&nbsp;<span class="numeric-value">${o}</span>&nbsp;${e("free")}
             </div>
           </div>
           ${l.length ? I`
