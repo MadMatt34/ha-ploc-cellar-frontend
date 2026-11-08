@@ -1086,7 +1086,7 @@ var nt = class extends je {
     .wine-hero { display: grid; grid-template-columns: 8px minmax(0, 1fr); align-items: stretch; gap: 14px; min-width: 0; }
     .wine-hero-banner { width: 8px; min-height: 120px; border-radius: 999px; }
     .wine-hero-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 32%); align-items: center; gap: 14px; min-width: 0; }
-    .wine-image-container { display: flex; justify-content: flex-end; align-items: center; min-width: 0; max-height: 160px; overflow: hidden; padding-right: 10px; border-radius: 20px; background: var(--secondary-background-color); }
+    .wine-image-container { display: flex; justify-content: flex-end; align-items: center; min-width: 0; max-height: 160px; overflow: hidden; padding-right: 10px; border-radius: 20px; }
     .wine-image { display: block; max-width: 100%; max-height: 160px; object-fit: contain; border-radius: 10px; }
     .identity { min-width: 0; }
     .identity-text { min-width: 0; }
@@ -1145,11 +1145,11 @@ var nt = class extends je {
     .stock-details .characteristic-value { font-family: var(--ploc-numeric-font-family); font-variant-numeric: tabular-nums; }
     .stock-label { display: block; margin-top: 3px; color: var(--secondary-text-color); font-size: .8rem; }
     .locations { display: grid; gap: 9px; }
-    .location { padding: 10px 12px; border: 1px solid var(--divider-color); border-radius: 9px; }
+    .location { padding: 10px 12px; border: 1px solid var(--divider-color); border-radius: 9px; background: var(--secondary-background-color); }
     .location-name { display: block; }
     .location-coordinates { display: grid; gap: 6px; margin-top: 8px; }
     .location-coordinate-row { display: flex; flex-wrap: wrap; gap: 6px; }
-    .location-coordinate { display: block; width: fit-content; max-width: 100%; padding: 4px 9px; border-radius: 999px; background: var(--secondary-background-color); color: var(--secondary-text-color); font-size: .82rem; line-height: 1.4; }
+    .location-coordinate { display: block; width: fit-content; max-width: 100%; padding: 4px 9px; border-radius: 999px; background: var(--primary-background-color); color: var(--primary-text-color); font-size: .82rem; line-height: 1.4; }
     .muted { color: var(--secondary-text-color); font-size: .88rem; }
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
     @media (max-width: 560px) {
@@ -1266,7 +1266,7 @@ var nt = class extends je {
 	renderStock(e) {
 		let t = e.purchased !== null || e.consumed !== null || e.movement_balance !== null || e.calculated_stock !== null || e.negative_movement_bottles !== null || e.physical_surplus_bottles !== null || e.unlocated_bottles !== null;
 		return N`
-      <details class="detail-section stock-details" open>
+      <details class="detail-section stock-details">
         <summary class="section-summary"><ha-icon icon="mdi:chart-box-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_stock")}</summary>
         <div class="section-body">
         <div class="stock">
@@ -1275,18 +1275,16 @@ var nt = class extends je {
           ${this.stockItem("wine_detail_effective", e.effective_stock)}
         </div>
         ${t ? N`
-          <details class="nested-details">
-            <summary class="section-summary"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>${this.t("wine_detail_movements")}</summary>
-            <div class="section-body"><dl>
-            ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", e.purchased)}
-            ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", e.consumed)}
-            ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", e.movement_balance)}
-            ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", e.calculated_stock)}
-            ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", e.unlocated_bottles)}
-            ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", e.negative_movement_bottles)}
-            ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", e.physical_surplus_bottles)}
+          <div class="section-summary"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>${this.t("wine_detail_movements")}</div>
+          <div class="section-body"><dl>
+          ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", e.purchased)}
+          ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", e.consumed)}
+          ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", e.movement_balance)}
+          ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", e.calculated_stock)}
+          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", e.unlocated_bottles)}
+          ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", e.negative_movement_bottles)}
+          ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", e.physical_surplus_bottles)}
           </dl></div>
-          </details>
         ` : P}
         </div>
       </details>
