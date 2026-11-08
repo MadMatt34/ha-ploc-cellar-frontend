@@ -110,7 +110,7 @@
   "editor_rack_picker_buttons": "Boutons",
   "editor_rack_picker_dropdown": "Liste déroulante",
   "wine_detail_stock": "Stock",
-  "wine_detail_bottles_in_stock": "bouteilles en cave",\n  "wine_detail_effective_stock_suffix": "{count} en stock effectif",\n  "wine_detail_issue_unlocated": "{count} bouteille(s) non localisée(s)",\n  "wine_detail_issue_negative": "{count} bouteille(s) au solde négatif",\n  "wine_detail_issue_surplus": "{count} bouteille(s) en excédent physique",
+  "wine_detail_bottles_in_stock": "bouteilles en cave",\n  "wine_detail_effective_stock_suffix": "{count} en stock effectif",\n  "wine_detail_issue_unlocated": "Bouteilles non localisées : {count}",\n  "wine_detail_issue_negative": "Solde négatif : {count} bouteille(s)",\n  "wine_detail_issue_surplus": "Excédent physique : {count} bouteille(s)",
   "wine_detail_physical": "En cave physiquement",
   "wine_detail_reconstructed": "Stock reconstitué",
   "wine_detail_effective": "Stock effectif",
