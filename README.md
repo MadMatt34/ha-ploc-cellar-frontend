@@ -42,16 +42,18 @@ In a **Sections** view, the overview card uses a default width of 12 columns wit
 
 ## Development
 
-Requires Node.js `^20.19.0` or `>=22.12.0` (the versions supported by Vite 8).
+Requires Node.js `^20.19.0` or `>=22.12.0` (the versions supported by Vite 8). Browser interaction tests use the pinned Playwright 1.65.0 dependency and Chromium.
 
 ```sh
 npm ci
 npm run check
 npm test
+npx playwright install chromium # once per local environment
+npm run test:e2e
 npm run build
 ```
 
-The production bundle is generated at `dist/ploc-cellar-card.js`, then copied to the repository root as `ploc-cellar-card.js`, the filename expected by HACS (`hacs.json`). Both files are versioned. Dependencies are bundled into the standalone JavaScript module. The frontend CI workflow runs the strict TypeScript check, unit tests and production build on pushes and pull requests; on `main`, it commits both generated bundles when they change.
+The production bundle is generated at `dist/ploc-cellar-card.js`, then copied to the repository root as `ploc-cellar-card.js`, the filename expected by HACS (`hacs.json`). Both files are versioned. Dependencies are bundled into the standalone JavaScript module. The frontend CI workflow runs the strict TypeScript check, unit tests and production build on pushes and pull requests. A separate Chromium job runs the browser interaction suite on every push and pull request; on `main`, it commits both generated bundles when they change.
 
 ## Backend contract
 
