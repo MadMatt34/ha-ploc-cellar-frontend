@@ -287,6 +287,9 @@ describe("Ploc Cellar browser interactions", () => {
     try {
       await page.evaluate(() => {
         document.documentElement.style.setProperty("--error-color", "rgb(200, 0, 0)");
+        window.__plocFixture.inventory.unlocated_bottles = 2;
+        window.__plocFixture.inventory.negative_movement_bottles = 1;
+        window.__plocFixture.inventory.physical_surplus_bottles = 0;
         const wine = window.__plocFixture.inventory.wines[0];
         wine.bottles_in_cellar = 0;
         wine.effective_stock = 4;
@@ -294,6 +297,12 @@ describe("Ploc Cellar browser interactions", () => {
         wine.negative_movement_bottles = 1;
         return window.mountPlocCard("ploc-cellar-inventory-card", {});
       });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+      const mainCard = page.locator("ploc-cellar-card");
+      const mainDiagnostics = mainCard.locator(".diagnostic-value");
+      await mainDiagnostics.first().waitFor();
+      assert.equal(await mainDiagnostics.first().evaluate((element) => getComputedStyle(element).color), "rgb(200, 0, 0)");
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
       const card = page.locator("ploc-cellar-inventory-card");
       const inventoryCount = await card.locator(".wine").count();
       await card.locator(".wine").filter({ hasText: "Château A" }).click();
@@ -304,6 +313,12 @@ describe("Ploc Cellar browser interactions", () => {
       const stock = detail.locator(".stock-details");
       await stock.locator("summary").click();
       await stock.locator(".stock-issues[role='alert']").getByText("Unlocated bottles: 2 · Negative balance: 1 bottle(s)").waitFor();
+      const errorValues = stock.locator(".characteristic-value.is-error");
+      assert.equal(await errorValues.count(), 2);
+      assert.deepEqual(await errorValues.allTextContents(), ["1", "2"]);
+      for (const value of await errorValues.all()) {
+        assert.equal(await value.evaluate((element) => getComputedStyle(element).color), "rgb(200, 0, 0)");
+      }
       assert.equal(await stock.locator(".stock-issues ha-icon[icon='mdi:alert-circle']").count(), 1);
       assert.equal(await stock.evaluate((element) => element.classList.contains("has-inventory-issues")), true);
       const borderColor = await stock.evaluate((element) => getComputedStyle(element).borderTopColor);
