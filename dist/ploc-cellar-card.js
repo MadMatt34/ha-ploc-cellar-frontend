@@ -645,10 +645,7 @@ var He = {
 	filter_appellation: "All appellations",
 	filter_meal: "All food pairings",
 	filter_vintage: "All vintages",
-	sort_by: "Sort by",
-	sort_name: "Name",
-	sort_bottles: "Quantity descending",
-	sort_vintage: "Vintage descending",
+	sort_by: "Sort by:",
 	inventory_results: "{count} wine(s)",
 	inventory_bottle_total: "{count} bottle(s)",
 	clear_filters: "Clear filters",
@@ -751,7 +748,13 @@ var He = {
 	meal_cheese: "Cheese",
 	meal_dessert: "Dessert",
 	wine_detail_no_locations: "No physical location is assigned to this wine.",
-	rack_grid_compacted: "Rack positions are shown in a compact layout because their coordinates are too far apart."
+	rack_grid_compacted: "Rack positions are shown in a compact layout because their coordinates are too far apart.",
+	sort_name_asc: "Name ascending",
+	sort_name_desc: "Name descending",
+	sort_bottles_asc: "Quantity ascending",
+	sort_bottles_desc: "Quantity descending",
+	sort_vintage_asc: "Vintage ascending",
+	sort_vintage_desc: "Vintage descending"
 }, Ue = {
 	card_title: "Cave Ploc",
 	rack_title: "Rangement de la cave",
@@ -789,10 +792,7 @@ var He = {
 	filter_appellation: "Toutes les appellations",
 	filter_meal: "Tous les mets",
 	filter_vintage: "Tous les millésimes",
-	sort_by: "Trier par",
-	sort_name: "Nom",
-	sort_bottles: "Quantité décroissante",
-	sort_vintage: "Millésime décroissant",
+	sort_by: "Trier par :",
 	inventory_results: "{count} référence(s)",
 	inventory_bottle_total: "{count} bouteille(s)",
 	clear_filters: "Effacer les filtres",
@@ -895,7 +895,13 @@ var He = {
 	meal_cheese: "Fromages",
 	meal_dessert: "Desserts",
 	wine_detail_no_locations: "Aucun emplacement physique n’est affecté à ce vin.",
-	rack_grid_compacted: "La disposition des emplacements est condensée car les coordonnées sont trop espacées."
+	rack_grid_compacted: "La disposition des emplacements est condensée car les coordonnées sont trop espacées.",
+	sort_name_asc: "Nom ascendant",
+	sort_name_desc: "Nom descendant",
+	sort_bottles_asc: "Quantité ascendante",
+	sort_bottles_desc: "Quantité descendante",
+	sort_vintage_asc: "Millésime ascendant",
+	sort_vintage_desc: "Millésime descendant"
 };
 // src/translations.ts
 function We(e, t) {
@@ -1553,7 +1559,7 @@ I([Ve({ attribute: !1 })], tt.prototype, "hass", void 0), I([F()], tt.prototype,
 // src/ploc-cellar-inventory-card.ts
 var nt = class extends je {
 	constructor(...e) {
-		super(...e), this.loading = !1, this.search = "", this.color = "", this.region = "", this.appellation = "", this.vintage = "", this.meal = "", this.sort = "name", this.requestGeneration = 0;
+		super(...e), this.loading = !1, this.search = "", this.color = "", this.region = "", this.appellation = "", this.vintage = "", this.meal = "", this.sort = "name-asc", this.requestGeneration = 0;
 	}
 	static {
 		this.styles = c`
@@ -1576,13 +1582,13 @@ var nt = class extends je {
     .search { grid-column: 1 / -1; }
     .summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; color: var(--secondary-text-color); font-size: .85rem; margin: 12px 0; }
     .wine-list { display: grid; gap: 8px; }
-    .wine { border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; }
+    .wine { display: block; width: 100%; box-sizing: border-box; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; cursor: pointer; }
+    .wine:hover { background: var(--secondary-background-color); }
+    .wine:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
     .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
-    .wine-name-button { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: inherit; line-height: inherit; text-align: left; cursor: pointer; }
-    .wine-name-button:hover { color: var(--primary-color); text-decoration: underline; }
-    .wine-name-button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 2px; }
-    .quantity { flex: 0 0 auto; white-space: nowrap; font-weight: 600; }
+    .quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; font-family: var(--ploc-numeric-font-family); font-size: 1.05rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .quantity ha-icon { --mdc-icon-size: 20px; color: var(--wine-color, var(--secondary-text-color)); }
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
@@ -1592,6 +1598,9 @@ var nt = class extends je {
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
     .filters-chevron { --mdc-icon-size: 18px; margin-left: auto; color: var(--secondary-text-color); transition: transform 120ms ease; }
     .filters[open] .filters-chevron { transform: rotate(90deg); }
+    .sort-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .sort-row > span { flex: 0 0 auto; color: var(--secondary-text-color); font-size: .9rem; }
+    .sort-row select { flex: 1; width: 100%; }
     .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
     .error { color: var(--error-color); padding: 8px 0; }
@@ -1652,10 +1661,23 @@ var nt = class extends je {
 			numeric: !0,
 			sensitivity: "base"
 		});
-		return [...t].sort((e, t) => this.sort === "bottles" ? t.bottles_in_cellar - e.bottles_in_cellar || n.compare(e.name, t.name) : this.sort === "vintage" && (t.vintage ?? 0) - (e.vintage ?? 0) || n.compare(e.name, t.name));
+		return [...t].sort((e, t) => {
+			if (this.sort === "name-desc") return n.compare(t.name, e.name);
+			if (this.sort === "bottles-asc" || this.sort === "bottles-desc") {
+				let r = e.bottles_in_cellar - t.bottles_in_cellar;
+				return (this.sort === "bottles-asc" ? r : -r) || n.compare(e.name, t.name);
+			}
+			if (this.sort === "vintage-asc" || this.sort === "vintage-desc") {
+				if (e.vintage == null && t.vintage != null) return 1;
+				if (e.vintage != null && t.vintage == null) return -1;
+				let r = (e.vintage ?? 0) - (t.vintage ?? 0);
+				return (this.sort === "vintage-asc" ? r : -r) || n.compare(e.name, t.name);
+			}
+			return n.compare(e.name, t.name);
+		});
 	}
 	clearFilters() {
-		this.search = "", this.color = "", this.region = "", this.appellation = "", this.vintage = "", this.meal = "", this.sort = "name";
+		this.search = "", this.color = "", this.region = "", this.appellation = "", this.vintage = "", this.meal = "", this.sort = "name-asc";
 	}
 	mealValues() {
 		let e = /* @__PURE__ */ new Set();
@@ -1689,26 +1711,29 @@ var nt = class extends je {
 	renderWine(e) {
 		let t = (e) => We(this.hass?.language ?? "en", e), n = e.vintage === null ? t("unknown_vintage") : String(e.vintage), r = e.color_rgb?.every(Number.isFinite) ? e.color_rgb.map((e) => Math.round(Math.min(255, Math.max(0, e)))) : null, i = r ? `rgb(${r.join(", ")})` : "";
 		return N`
-      <article class="wine" style=${i ? "--wine-color: " + i : ""}>
+      <button class="wine" type="button" aria-haspopup="dialog"
+        aria-label=${`${e.name}, ${new Intl.NumberFormat(this.hass?.language ?? void 0).format(e.bottles_in_cellar)} ${t("bottles_short")}`}
+        style=${i ? "--wine-color: " + i : ""}
+        @click=${() => {
+			this.selectedWine = e;
+		}}>
         <div class="wine-main">
           <div>
-            <div class="wine-name"><button class="wine-name-button" type="button" aria-haspopup="dialog" @click=${() => {
-			this.selectedWine = e;
-		}}>${e.name}</button></div>
+            <div class="wine-name">${e.name}</div>
             <div class="metadata">${[
 			e.appellation,
 			e.region,
 			e.country
 		].filter(Boolean).join(" · ")}</div>
           </div>
-          <div class="quantity">${e.bottles_in_cellar} ${t("bottles_short")}</div>
+          <div class="quantity"><span>${new Intl.NumberFormat(this.hass?.language ?? void 0).format(e.bottles_in_cellar)}</span><ha-icon icon="mdi:bottle-wine" aria-hidden="true"></ha-icon></div>
         </div>
         <div class="tags">
           ${e.color ? N`<span class="tag">${e.color}</span>` : P}
           <span class="tag">${n}</span>
           ${e.bottle_format ? N`<span class="tag">${e.bottle_format}</span>` : P}
         </div>
-      </article>
+      </button>
     `;
 	}
 	render() {
@@ -1740,15 +1765,21 @@ var nt = class extends je {
               ${this.selectFilter("appellation", e("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
               ${this.selectFilter("vintage", e("filter_vintage"), this.vintage, this.valuesFor("vintage"))}
               ${this.selectMealFilter()}
+            </div>
+            <label class="sort-row">
+              <span>${e("sort_by")}</span>
               <select aria-label=${e("sort_by")} .value=${this.sort}
                 @change=${(e) => {
 			this.sort = e.target.value;
 		}}>
-                <option value="name" ?selected=${this.sort === "name"}>${e("sort_name")}</option>
-                <option value="bottles" ?selected=${this.sort === "bottles"}>${e("sort_bottles")}</option>
-                <option value="vintage" ?selected=${this.sort === "vintage"}>${e("sort_vintage")}</option>
+                <option value="name-asc">${e("sort_name_asc")}</option>
+                <option value="name-desc">${e("sort_name_desc")}</option>
+                <option value="bottles-asc">${e("sort_bottles_asc")}</option>
+                <option value="bottles-desc">${e("sort_bottles_desc")}</option>
+                <option value="vintage-asc">${e("sort_vintage_asc")}</option>
+                <option value="vintage-desc">${e("sort_vintage_desc")}</option>
               </select>
-            </div>
+            </label>
           </details>
           <div class="summary">
             <span>${e("inventory_results").replace("{count}", String(t.length))}</span>
