@@ -39,8 +39,9 @@ export class PlocCellarWineDetail extends LitElement {
     .nested-details > .section-summary { min-height: 42px; padding: 9px 0; font-size: .88rem; }
     .nested-details > .section-body { padding: 0 0 4px; }
     .wine-dialog-title { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; white-space: normal; }
-    .wine-color-banner { height: 8px; min-width: 0; border-radius: 999px; }
-    .wine-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 32%); align-items: center; gap: 14px; min-width: 0; }
+    .wine-hero { display: grid; grid-template-columns: 8px minmax(0, 1fr); align-items: stretch; gap: 14px; min-width: 0; }
+    .wine-hero-banner { width: 8px; min-height: 120px; border-radius: 999px; }
+    .wine-hero-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 32%); align-items: center; gap: 14px; min-width: 0; }
     .wine-image-container { display: flex; justify-content: flex-end; align-items: center; min-width: 0; max-height: 180px; overflow: hidden; }
     .wine-image { display: block; max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 10px; }
     .identity { min-width: 0; }
@@ -48,6 +49,9 @@ export class PlocCellarWineDetail extends LitElement {
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .wine-vintage { margin-top: 5px; font-family: var(--ploc-wine-font-family); font-size: 1.2rem; font-weight: 600; line-height: 1.2; }
+    .wine-stock-line { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--secondary-text-color); font-size: .86rem; }
+    .wine-stock-line ha-icon { --mdc-icon-size: 19px; flex: 0 0 auto; }
+    .wine-stock-count { font-family: var(--ploc-numeric-font-family); font-size: 1rem; font-variant-numeric: tabular-nums; color: var(--primary-text-color); }
     .tag {
       padding: 4px 9px;
       border-radius: 999px;
@@ -108,7 +112,8 @@ export class PlocCellarWineDetail extends LitElement {
       .content { gap: 11px; }
       .characteristic-copy { grid-template-columns: minmax(0, 1fr); gap: 2px; }
       .characteristic { padding: 10px 2px; }
-      .wine-hero { grid-template-columns: minmax(0, 1fr) minmax(88px, 34%); gap: 9px; }
+      .wine-hero { gap: 9px; }
+      .wine-hero-main { grid-template-columns: minmax(0, 1fr) minmax(88px, 34%); gap: 9px; }
       .wine-image-container, .wine-image { max-height: 145px; }
     }
     @media (max-width: 480px) {
@@ -215,6 +220,16 @@ export class PlocCellarWineDetail extends LitElement {
     `;
   }
 
+  private get bottleColorStyle(): string {
+    const rgb = this.wine?.color_rgb;
+    if (
+      !rgb ||
+      rgb.length !== 3 ||
+      !rgb.every((component) => Number.isInteger(component) && component >= 0 && component <= 255)
+    ) return "color: var(--secondary-text-color);";
+    return `color: rgb(${rgb[0]} ${rgb[1]} ${rgb[2]});`;
+  }
+
   private get colorStyle(): string {
     const rgb = this.wine?.color_rgb;
     if (
@@ -234,6 +249,11 @@ export class PlocCellarWineDetail extends LitElement {
       <div class="identity">
         <div class="identity-text">
           ${wine.vintage !== null ? html`<div class="wine-vintage">${wine.vintage}</div>` : nothing}
+          <div class="wine-stock-line">
+            <ha-icon icon="mdi:bottle-wine" style=${this.bottleColorStyle} aria-hidden="true"></ha-icon>
+            <span class="wine-stock-count">${this.formatNumber(wine.bottles_in_cellar)}</span>
+            <span>${this.t("wine_detail_bottles_in_stock")}</span>
+          </div>
           ${tags.length ? html`<div class="tags">${tags.map((tag) => html`<span class="tag">${tag}</span>`)}</div>` : nothing}
         </div>
       </div>
@@ -338,14 +358,16 @@ export class PlocCellarWineDetail extends LitElement {
       <ha-dialog .open=${true} .accessibleLabel=${wine.name} @closed=${() => this.onDialogClosed()}>
         <span slot="headerTitle" class="wine-dialog-title">${wine.name}</span>
         <div class="content">
-          <div class="wine-color-banner" style=${this.colorStyle} aria-hidden="true"></div>
           <div class="wine-hero">
-            ${this.renderIdentity(wine)}
-            ${this.imageUrl ? html`
-              <div class="wine-image-container">
-                <img class="wine-image" src=${this.imageUrl} alt=${wine.name} />
-              </div>
-            ` : nothing}
+            <div class="wine-hero-banner" style=${this.colorStyle} aria-hidden="true"></div>
+            <div class="wine-hero-main">
+              ${this.renderIdentity(wine)}
+              ${this.imageUrl ? html`
+                <div class="wine-image-container">
+                  <img class="wine-image" src=${this.imageUrl} alt=${wine.name} />
+                </div>
+              ` : nothing}
+            </div>
           </div>
           ${this.renderStock(wine)}
           ${this.renderMeals(wine)}
