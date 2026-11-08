@@ -687,6 +687,7 @@ var He = {
 	statistics_distribution_scope: "Breakdowns include known wine references only.",
 	statistics_unknown_wine_positions: "{count} occupied position(s) have an unknown wine reference. They are included in total stock but not in the breakdowns.",
 	editor_show_occupancy: "Show rack occupancy",
+	editor_show_rack_occupancy: "Show rack occupancy bar",
 	editor_show_diagnostics: "Show diagnostics",
 	editor_show_statistics: "Show statistics",
 	editor_show_statistics_legends: "Show chart legends",
@@ -834,6 +835,7 @@ var He = {
 	statistics_distribution_scope: "Les répartitions ne portent que sur les références de vins connues.",
 	statistics_unknown_wine_positions: "{count} emplacement(s) occupé(s) font référence à un vin inconnu. Ils sont inclus dans le stock total, mais pas dans les répartitions.",
 	editor_show_occupancy: "Afficher l’occupation des casiers",
+	editor_show_rack_occupancy: "Afficher la barre d’occupation du casier",
 	editor_show_diagnostics: "Afficher les diagnostics",
 	editor_show_statistics: "Afficher les statistiques",
 	editor_show_statistics_legends: "Afficher les légendes des graphiques",
@@ -1293,12 +1295,13 @@ var tt = class extends je {
     button[disabled] { opacity: .5; cursor: default; }
     .rack-picker { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0; }
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
-    .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; padding: 0; }
+    .rack-visualization { width: max-content; max-width: 100%; margin: 4px auto 0; }
+    .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; width: 100%; box-sizing: border-box; padding: 0; }
     .rack-grid { display: grid; flex: 0 0 auto; gap: 6px; width: max-content; min-width: min-content; }
     .rack-summary { color: var(--secondary-text-color); font-size: .85rem; line-height: 1.2; text-align: center; }
     .rack-name { color: var(--primary-text-color); font-size: 1rem; font-weight: 500; }
     .color-counts { color: var(--secondary-text-color); text-align: center; }
-    .rack-occupancy { position: relative; height: 20px; margin: 0 0 0; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); margin: 4px 0 8px 0; }
+    .rack-occupancy { position: relative; box-sizing: border-box; width: 100%; height: 20px; margin: 0 0 8px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
     .rack-occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .rack-occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
     .numeric-value { font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
@@ -1448,22 +1451,26 @@ var tt = class extends je {
             <div class="rack-name">${n?.name ?? ""}</div>
             ${u.length ? N`<div class="color-counts">${u.map(([e, t], n) => N`${n ? " · " : P}<span class="color-count">${e}: <span class="numeric-value">${t}</span></span>`)}</div>` : P}
           </div>
-          <div class="rack-occupancy"
-            role="progressbar"
-            aria-label="${e("occupied")} / ${e("free")}"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            aria-valuenow=${Math.round(s)}
-            aria-valuetext=${`${r.length} ${e("positions")}, ${a} ${e("occupied")}, ${o} ${e("free")}`}>
-            <div class="rack-occupancy-fill" style=${`width: ${s}%;`}></div>
-            <div class="rack-occupancy-label">
-              <span class="numeric-value">${r.length}</span>&nbsp;${e("positions")}&nbsp;·&nbsp;<span class="numeric-value">${a}</span>&nbsp;${e("occupied")}&nbsp;·&nbsp;<span class="numeric-value">${o}</span>&nbsp;${e("free")}
-            </div>
-          </div>
-          ${c.length ? N`
-            ${d.compact ? N`<div class="warning">${e("rack_grid_compacted")}</div>` : P}
-            <div class="grid-wrap">
-              <div class="rack-grid" style=${`grid-template-columns: repeat(${d.columnCount}, 98px); grid-template-rows: repeat(${d.rowCount}, 98px);`}>
+          <div class="rack-visualization"
+            style=${`width: ${c.length ? `${d.columnCount * 104 - 6}px` : "100%"};`}>
+            ${this.config?.show_rack_occupancy === !1 ? P : N`
+              <div class="rack-occupancy"
+                role="progressbar"
+                aria-label="${e("occupied")} / ${e("free")}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow=${Math.round(s)}
+                aria-valuetext=${`${r.length} ${e("positions")}, ${a} ${e("occupied")}, ${o} ${e("free")}`}>
+                <div class="rack-occupancy-fill" style=${`width: ${s}%;`}></div>
+                <div class="rack-occupancy-label">
+                  <span class="numeric-value">${r.length}</span>&nbsp;${e("positions")}&nbsp;·&nbsp;<span class="numeric-value">${a}</span>&nbsp;${e("occupied")}&nbsp;·&nbsp;<span class="numeric-value">${o}</span>&nbsp;${e("free")}
+                </div>
+              </div>
+            `}
+            ${c.length ? N`
+              ${d.compact ? N`<div class="warning">${e("rack_grid_compacted")}</div>` : P}
+              <div class="grid-wrap">
+                <div class="rack-grid" style=${`grid-template-columns: repeat(${d.columnCount}, 98px); grid-template-rows: repeat(${d.rowCount}, 98px);`}>
                 ${c.map((t) => {
 			let n = f.get(t.id);
 			if (!n) return P;
@@ -1501,8 +1508,9 @@ var tt = class extends je {
                   </div>
                 `)}
               </div>
-            </div>
-          ` : N`<div class="warning">${e("no_coordinates")}</div>`}
+              </div>
+            ` : N`<div class="warning">${e("no_coordinates")}</div>`}
+          </div>
           ${p.length ? N`
             <div class="unplaced">
               <strong>${e("positions_without_coordinates")}</strong>
@@ -1818,6 +1826,7 @@ var rt = class extends je {
 			config_entry_id: "editor_configuration",
 			title: "editor_title",
 			rack_picker_mode: "editor_rack_picker_mode",
+			show_rack_occupancy: "editor_show_rack_occupancy",
 			show_occupancy: "editor_show_occupancy",
 			show_diagnostics: "editor_show_diagnostics",
 			show_statistics: "editor_show_statistics",
@@ -1858,6 +1867,9 @@ var rt = class extends je {
 			name: "title",
 			selector: { text: {} }
 		}, {
+			name: "show_rack_occupancy",
+			selector: { boolean: {} }
+		}, {
 			name: "rack_picker_mode",
 			selector: { select: {
 				mode: "dropdown",
@@ -1873,7 +1885,7 @@ var rt = class extends je {
 	}
 	setConfig(e) {
 		let t = { ...e };
-		this.isOverviewType(e.type) ? (t.show_occupancy = e.show_occupancy !== !1, t.show_diagnostics = e.show_diagnostics !== !1, t.show_statistics = e.show_statistics !== !1, t.show_statistics_legends = e.show_statistics_legends !== !1) : e.type === "custom:ploc-cellar-rack-card" && (t.rack_picker_mode = e.rack_picker_mode ?? "buttons"), this.config = t;
+		this.isOverviewType(e.type) ? (t.show_occupancy = e.show_occupancy !== !1, t.show_diagnostics = e.show_diagnostics !== !1, t.show_statistics = e.show_statistics !== !1, t.show_statistics_legends = e.show_statistics_legends !== !1) : e.type === "custom:ploc-cellar-rack-card" && (t.rack_picker_mode = e.rack_picker_mode ?? "buttons", t.show_rack_occupancy = e.show_rack_occupancy !== !1), this.config = t;
 	}
 	isOverviewType(e) {
 		return e === "custom:ploc-cellar-card" || e === "custom:ploc-cellar-statistics-card";
