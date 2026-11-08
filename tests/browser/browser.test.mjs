@@ -100,6 +100,30 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
+
+  it("keeps inventory controls within a narrow mobile viewport", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
+      const card = page.locator("ploc-cellar-inventory-card");
+      await card.locator(".wine").first().waitFor();
+      const dimensions = await card.evaluate((element) => {
+        const surface = element.shadowRoot.querySelector("ha-card");
+        return { width: surface.clientWidth, scrollWidth: surface.scrollWidth };
+      });
+      assert.ok(
+        dimensions.scrollWidth <= dimensions.width + 1,
+        `inventory card overflows on mobile: ${JSON.stringify(dimensions)}`,
+      );
+      await card.locator(".search").fill("Château");
+      assert.equal(await card.locator(".wine").count(), 1);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
   it("opens and closes the wine detail from the inventory card", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
