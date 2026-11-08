@@ -14,7 +14,6 @@ export class PlocCellarWineDetail extends LitElement {
   @state() private imageUrl: string | null = null;
 
   private readonly imageLoader = new WineImageLoader();
-  private imageHass?: HomeAssistant;
 
   static styles = css`
     :host {
@@ -99,10 +98,6 @@ export class PlocCellarWineDetail extends LitElement {
 
   private async loadWineImage(): Promise<void> {
     const hass = this.hass;
-    if (this.imageHass !== hass) {
-      this.imageHass = hass;
-      this.imageLoader.dispose((url) => { this.imageUrl = url; });
-    }
     await this.imageLoader.load(
       this.wine?.image_url ?? null,
       hass ? (path) => hass.fetchWithAuth(path) : undefined,
