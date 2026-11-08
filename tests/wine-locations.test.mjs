@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { groupWineLocations } from "../.test-dist/wine-locations.js";
+import { groupCoordinatesByRow, groupWineLocations } from "../.test-dist/wine-locations.js";
 
 test("groups positions into one rack while preserving rack and coordinate order", () => {
   assert.deepEqual(groupWineLocations([
@@ -27,4 +27,18 @@ test("keeps positions without complete coordinates in their rack group", () => {
 
 test("returns no groups for an empty location list", () => {
   assert.deepEqual(groupWineLocations([]), []);
+});
+
+test("groups coordinate tags horizontally by physical row", () => {
+  assert.deepEqual(groupCoordinatesByRow([
+    { row: 0, column: 1 },
+    { row: 0, column: 2 },
+    { row: 1, column: 0 },
+    { row: 0, column: 3 },
+    { row: null, column: 4 },
+    { row: 2, column: null },
+  ]), [
+    { row: 0, columns: [1, 2, 3] },
+    { row: 1, columns: [0] },
+  ]);
 });
