@@ -318,6 +318,7 @@ describe("Ploc Cellar browser interactions", () => {
       const hero = detail.locator(".wine-hero");
       assert.equal(await hero.evaluate((element) => getComputedStyle(element).position), "relative");
       const heroMainBefore = await detail.locator(".wine-hero-main").boundingBox();
+      const scrollYBefore = await page.evaluate(() => window.scrollY);
       const stock = detail.locator(".stock-details");
       await stock.locator("summary").click();
       await stock.locator(".stock-issues[role='alert']").getByText("Unlocated bottles: 2 · Negative balance: 1 bottle(s)").waitFor();
@@ -333,7 +334,12 @@ describe("Ploc Cellar browser interactions", () => {
       const alertColor = await stock.evaluate((element) => getComputedStyle(element).getPropertyValue("--error-color").trim());
       assert.equal(borderColor, alertColor);
       assert.equal(await card.locator(".wine").count(), inventoryCount);
-      assert.deepEqual(await detail.locator(".wine-hero-main").boundingBox(), heroMainBefore);
+      const heroMainAfter = await detail.locator(".wine-hero-main").boundingBox();
+      const scrollYAfter = await page.evaluate(() => window.scrollY);
+      assert.deepEqual(
+        { ...heroMainAfter, y: heroMainAfter.y + scrollYAfter },
+        { ...heroMainBefore, y: heroMainBefore.y + scrollYBefore },
+      );
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();
