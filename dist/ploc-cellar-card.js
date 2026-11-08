@@ -1593,7 +1593,9 @@ var nt = class extends je {
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
     .filters { margin: 14px 0; }
+    .filters[open] { padding: 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
     .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }
+    .filters[open] > summary { color: var(--primary-text-color); padding-bottom: 8px; border-bottom: 1px solid var(--divider-color); }
     .filters > summary::-webkit-details-marker { display: none; }
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
     .filters-chevron { --mdc-icon-size: 18px; margin-left: auto; color: var(--secondary-text-color); transition: transform 120ms ease; }
@@ -1646,18 +1648,7 @@ var nt = class extends je {
 		}));
 	}
 	get filteredWines() {
-		let e = this.search.trim().toLocaleLowerCase(), t = (this.inventory?.wines ?? []).filter((t) => this.color && t.color !== this.color || this.region && t.region !== this.region || this.appellation && t.appellation !== this.appellation || this.vintage && String(t.vintage ?? "") !== this.vintage || this.meal && !Xe(t.meals).includes(this.meal) ? !1 : !e || [
-			t.name,
-			t.domain,
-			t.appellation,
-			t.region,
-			t.country,
-			t.grapes,
-			t.cuvee,
-			t.color,
-			t.vintage,
-			t.bottle_format
-		].filter((e) => e != null).join(" ").toLocaleLowerCase().includes(e)), n = new Intl.Collator(this.hass?.language ?? void 0, {
+		let e = this.search.trim().toLocaleLowerCase(), t = (this.inventory?.wines ?? []).filter((t) => this.color && t.color !== this.color || this.region && t.region !== this.region || this.appellation && t.appellation !== this.appellation || this.vintage && String(t.vintage ?? "") !== this.vintage || this.meal && !Xe(t.meals).includes(this.meal) ? !1 : !e || [t.name, t.domain].filter((e) => e !== null).join(" ").toLocaleLowerCase().includes(e)), n = new Intl.Collator(this.hass?.language ?? void 0, {
 			numeric: !0,
 			sensitivity: "base"
 		});
