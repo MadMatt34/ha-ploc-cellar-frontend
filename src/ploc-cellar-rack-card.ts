@@ -286,7 +286,7 @@ export class PlocCellarRackCard extends LitElement {
             ${selectedRackColorCounts.length ? html`<div class="color-counts">${selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: <span class="numeric-value">${count}</span></span>`)}</div>` : nothing}
           </div>
           <div class="rack-visualization"
-            style=${`width: ${items.length ? gridLayout.columnCount * 104 - 6 : 0}px;`}>
+            style=${`width: ${items.length ? `${gridLayout.columnCount * 104 - 6}px` : "100%" };`}>
             ${this.config?.show_rack_occupancy === false ? nothing : html`
               <div class="rack-occupancy"
                 role="progressbar"
