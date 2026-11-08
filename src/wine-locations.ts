@@ -27,6 +27,13 @@ export function groupWineLocations(locations: readonly WineLocation[]): GroupedW
   return [...groups.values()];
 }
 
+/** Return coordinates with at least one missing axis, preserving source order. */
+export function getIncompleteCoordinates(
+  coordinates: readonly { row: number | null; column: number | null }[],
+): Array<{ row: number | null; column: number | null }> {
+  return coordinates.filter(({ row, column }) => row === null || column === null);
+}
+
 /** Group complete coordinates by physical row, preserving their source order. */
 export function groupCoordinatesByRow(
   coordinates: readonly { row: number | null; column: number | null }[],

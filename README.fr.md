@@ -42,7 +42,7 @@ Dans une vue **Sections**, la carte de vue d'ensemble utilise par défaut une la
 
 ## Développement
 
-Node.js `^20.19.0` ou `>=22.12.0` est requis (versions prises en charge par Vite 7).
+Node.js `^20.19.0` ou `>=22.12.0` est requis (versions prises en charge par Vite 8).
 
 ```sh
 npm ci
@@ -67,7 +67,7 @@ Le français et l'anglais sont pris en charge.
 
 ## Caractéristiques des vins
 
-La modale de détail utilise des sections repliables indépendantes pour le stock, les accords mets-vins, les caractéristiques, les emplacements et les notes. Les mouvements de stock disposent de leur propre sous-section repliable. Les caractéristiques sont regroupées entre origine/identification et dégustation/composition, sous forme de lignes associant une icône, un libellé et sa valeur. Les cépages sont regroupés dans un encart dédié ; les pourcentages placés avant ou après le nom du cépage sont représentés par des barres proportionnelles, teintées selon la couleur du vin. Lorsqu'un cépage ne comporte pas de pourcentage explicite, il est considéré à 100 % et représenté par une barre pleine. Les pourcentages explicites invalides restent non déterminés.
+La modale de détail utilise des sections repliables indépendantes pour le stock, les accords mets-vins, les caractéristiques, les emplacements et les notes. Les emplacements sont regroupés dans une seule tuile par casier ; la partie connue d’une coordonnée reste affichée même si la ligne ou la colonne est absente. Les mouvements de stock disposent de leur propre sous-section repliable. Les caractéristiques sont regroupées entre origine/identification et dégustation/composition, sous forme de lignes associant une icône, un libellé et sa valeur. Les cépages sont regroupés dans un encart dédié ; les pourcentages placés avant ou après le nom du cépage sont représentés par des barres proportionnelles, teintées selon la couleur du vin. Lorsqu'un cépage ne comporte pas de pourcentage explicite, il est considéré à 100 % et représenté par une barre pleine. Les pourcentages explicites invalides restent non déterminés.
 
 ## Photos des vins
 
