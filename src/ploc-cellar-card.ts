@@ -67,6 +67,8 @@ export class PlocCellarCard extends LitElement {
     .label, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .section { margin-top: 16px; }
     .section-title { margin: 0 0 8px; font-size: .95rem; font-weight: 500; }
+    details.section > summary { display: list-item; cursor: pointer; }
+    details.section > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .occupancy-bar { position: relative; height: 20px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
     .occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
@@ -427,8 +429,8 @@ export class PlocCellarCard extends LitElement {
             </section>
           ` : nothing}
           ${showDiagnostics && hasDiagnostics ? html`
-            <section class="section">
-              <h3 class="section-title">${t("inventory_diagnostics")}</h3>
+            <details class="section" open>
+              <summary class="section-title">${t("inventory_diagnostics")}</summary>
               ${!data.stock_reconstruction_complete
                 ? html`<div class="warning">${t("reconstruction_incomplete")}</div>`
                 : nothing}
@@ -451,11 +453,11 @@ export class PlocCellarCard extends LitElement {
               ${data.positions_with_unknown_wine > 0
                 ? html`<div class="warning">${t("statistics_unknown_wine_positions").replace("{count}", this.formatNumber(data.positions_with_unknown_wine))}</div>`
                 : nothing}
-            </section>
+            </details>
           ` : nothing}
           ${showStatistics ? html`
-            <section class="section">
-              <h3 class="section-title">${t("statistics_title")}</h3>
+            <details class="section" open>
+              <summary class="section-title">${t("statistics_title")}</summary>
               <p class="muted">${t("statistics_distribution_scope")}</p>
               <div class="groups">
                 ${this.renderDistribution("color", "statistics_color")}
@@ -464,7 +466,7 @@ export class PlocCellarCard extends LitElement {
                 ${this.renderDistribution("vintage", "statistics_vintage")}
                 ${this.renderDistribution("bottle_format", "statistics_format")}
               </div>
-            </section>
+            </details>
           ` : nothing}
           <div class="muted section">${t("last_sync")}: ${this.formatSync(data.last_sync)}</div>
           ${this.renderDiagnosticDialog()}
