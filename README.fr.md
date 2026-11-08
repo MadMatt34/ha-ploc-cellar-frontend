@@ -9,7 +9,7 @@ Frontend Lovelace indépendant pour l'intégration Home Assistant [Ploc Cellar](
 Ce dépôt fournit trois cartes personnalisées :
 
 - **Vue d'ensemble Ploc Cellar** (`custom:ploc-cellar-card`) : synthèse et statistiques de la cave : stock physique et reconstitué, occupation des casiers, diagnostics du stock et graphiques en anneau par couleur, région, appellation, millésime et format de bouteille. Les répartitions des graphiques concernent les références de vins connues ; les emplacements occupés dont le vin n'est pas résolu restent inclus dans les totaux physiques globaux et sont signalés séparément.
-- **Inventaire Ploc Cellar** (`custom:ploc-cellar-inventory-card`) : liste des vins avec recherche textuelle, filtres repliables par couleur, région, appellation, millésime et mets, tri et quantités. La fiche détaillée reste accessible en sélectionnant le nom d'un vin.
+- **Inventaire Ploc Cellar** (`custom:ploc-cellar-inventory-card`) : liste des vins avec recherche textuelle, filtres repliables par couleur, région, appellation, millésime et mets, tri et quantités. Les filtres couleur, région, appellation et millésime proposent aussi l’option **Inconnu** pour retrouver les vins dont la propriété est absente ou vide. La fiche détaillée reste accessible en sélectionnant le nom d'un vin.
 - **Casiers Ploc Cellar** (`custom:ploc-cellar-rack-card`) : sélection du casier et représentation des emplacements selon les coordonnées réelles ligne/colonne de PLOUD. Chaque emplacement occupé est représenté individuellement et reprend la couleur du vin lorsqu'elle est disponible.
   L'éditeur permet de masquer la barre d'occupation du casier ; elle est affichée par défaut et sa largeur suit celle de la représentation des emplacements.
 
