@@ -200,6 +200,7 @@ export class PlocCellarWineDetail extends LitElement {
     if (!grapes.length) return nothing;
     return html`
       <div class="characteristic">
+        <ha-icon icon="mdi:fruit-grapes" aria-hidden="true"></ha-icon>
         <div class="characteristic-value">
           <div class="grapes-list" style=${this.grapeAccentStyle}>
             ${grapes.map((grape) => html`
