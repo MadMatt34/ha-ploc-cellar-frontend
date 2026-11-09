@@ -180,7 +180,7 @@ type RequiredNumericContract = Assert<
 type OptionalFieldContract = Assert<
   Equal<
     [OptionalKeys<Wine>, OptionalKeys<WineDiagnostic>],
-    ["meals" | "image_url", "wine"]
+    [never, never]
   >
 >;
 
