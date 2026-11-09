@@ -334,7 +334,6 @@ export class PlocCellarInventoryCard extends LitElement {
           <div class="summary">
             <span>${t("inventory_results").replace("{count}", String(wines.length))}</span>
             <span>${t("inventory_bottle_total").replace("{count}", String(total))}</span>
-            ${activeFilters ? html`<button @click=${() => this.clearFilters()}>${t("clear_filters")}</button>` : nothing}
           </div>
           ${!this.inventory.stock_reconstruction_complete
             ? html`<div class="warning">${t("reconstruction_incomplete")}</div>`
