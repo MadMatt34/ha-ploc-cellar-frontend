@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { fetchInventory, getInventorySyncMarker, LAST_SYNC_ENTITY_ID } from "../.test-dist/inventory-client.js";
+import { fetchInventory, subscribeToInventorySync, SYNC_COMPLETED_EVENT } from "../.test-dist/inventory-client.js";
 
 function deferred() {
   let resolve;
@@ -74,28 +74,29 @@ test("removes failed requests so a later call can retry", async () => {
   assert.equal(calls, 2);
 });
 
-test("reads the successful synchronization timestamp from the HA entity state", () => {
+test("subscribes to the successful sync event and filters by config entry", async () => {
+  let registeredEvent;
+  let callback;
+  const unsubscribe = () => {};
   const hass = {
-    states: {
-      [LAST_SYNC_ENTITY_ID]: { state: "2026-11-09T08:30:00+00:00" },
+    connection: {
+      subscribeEvents: async (listener, eventType) => {
+        callback = listener;
+        registeredEvent = eventType;
+        return unsubscribe;
+      },
     },
   };
+  let syncCount = 0;
 
-  assert.equal(getInventorySyncMarker(hass), "2026-11-09T08:30:00+00:00");
-});
+  const stop = await subscribeToInventorySync(hass, "entry-1", () => {
+    syncCount += 1;
+  });
 
-test("ignores missing and unavailable synchronization entity states", () => {
-  assert.equal(getInventorySyncMarker({ states: {} }), null);
-  assert.equal(
-    getInventorySyncMarker({
-      states: { [LAST_SYNC_ENTITY_ID]: { state: "unavailable" } },
-    }),
-    null,
-  );
-  assert.equal(
-    getInventorySyncMarker({
-      states: { [LAST_SYNC_ENTITY_ID]: { state: "unknown" } },
-    }),
-    null,
-  );
+  assert.equal(registeredEvent, SYNC_COMPLETED_EVENT);
+  assert.strictEqual(stop, unsubscribe);
+  callback({ data: { config_entry_id: "entry-2" } });
+  assert.equal(syncCount, 0);
+  callback({ data: { config_entry_id: "entry-1" } });
+  assert.equal(syncCount, 1);
 });
