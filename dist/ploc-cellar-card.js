@@ -1886,11 +1886,11 @@ var mt = class extends je {
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
     .filters { margin: 14px 0; }
     .filters[open] { padding: 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
-    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }
+    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { margin-left: auto; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
     .filters[open] > summary { color: var(--primary-text-color); padding-bottom: 8px; border-bottom: 1px solid var(--divider-color); }
     .filters > summary::-webkit-details-marker { display: none; }
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
-    .filters-chevron { --mdc-icon-size: 18px; margin-left: auto; color: var(--secondary-text-color); transition: transform 120ms ease; }
+    .filters-chevron { --mdc-icon-size: 18px; margin-left: 0; color: var(--secondary-text-color); transition: transform 120ms ease; }
     .filters[open] .filters-chevron { transform: rotate(90deg); }
     .sort-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .sort-row > span { flex: 0 0 auto; color: var(--secondary-text-color); font-size: .9rem; }
@@ -2042,7 +2042,9 @@ var mt = class extends je {
 			this.search = e.target.value;
 		}} />
           <details class="filters">
-            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
+            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span>${r ? N`<button class="filters-clear" type="button" @click=${(e) => {
+			e.stopPropagation(), this.clearFilters();
+		}}>${e("clear_filters")}</button>` : P}<ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
             <div class="toolbar">
               ${this.selectFilter("color", e("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", e("filter_region"), this.region, this.valuesFor("region"))}
