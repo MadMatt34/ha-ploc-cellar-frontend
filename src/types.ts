@@ -1,6 +1,15 @@
+export interface HomeAssistantEvent<T> {
+  data: T;
+}
+
 export interface HomeAssistant {
   language: string;
-  states?: Record<string, { state: string }>;
+  connection: {
+    subscribeEvents<T>(
+      callback: (event: HomeAssistantEvent<T>) => void,
+      eventType: string,
+    ): Promise<() => void>;
+  };
   callWS<T>(message: Record<string, unknown>): Promise<T>;
   fetchWithAuth(url: string, init?: RequestInit): Promise<Response>;
 }
