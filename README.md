@@ -17,7 +17,7 @@ This repository contains three custom cards:
 
 Each card uses the native configuration-entry selector in its editor and stores its own `config_entry_id`. The cards communicate only with Home Assistant through the integration's `ploc_cellar.get_inventory` WebSocket response service. They do not connect to PLOUD directly. The backend integration must be installed and configured before the cards can display data.
 
-The cards request the inventory when they are initialized and expose a manual refresh action. They do not poll for backend synchronization events, so use **Refresh** after a PLOUD synchronization when a dashboard has remained open.
+The cards request the inventory when they are initialized and automatically refresh when the integration completes a successful PLOUD synchronization. The update is delivered through a Home Assistant event scoped to the selected configuration entry; no entity ID, polling or manual refresh is required.
 
 ## Installation
 
