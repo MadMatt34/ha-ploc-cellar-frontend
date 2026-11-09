@@ -298,20 +298,22 @@ describe("Ploc Cellar browser interactions", () => {
         return window.mountPlocCard("ploc-cellar-inventory-card", {});
       });
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
-      window.__plocFixture.inventory.wine_diagnostics = [{
-        id: "wine-a",
-        name: "Château A",
-        domain: "Domaine A",
-        vintage: 2018,
-        purchased: 4,
-        consumed: 2,
-        movement_balance: 2,
-        bottles_in_cellar: 0,
-        effective_stock: 4,
-        unlocated_bottles: 2,
-        negative_movement_bottles: 1,
-        physical_surplus_bottles: 0,
-      }];
+      await page.evaluate(() => {
+        window.__plocFixture.inventory.wine_diagnostics = [{
+          id: "wine-a",
+          name: "Château A",
+          domain: "Domaine A",
+          vintage: 2018,
+          purchased: 4,
+          consumed: 2,
+          movement_balance: 2,
+          bottles_in_cellar: 0,
+          effective_stock: 4,
+          unlocated_bottles: 2,
+          negative_movement_bottles: 1,
+          physical_surplus_bottles: 0,
+        }];
+      });
       const mainCard = page.locator("ploc-cellar-card");
       const mainDiagnostics = mainCard.locator(".diagnostic-value");
       await mainDiagnostics.first().waitFor();
