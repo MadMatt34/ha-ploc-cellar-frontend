@@ -298,10 +298,37 @@ describe("Ploc Cellar browser interactions", () => {
         return window.mountPlocCard("ploc-cellar-inventory-card", {});
       });
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+      window.__plocFixture.inventory.wine_diagnostics = [{
+        id: "wine-a",
+        name: "Château A",
+        domain: "Domaine A",
+        vintage: 2018,
+        purchased: 4,
+        consumed: 2,
+        movement_balance: 2,
+        bottles_in_cellar: 0,
+        effective_stock: 4,
+        unlocated_bottles: 2,
+        negative_movement_bottles: 1,
+        physical_surplus_bottles: 0,
+      }];
       const mainCard = page.locator("ploc-cellar-card");
       const mainDiagnostics = mainCard.locator(".diagnostic-value");
       await mainDiagnostics.first().waitFor();
       assert.equal(await mainDiagnostics.first().evaluate((element) => getComputedStyle(element).color), "rgb(200, 0, 0)");
+      await mainCard.locator(".diagnostic").filter({ hasText: "Unlocated bottles" }).click();
+      const diagnosticDialog = mainCard.locator("ha-dialog");
+      await diagnosticDialog.waitFor();
+      const diagnosticWine = diagnosticDialog.locator(".diagnostic-wine");
+      await diagnosticWine.waitFor();
+      assert.equal(await diagnosticWine.locator(".diagnostic-wine-name").innerText(), "Château A");
+      assert.equal(await diagnosticWine.locator(".diagnostic-wine-metadata").innerText(), "Pauillac · Bordeaux · France");
+      assert.equal(await diagnosticWine.locator(".diagnostic-wine-tags").innerText(), "Rouge2018Bouteille");
+      assert.equal(await diagnosticWine.locator(".diagnostic-quantity").innerText(), "2");
+      assert.equal(await diagnosticWine.locator("ha-icon[icon='mdi:alert-circle']").count(), 1);
+      assert.equal(await diagnosticWine.evaluate((element) => getComputedStyle(element).borderLeftColor), "rgb(150, 20, 30)");
+      await diagnosticWine.click();
+      await mainCard.locator("ploc-cellar-wine-detail").waitFor();
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
       const card = page.locator("ploc-cellar-inventory-card");
       const inventoryCount = await card.locator(".wine").count();
