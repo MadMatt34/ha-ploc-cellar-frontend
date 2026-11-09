@@ -7,6 +7,7 @@ import { translate, type TranslationKey } from "./translations";
 type EditorField =
   | "config_entry_id"
   | "title"
+  | "default_sort"
   | "rack_picker_mode"
   | "show_rack_occupancy"
   | "show_occupancy"
@@ -21,6 +22,10 @@ export class PlocCellarCardEditor extends LitElement {
 
   private get isOverviewCard(): boolean {
     return this.config?.type === "custom:ploc-cellar-card";
+  }
+
+  private get isInventoryCard(): boolean {
+    return this.config?.type === "custom:ploc-cellar-inventory-card";
   }
 
   private get isRackCard(): boolean {
@@ -50,6 +55,26 @@ export class PlocCellarCardEditor extends LitElement {
           selector: { boolean: {} },
         });
       }
+    } else if (this.isInventoryCard) {
+      fields.push(
+        { name: "title", selector: { text: {} } },
+        {
+          name: "default_sort",
+          selector: {
+            select: {
+              mode: "dropdown",
+              options: [
+                { label: translate(this.hass?.language ?? "en", "sort_name_asc"), value: "name-asc" },
+                { label: translate(this.hass?.language ?? "en", "sort_name_desc"), value: "name-desc" },
+                { label: translate(this.hass?.language ?? "en", "sort_bottles_asc"), value: "bottles-asc" },
+                { label: translate(this.hass?.language ?? "en", "sort_bottles_desc"), value: "bottles-desc" },
+                { label: translate(this.hass?.language ?? "en", "sort_vintage_asc"), value: "vintage-asc" },
+                { label: translate(this.hass?.language ?? "en", "sort_vintage_desc"), value: "vintage-desc" },
+              ],
+            },
+          },
+        },
+      );
     } else if (this.isRackCard) {
       fields.push(
         { name: "title", selector: { text: {} } },
@@ -86,6 +111,8 @@ export class PlocCellarCardEditor extends LitElement {
       nextConfig.show_diagnostics = config.show_diagnostics !== false;
       nextConfig.show_statistics = config.show_statistics !== false;
       nextConfig.show_statistics_legends = config.show_statistics_legends !== false;
+    } else if (config.type === "custom:ploc-cellar-inventory-card") {
+      nextConfig.default_sort = config.default_sort ?? "name-asc";
     } else if (config.type === "custom:ploc-cellar-rack-card") {
       nextConfig.rack_picker_mode = config.rack_picker_mode ?? "buttons";
       nextConfig.show_rack_occupancy = config.show_rack_occupancy !== false;
@@ -102,6 +129,7 @@ export class PlocCellarCardEditor extends LitElement {
     const labels: Record<EditorField, TranslationKey> = {
       config_entry_id: "editor_configuration",
       title: "editor_title",
+      default_sort: "sort_by",
       rack_picker_mode: "editor_rack_picker_mode",
       show_rack_occupancy: "editor_show_rack_occupancy",
       show_occupancy: "editor_show_occupancy",
