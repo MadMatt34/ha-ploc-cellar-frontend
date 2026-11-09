@@ -90,6 +90,13 @@ describe("Ploc Cellar browser interactions", () => {
       assert.equal(await card.locator(".wine").count(), 1);
       await card.getByText("Vin inconnu", { exact: true }).waitFor();
 
+      const clearFilters = card.locator(".filters > summary .filters-clear");
+      await clearFilters.waitFor();
+      await clearFilters.click();
+      assert.equal(await card.locator(".wine").count(), 3);
+      assert.equal(await card.locator(".filters").getAttribute("open"), "");
+      assert.equal(await card.locator(".filters-clear").count(), 0);
+
       await colorFilter.selectOption("all");
       await card.locator(".sort-row select").selectOption("name-desc");
       const names = await card.locator(".wine-name").allTextContents();
