@@ -305,7 +305,6 @@ export class PlocCellarCard extends LitElement {
 
   private openDiagnosticWine(diagnostic: WineDiagnostic): void {
     const wine = diagnostic.wine;
-    if (!wine) return;
     this.activeDiagnostic = undefined;
     this.selectedWine = wine;
   }
@@ -331,7 +330,7 @@ export class PlocCellarCard extends LitElement {
           <p class="muted">${t(detailKey)}</p>
           ${wines.length ? wines.map((diagnostic) => {
             const wine = diagnostic.wine;
-            const color = wine?.color_rgb?.every(Number.isFinite)
+            const color = wine.color_rgb?.every(Number.isFinite)
               ? wine.color_rgb.map((component) => Math.round(Math.min(255, Math.max(0, component))))
               : null;
             const wineColor = color ? `rgb(${color.join(", ")})` : "";
