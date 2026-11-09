@@ -2070,7 +2070,6 @@ var mt = class extends je {
           <div class="summary">
             <span>${e("inventory_results").replace("{count}", String(t.length))}</span>
             <span>${e("inventory_bottle_total").replace("{count}", String(n))}</span>
-            ${r ? N`<button @click=${() => this.clearFilters()}>${e("clear_filters")}</button>` : P}
           </div>
           ${this.inventory.stock_reconstruction_complete ? P : N`<div class="warning">${e("reconstruction_incomplete")}</div>`}
           <div class="wine-list">
