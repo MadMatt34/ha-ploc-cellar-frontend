@@ -1884,6 +1884,9 @@ var pt = class extends je {
     .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
     .quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; font-family: var(--ploc-numeric-font-family); font-size: 1.5rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .quantity ha-icon { --mdc-icon-size: 25px; color: var(--wine-color, var(--secondary-text-color)); }
+    .quantity-column { display: grid; justify-items: end; align-content: start; gap: 5px; flex: 0 0 auto; min-width: 0; max-width: 42%; }
+    .wine-alert { display: flex; align-items: flex-start; justify-content: flex-end; gap: 4px; color: var(--error-color); font-size: .72rem; line-height: 1.25; text-align: right; overflow-wrap: anywhere; }
+    .wine-alert ha-icon { --mdc-icon-size: 15px; flex: 0 0 auto; margin-top: 1px; }
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
@@ -1996,11 +1999,24 @@ var pt = class extends je {
     `;
 	}
 	renderWine(e) {
-		let t = (e) => I(this.hass?.language ?? "en", e), n = e.vintage === null ? t("unknown_vintage") : String(e.vintage), r = e.color_rgb?.every(Number.isFinite) ? e.color_rgb.map((e) => Math.round(Math.min(255, Math.max(0, e)))) : null, i = r ? `rgb(${r.join(", ")})` : "";
+		let t = (e) => I(this.hass?.language ?? "en", e), n = [
+			{
+				key: "wine_detail_issue_unlocated",
+				count: e.unlocated_bottles ?? 0
+			},
+			{
+				key: "wine_detail_issue_negative",
+				count: e.negative_movement_bottles ?? 0
+			},
+			{
+				key: "wine_detail_issue_surplus",
+				count: e.physical_surplus_bottles ?? 0
+			}
+		].filter((e) => e.count > 0), r = e.vintage === null ? t("unknown_vintage") : String(e.vintage), i = e.color_rgb?.every(Number.isFinite) ? e.color_rgb.map((e) => Math.round(Math.min(255, Math.max(0, e)))) : null, a = i ? `rgb(${i.join(", ")})` : "";
 		return N`
       <button class="wine" type="button" aria-haspopup="dialog"
         aria-label=${`${e.name}, ${new Intl.NumberFormat(this.hass?.language ?? void 0).format(e.bottles_in_cellar)} ${t("bottles_short")}`}
-        style=${i ? "--wine-color: " + i : ""}
+        style=${a ? "--wine-color: " + a : ""}
         @click=${() => {
 			this.selectedWine = e;
 		}}>
@@ -2013,11 +2029,20 @@ var pt = class extends je {
 			e.country
 		].filter(Boolean).join(" · ")}</div>
           </div>
-          <div class="quantity"><span>${new Intl.NumberFormat(this.hass?.language ?? void 0).format(e.bottles_in_cellar)}</span><ha-icon icon="mdi:bottle-wine" aria-hidden="true"></ha-icon></div>
+          <div class="quantity-column">
+            <div class="quantity"><span>${new Intl.NumberFormat(this.hass?.language ?? void 0).format(e.bottles_in_cellar)}</span><ha-icon icon="mdi:bottle-wine" aria-hidden="true"></ha-icon></div>
+            ${n.length ? N`
+              <div class="wine-alert" role="img"
+                aria-label=${n.map((e) => t(e.key).replace("{count}", new Intl.NumberFormat(this.hass?.language ?? void 0).format(e.count))).join(" · ")}>
+                <ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon>
+                <span>${n.map((e) => t(e.key).replace("{count}", new Intl.NumberFormat(this.hass?.language ?? void 0).format(e.count))).join(" · ")}</span>
+              </div>
+            ` : P}
+          </div>
         </div>
         <div class="tags">
           ${e.color ? N`<span class="tag">${e.color}</span>` : P}
-          <span class="tag">${n}</span>
+          <span class="tag">${r}</span>
           ${e.bottle_format ? N`<span class="tag">${e.bottle_format}</span>` : P}
         </div>
       </button>
