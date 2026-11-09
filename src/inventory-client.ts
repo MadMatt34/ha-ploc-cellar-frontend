@@ -1,5 +1,7 @@
 import type { HomeAssistant, InventoryResponse } from "./types";
 
+export const SYNC_COMPLETED_EVENT = "ploc_cellar_sync_completed";
+
 /**
  * Coalesce simultaneous inventory requests made by the three cards.
  *
@@ -44,13 +46,18 @@ export function fetchInventory(
   return trackedRequest;
 }
 
-/** The entity state changes after each successful PLOUD synchronization. */
-export const LAST_SYNC_ENTITY_ID =
-  "sensor.ploc_cellar_last_successful_synchronization";
-
-export function getInventorySyncMarker(hass: HomeAssistant): string | null {
-  const state = hass.states?.[LAST_SYNC_ENTITY_ID]?.state;
-  return state && state !== "unknown" && state !== "unavailable"
-    ? state
-    : null;
+/**
+ * Subscribe to successful synchronization events for one configuration entry.
+ */
+export function subscribeToInventorySync(
+  hass: HomeAssistant,
+  configEntryId: string,
+  onSync: () => void,
+): Promise<() => void> {
+  return hass.connection.subscribeEvents(
+    (event) => {
+      if (event.data.config_entry_id === configEntryId) onSync();
+    },
+    SYNC_COMPLETED_EVENT,
+  );
 }
