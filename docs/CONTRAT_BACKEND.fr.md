@@ -24,6 +24,19 @@ Les cartes utilisent la commande WebSocket Home Assistant `call_service` en dema
 
 Le service backend accepte également les filtres facultatifs `search` et `color`. Les cartes demandent actuellement l'inventaire de l'entrée sélectionnée et appliquent leur présentation et leurs filtres dans le frontend.
 
+## Événement de synchronisation réussie
+
+Après validation complète, persistance et validation du nouvel état par le coordinateur, l'intégration déclenche l'événement Home Assistant `ploc_cellar_sync_completed`. Les données de l'événement contiennent :
+
+```ts
+{
+  config_entry_id: string;
+  last_sync: string;
+}
+```
+
+Le frontend s'abonne à cet événement via la connexion WebSocket Home Assistant active et actualise uniquement les cartes dont le `config_entry_id` configuré correspond à celui de l'événement. L'événement n'est pas déclenché lorsqu'une synchronisation échoue ou n'est pas validée. Le frontend ne dépend pas de l'identifiant généré de l'entité de diagnostic de dernière synchronisation et n'effectue aucun polling.
+
 ## Réponse
 
 La structure de la réponse est décrite par `InventoryResponse`, `Rack`, `RackItem`, `Wine` et `WineDiagnostic` dans `src/types.ts`.
