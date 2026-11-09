@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { fetchInventory } from "../.test-dist/inventory-client.js";
+import { fetchInventory, getInventorySyncMarker, LAST_SYNC_ENTITY_ID } from "../.test-dist/inventory-client.js";
 
 function deferred() {
   let resolve;
@@ -72,4 +72,30 @@ test("removes failed requests so a later call can retry", async () => {
   await assert.rejects(fetchInventory(hass, "entry-1"), /temporary failure/);
   assert.deepEqual(await fetchInventory(hass, "entry-1"), { retry: true });
   assert.equal(calls, 2);
+});
+
+test("reads the successful synchronization timestamp from the HA entity state", () => {
+  const hass = {
+    states: {
+      [LAST_SYNC_ENTITY_ID]: { state: "2026-11-09T08:30:00+00:00" },
+    },
+  };
+
+  assert.equal(getInventorySyncMarker(hass), "2026-11-09T08:30:00+00:00");
+});
+
+test("ignores missing and unavailable synchronization entity states", () => {
+  assert.equal(getInventorySyncMarker({ states: {} }), null);
+  assert.equal(
+    getInventorySyncMarker({
+      states: { [LAST_SYNC_ENTITY_ID]: { state: "unavailable" } },
+    }),
+    null,
+  );
+  assert.equal(
+    getInventorySyncMarker({
+      states: { [LAST_SYNC_ENTITY_ID]: { state: "unknown" } },
+    }),
+    null,
+  );
 });
