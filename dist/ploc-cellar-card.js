@@ -686,7 +686,6 @@ var He = {
 	diagnostic_unlocated: "Unlocated bottles",
 	diagnostic_negative: "Negative movement balance",
 	diagnostic_surplus: "Physical surplus",
-	statistics_distribution_scope: "Breakdowns include known wine references only.",
 	statistics_unknown_wine_positions: "{count} occupied position(s) have an unknown wine reference. They are included in total stock but not in the breakdowns.",
 	editor_show_occupancy: "Show rack occupancy",
 	editor_show_rack_occupancy: "Show rack occupancy bar",
@@ -845,7 +844,6 @@ var He = {
 	diagnostic_unlocated: "Bouteilles non localisées",
 	diagnostic_negative: "Solde de mouvements négatif",
 	diagnostic_surplus: "Excédent physique",
-	statistics_distribution_scope: "Les répartitions ne portent que sur les références de vins connues.",
 	statistics_unknown_wine_positions: "{count} emplacement(s) occupé(s) font référence à un vin inconnu. Ils sont inclus dans le stock total, mais pas dans les répartitions.",
 	editor_show_occupancy: "Afficher l’occupation des casiers",
 	editor_show_rack_occupancy: "Afficher la barre d’occupation du casier",
@@ -1550,7 +1548,7 @@ var ct = class extends je {
     button { color: var(--primary-text-color); background: var(--secondary-background-color); border: 1px solid var(--divider-color); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
     button[aria-pressed="true"] { border-color: var(--primary-color); background: var(--secondary-background-color); }
     button[disabled] { opacity: .5; cursor: default; }
-    .rack-picker { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0; }
+    .rack-picker { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 10px 0; }
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
     .rack-visualization { width: max-content; max-width: 100%; margin: 4px auto 0; }
     .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; width: 100%; box-sizing: border-box; padding: 0; }
@@ -19561,11 +19559,11 @@ var WO = [
     h2 { margin: 0; font-size: 1.25rem; font-weight: 500; }
     button { color: var(--primary-text-color); background: var(--secondary-background-color); border: 0; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
     button[disabled] { opacity: .5; cursor: default; }
-    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 16px 0; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 10px 0; }
     .metric { background: var(--secondary-background-color); border-radius: 10px; padding: 12px; min-width: 0; }
     .value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .label, .muted { color: var(--secondary-text-color); font-size: .85rem; }
-    .section { margin-top: 16px; }
+    .section { margin-top: 10px; }
     .section-title { margin: 0 0 8px; font-size: .95rem; font-weight: 500; }
     details.section > summary { display: list-item; cursor: pointer; }
     details.section > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
@@ -19596,9 +19594,9 @@ var WO = [
     .diagnostic-wine-tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
     .diagnostic-quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; color: var(--error-color); font-family: var(--ploc-numeric-font-family); font-size: 1.5rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .diagnostic-quantity ha-icon { --mdc-icon-size: 25px; color: var(--error-color); }
-    .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 14px; }
+    .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 10px; }
     .group { min-width: 0; border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; }
-    .group-title { margin: 0 0 12px; font-size: 1rem; font-weight: 500; }
+    .group-title { margin: 0px; font-size: 1rem; font-weight: 500; }
     .chart-content { display: grid; grid-template-columns: minmax(112px, .85fr) minmax(0, 1.15fr); gap: 12px; align-items: center; }
     .chart-content.chart-content-no-legend { grid-template-columns: minmax(0, 1fr); }
     .donut { position: relative; display: block; width: 100%; max-width: 150px; aspect-ratio: 1; justify-self: center; }
@@ -19895,12 +19893,11 @@ var WO = [
           ${a ? N`
             <details class="section" open>
               <summary class="section-title">${e("statistics_title")}</summary>
-              <p class="muted">${e("statistics_distribution_scope")}</p>
               <div class="groups">
                 ${this.renderDistribution("color", "statistics_color")}
-                ${this.renderDistribution("region", "statistics_region")}
-                ${this.renderDistribution("appellation", "statistics_appellation")}
                 ${this.renderDistribution("vintage", "statistics_vintage")}
+                ${this.renderDistribution("appellation", "statistics_appellation")}
+                ${this.renderDistribution("region", "statistics_region")}
                 ${this.renderDistribution("bottle_format", "statistics_format")}
               </div>
             </details>
