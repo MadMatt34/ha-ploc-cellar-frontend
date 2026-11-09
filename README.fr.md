@@ -114,7 +114,7 @@ Les valeurs de la vue d’ensemble, les nombres de bouteilles par casier et les 
 - **La carte affiche une erreur ou aucun inventaire :** vérifier l'entrée de configuration sélectionnée et consulter les journaux Home Assistant pour les erreurs de `ploc_cellar`.
 - **La carte ne s'actualise pas après une synchronisation :** vérifier la compatibilité des versions backend et frontend et s'assurer que la carte utilise l'entrée qui vient d'être synchronisée. Les cartes n'effectuent aucun polling et ne nécessitent aucune actualisation manuelle.
 
-Pour signaler un problème frontend, préciser la version de Home Assistant, le navigateur, la version/le commit du dépôt frontend, le type de carte et les messages pertinents de la console du navigateur ou des journaux Home Assistant. Ne pas joindre d'identifiants ni de jetons d'accès.
+Pour signaler un problème frontend, [ouvrir un ticket sur GitHub](https://github.com/MadMatt34/ha-ploc-cellar-frontend/issues/new) en précisant la version de Home Assistant, le navigateur, la version/le commit du dépôt frontend, le type de carte et les messages pertinents de la console du navigateur ou des journaux Home Assistant. Ne pas joindre d'identifiants ni de jetons d'accès.
 
 ## Désinstallation
 
