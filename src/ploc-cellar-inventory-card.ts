@@ -58,7 +58,8 @@ export class PlocCellarInventoryCard extends LitElement {
     input { box-sizing: border-box; width: 100%; }
     .toolbar { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; margin: 10px 0 0; }
     .search { grid-column: 1 / -1; }
-    .summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; color: var(--secondary-text-color); font-size: .85rem; margin: 12px 0; }
+    .summary { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0; color: var(--secondary-text-color); font-size: .85rem; margin: 12px 0; text-align: right; }
+    .summary span + span::before { content: "·"; margin: 0 8px; }
     .wine-list { display: grid; gap: 8px; }
     .wine { display: block; width: 100%; box-sizing: border-box; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; cursor: pointer; }
     .wine:hover { background: var(--secondary-background-color); }
