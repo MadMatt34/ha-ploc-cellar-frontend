@@ -60,7 +60,7 @@ Principaux champs de la réponse :
 - `Wine.ploud_bottles` est la valeur brute du stock PLOUD et n'est fournie qu'à titre informatif.
 - Les coordonnées d'un emplacement (`row`, `column`) peuvent être à `null` ; l'interface doit gérer leur absence.
 - Les caractéristiques d'un vin peuvent être à `null` ; l'interface ne doit pas supposer que l'appellation, la couleur, la région, le millésime ou le format est toujours renseigné.
-- `Wine.meals` est le masque de bits entier brut et facultatif du champ PLOUD `ml`, qui représente les accords mets-vins. Le frontend décode les indicateurs connus ; le backend conserve les bits inconnus et l'interface ne les affiche pas. Le champ est facultatif dans le type frontend afin de rester compatible avec les anciennes versions du backend.
+- `Wine.meals` est le masque de bits entier brut nullable du champ PLOUD `ml`, qui représente les accords mets-vins. Le backend fournit toujours ce champ ; sa valeur peut être `null`. Le frontend décode les indicateurs connus, conserve la valeur brute et ignore les bits inconnus à l'affichage.
 - Les emplacements occupés dont la référence vin n'est pas résolue restent inclus dans les totaux physiques, même si la fiche vin correspondante est indisponible.
 - Les filtres backend ne doivent pas modifier les totaux globaux.
 
@@ -72,11 +72,11 @@ Toute évolution de la réponse du service doit être traitée comme une modific
 2. **Types frontend :** mettre à jour l'interface correspondante dans `src/types.ts` ainsi que les assertions miroir dans `src/backend-inventory-contract.ts`. Conserver les ensembles exacts de clés ; adapter les assertions de nullabilité et de types primitifs si ces propriétés changent.
 3. **Vérifier les consommateurs :** rechercher le champ concerné dans les trois cartes et leurs éditeurs. Gérer explicitement les valeurs `null` lorsque nécessaire et préserver la distinction entre emplacements physiques et stock reconstitué.
 4. **Documentation :** mettre à jour ce document et son équivalent anglais, avec la signification du champ et toute évolution de sémantique.
-5. **Validation et publication :** exécuter `npm ci`, `npm run check` et `npm run build`. Fusionner/publier le backend et le frontend de manière coordonnée afin que les utilisateurs ne reçoivent pas un frontend qui attend des champs absents de leur version backend. Pour une modification incompatible, conserver temporairement la compatibilité du frontend avec l'ancien backend ou exiger clairement la version backend correspondante.
+5. **Validation et publication :** exécuter `npm ci`, `npm run check` et `npm run build`. Fusionner/publier le backend et le frontend de manière coordonnée afin que les utilisateurs ne reçoivent pas un frontend qui attend des champs absents de leur version backend. Pour toute modification du contrat, publier les versions backend et frontend correspondantes de manière coordonnée.
 
 Même un nouveau champ additif doit être ajouté au test de contrat exact du backend et à l'assertion exacte des clés côté frontend. Cette stricte synchronisation est volontaire : elle force les deux dépôts à faire évoluer ensemble leurs structures déclarées.
 
-## Règles de compatibilité
+## Contrat strict
 
 Préserver la distinction entre emplacements physiques et stock reconstitué. Les nouveaux champs nullable doivent être traités comme tels dans l'interface. Ne pas modifier le domaine du service, son nom, son mode de réponse ou la forme de la requête sans coordonner une version du frontend.
 
@@ -103,16 +103,16 @@ Le champ PLOUD `ml` est exposé sous la forme de l'entier brut facultatif `Wine.
 | `4096` | Dessert |
 | `8192` | Épicés |
 
-Le frontend décode et affiche les catégories connues dans la fenêtre de détail du vin, dans la langue de Home Assistant (français ou anglais). Le backend doit conserver la valeur brute, y compris les bits qu'il ne connaît pas ; le frontend ignore les bits inconnus et doit rester compatible lorsque `meals` est absent ou nul.
+Le frontend décode et affiche les catégories connues dans la fenêtre de détail du vin, dans la langue de Home Assistant (français ou anglais). Le backend fournit toujours `meals`, qui peut être `null`, et conserve les bits inconnus ; le frontend les ignore à l'affichage.
 
 L'indicateur `8192` est confirmé par l'application PLOUD comme la catégorie des plats épicés. Par exemple, la valeur `10341` combine `1 + 4 + 32 + 64 + 2048 + 8192`, soit apéritif, entrée, poissons, viandes blanches, fromages et plats épicés.
 ### Image du vin
 
-La réponse `Wine` peut contenir le champ facultatif `image_url: string | null`.
+La réponse `Wine` contient toujours le champ `image_url: string | null`.
 
 - Une valeur non nulle désigne une route locale Home Assistant vers l'image principale mise en cache, ou vers l'image de couverture si l'image principale n'est pas disponible.
 - La route exige une authentification Home Assistant. Le consommateur doit récupérer l'image avec `hass.fetchWithAuth(image_url)` ; une requête d'image distante non authentifiée n'est pas prise en charge.
 - L'URL peut contenir un paramètre de version. Une URL modifiée indique que la version du document mis en cache a changé : l'image doit être téléchargée à nouveau, même si l'identifiant du document PLOUD est identique.
-- Le champ peut être nul ou absent avec une ancienne version du backend, pour un vin sans référence d'image, lorsque le document n'a pas encore été téléchargé ou lorsque l'image est indisponible. L'interface doit le traiter comme facultatif et ne jamais rendre l'affichage de la fiche vin dépendant de sa présence.
+- Le champ vaut `null` lorsqu'aucune image n'est disponible pour un vin, lorsque le document n'a pas encore été téléchargé ou lorsque le vin ne possède pas de référence d'image. La fiche vin reste utilisable sans image.
 
 La carte affiche le blob reçu au moyen d'une URL d'objet. Elle révoque l'ancienne URL lorsqu'une image est remplacée et libère l'URL active lorsque le composant est déconnecté. L'échec d'une requête d'image ne doit pas empêcher l'affichage de l'inventaire ou des détails du vin.
