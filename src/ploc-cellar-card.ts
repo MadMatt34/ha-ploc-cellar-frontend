@@ -342,12 +342,12 @@ export class PlocCellarCard extends LitElement {
               <div class="diagnostic-wine-main">
                 <div class="diagnostic-wine-name">${diagnostic.name}</div>
                 <div class="diagnostic-wine-metadata">${[
-                  wine?.appellation,
+                  wine.appellation,
                   wine?.region,
                   wine?.country,
                 ].filter(Boolean).join(" · ")}</div>
                 <div class="diagnostic-wine-tags">
-                  ${wine?.color ? html`<span class="diagnostic-wine-tag">${wine.color}</span>` : nothing}
+                  ${wine.color ? html`<span class="diagnostic-wine-tag">${wine.color}</span>` : nothing}
                   <span class="diagnostic-wine-tag">${vintage}</span>
                   ${wine?.bottle_format ? html`<span class="diagnostic-wine-tag">${wine.bottle_format}</span>` : nothing}
                 </div>
