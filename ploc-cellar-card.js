@@ -729,7 +729,8 @@ var He = {
 	wine_detail_reconstructed: "Reconstructed stock",
 	wine_detail_effective: "Effective stock",
 	wine_detail_source_stock: "PLOUD source stock",
-	wine_detail_movements: "Stock movements and diagnostics",
+	wine_detail_movements: "Stock movements",
+	wine_detail_diagnostics: "Stock diagnostics",
 	wine_detail_purchased: "Purchased",
 	wine_detail_consumed: "Consumed",
 	wine_detail_balance: "Movement balance",
@@ -886,7 +887,8 @@ var He = {
 	wine_detail_reconstructed: "Stock reconstitué",
 	wine_detail_effective: "Stock effectif",
 	wine_detail_source_stock: "Stock source PLOUD",
-	wine_detail_movements: "Mouvements et diagnostics du stock",
+	wine_detail_movements: "Mouvements du stock",
+	wine_detail_diagnostics: "Diagnostics du stock",
 	wine_detail_purchased: "Achats",
 	wine_detail_consumed: "Consommations",
 	wine_detail_balance: "Solde des mouvements",
@@ -1342,16 +1344,19 @@ var rt = class extends je {
           ${this.stockItem("wine_detail_effective", e.effective_stock)}
         </div>
         ${r ? N`
-          <div class="section-subtitle"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>${this.t("wine_detail_movements")}</div>
-          <div class="section-body"><dl>
-          ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", e.purchased)}
-          ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", e.consumed)}
-          ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", e.movement_balance)}
-          ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", e.calculated_stock)}
-          ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", e.negative_movement_bottles, !0)}
-          ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", e.physical_surplus_bottles, !0)}
-          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", e.unlocated_bottles, !0)}
-          </dl></div>
+          <div class="section-subtitle"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>&nbsp;${this.t("wine_detail_movements")}</div>
+          <div class="section-body">
+            ${this.characteristic("mdi:cart-plus", "wine_detail_purchased", e.purchased)}
+            ${this.characteristic("mdi:glass-wine", "wine_detail_consumed", e.consumed)}
+            ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", e.movement_balance)}
+            ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", e.calculated_stock)}
+          </div>
+          <div class="section-subtitle"><ha-icon icon="mdi:alert-circle-outline" aria-hidden="true"></ha-icon>&nbsp;${this.t("wine_detail_diagnostics")}</div>
+          <div class="section-body">
+            ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", e.negative_movement_bottles, !0)}
+            ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", e.physical_surplus_bottles, !0)}
+            ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", e.unlocated_bottles, !0)}
+          </div>
         ` : P}
         </div>
       </details>
@@ -1361,7 +1366,7 @@ var rt = class extends je {
 		let t = Qe(e.meals);
 		return t.length ? N`
       <details class="detail-section" open>
-        <summary class="section-summary"><ha-icon icon="mdi:food-apple-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_meals")}</summary>
+        <summary class="section-summary"><ha-icon icon="mdi:silverware-variant" aria-hidden="true"></ha-icon>${this.t("wine_detail_meals")}</summary>
         <div class="section-body"><div class="meal-tiles">
           ${t.map((e) => N`<div class="meal-tile"><ha-icon icon=${Ze(e)} aria-hidden="true"></ha-icon><span>${this.t(e)}</span></div>`)}
         </div></div>
@@ -1436,17 +1441,17 @@ var rt = class extends je {
             <div class="section-body">
             <div class="section-subtitle">${this.t("wine_detail_origin")}</div>
             <div class="characteristics">
-              ${this.characteristic("mdi:medal-outline", "tooltip_classification", e.classification)}
-              ${this.characteristic("mdi:account-outline", "tooltip_domain", e.domain)}
+              ${this.characteristic("mdi:castle", "tooltip_domain", e.domain)}
               ${this.characteristic("mdi:map-marker-radius", "tooltip_appellation", e.appellation)}
               ${this.characteristic("mdi:map-outline", "tooltip_region", e.region)}
               ${this.characteristic("mdi:earth", "tooltip_country", e.country)}
             </div>
             <div class="section-subtitle">${this.t("wine_detail_tasting")}</div>
             <div class="characteristics">
+              ${this.characteristic("mdi:medal-outline", "tooltip_classification", e.classification)}
+              ${this.characteristic("mdi:tag-outline", "tooltip_cuvee", e.cuvee)}
               ${this.characteristic("mdi:palette-outline", "tooltip_color", e.color)}
               ${this.renderGrapes(e.grapes)}
-              ${this.characteristic("mdi:tag-outline", "tooltip_cuvee", e.cuvee)}
               ${this.characteristic("mdi:bottle-wine-outline", "tooltip_format", e.bottle_format ? `${e.bottle_format}${e.bottle_volume_l === null ? "" : ` (${this.formatNumber(e.bottle_volume_l)} L)`}` : null)}
               ${this.characteristic("mdi:percent-outline", "wine_detail_alcohol", e.alcohol_percent === null ? null : `${this.formatNumber(e.alcohol_percent)} %`)}
               ${this.characteristic("mdi:thermometer", "tooltip_temperature", t)}
