@@ -62,9 +62,9 @@ export interface Wine {
   bottle_format: string | null;
   bottle_volume_l: number | null;
   ploud_pid: string | null;
-  /** Raw PLOUD ml bitmask; optional for compatibility with older backends. */
-  meals?: number | null;
-  image_url?: string | null;
+  /** Raw PLOUD ml bitmask for food pairings. */
+  meals: number | null;
+  image_url: string | null;
   locations: Array<{
     rack: string;
     rack_id: string;
@@ -86,8 +86,7 @@ export interface WineDiagnostic {
   unlocated_bottles: number | null;
   negative_movement_bottles: number | null;
   physical_surplus_bottles: number | null;
-  /** Optional for compatibility with older backends; the card falls back to the inventory wine by id. */
-  wine?: Wine;
+  wine: Wine;
 }
 
 export interface InventoryResponse {
