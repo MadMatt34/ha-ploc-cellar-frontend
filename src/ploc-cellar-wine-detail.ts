@@ -323,16 +323,19 @@ export class PlocCellarWineDetail extends LitElement {
           ${this.stockItem("wine_detail_effective", wine.effective_stock)}
         </div>
         ${hasMovementData ? html`
-          <div class="section-subtitle"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>${this.t("wine_detail_movements")}</div>
-          <div class="section-body"><dl>
-          ${this.characteristic("mdi:cart-arrow-down", "wine_detail_purchased", wine.purchased)}
-          ${this.characteristic("mdi:cart-arrow-up", "wine_detail_consumed", wine.consumed)}
-          ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", wine.movement_balance)}
-          ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", wine.calculated_stock)}
-          ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", wine.negative_movement_bottles, true)}
-          ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", wine.physical_surplus_bottles, true)}
-          ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", wine.unlocated_bottles, true)}
-          </dl></div>
+          <div class="section-subtitle"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>&nbsp;${this.t("wine_detail_movements")}</div>
+          <div class="section-body">
+            ${this.characteristic("mdi:cart-plus", "wine_detail_purchased", wine.purchased)}
+            ${this.characteristic("mdi:glass-wine", "wine_detail_consumed", wine.consumed)}
+            ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", wine.movement_balance)}
+            ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", wine.calculated_stock)}
+          </div>
+          <div class="section-subtitle"><ha-icon icon="mdi:alert-circle-outline" aria-hidden="true"></ha-icon>&nbsp;${this.t("wine_detail_diagnostics")}</div>
+          <div class="section-body">
+            ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", wine.negative_movement_bottles, true)}
+            ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", wine.physical_surplus_bottles, true)}
+            ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", wine.unlocated_bottles, true)}
+          </div>
         ` : nothing}
         </div>
       </details>
@@ -344,7 +347,7 @@ export class PlocCellarWineDetail extends LitElement {
     if (!mealKeys.length) return nothing;
     return html`
       <details class="detail-section" open>
-        <summary class="section-summary"><ha-icon icon="mdi:food-apple-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_meals")}</summary>
+        <summary class="section-summary"><ha-icon icon="mdi:silverware-variant" aria-hidden="true"></ha-icon>${this.t("wine_detail_meals")}</summary>
         <div class="section-body"><div class="meal-tiles">
           ${mealKeys.map((key) => html`<div class="meal-tile"><ha-icon icon=${getMealIcon(key)} aria-hidden="true"></ha-icon><span>${this.t(key)}</span></div>`)}
         </div></div>
@@ -437,17 +440,17 @@ export class PlocCellarWineDetail extends LitElement {
             <div class="section-body">
             <div class="section-subtitle">${this.t("wine_detail_origin")}</div>
             <div class="characteristics">
-              ${this.characteristic("mdi:medal-outline", "tooltip_classification", wine.classification)}
-              ${this.characteristic("mdi:account-outline", "tooltip_domain", wine.domain)}
+              ${this.characteristic("mdi:castle", "tooltip_domain", wine.domain)}
               ${this.characteristic("mdi:map-marker-radius", "tooltip_appellation", wine.appellation)}
               ${this.characteristic("mdi:map-outline", "tooltip_region", wine.region)}
               ${this.characteristic("mdi:earth", "tooltip_country", wine.country)}
             </div>
             <div class="section-subtitle">${this.t("wine_detail_tasting")}</div>
             <div class="characteristics">
+              ${this.characteristic("mdi:medal-outline", "tooltip_classification", wine.classification)}
+              ${this.characteristic("mdi:tag-outline", "tooltip_cuvee", wine.cuvee)}
               ${this.characteristic("mdi:palette-outline", "tooltip_color", wine.color)}
               ${this.renderGrapes(wine.grapes)}
-              ${this.characteristic("mdi:tag-outline", "tooltip_cuvee", wine.cuvee)}
               ${this.characteristic("mdi:bottle-wine-outline", "tooltip_format", wine.bottle_format ? `${wine.bottle_format}${wine.bottle_volume_l === null ? "" : ` (${this.formatNumber(wine.bottle_volume_l)} L)`}` : null)}
               ${this.characteristic("mdi:percent-outline", "wine_detail_alcohol", wine.alcohol_percent === null ? null : `${this.formatNumber(wine.alcohol_percent)} %`)}
               ${this.characteristic("mdi:thermometer", "tooltip_temperature", temperature)}
