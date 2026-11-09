@@ -40,7 +40,7 @@ export class PlocCellarRackCard extends LitElement {
     button { color: var(--primary-text-color); background: var(--secondary-background-color); border: 1px solid var(--divider-color); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
     button[aria-pressed="true"] { border-color: var(--primary-color); background: var(--secondary-background-color); }
     button[disabled] { opacity: .5; cursor: default; }
-    .rack-picker { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0; }
+    .rack-picker { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 10px 0; }
     .rack-picker-select { width: 100%; max-width: 360px; min-height: 40px; padding: 8px 12px; color: var(--primary-text-color); background: var(--card-background-color); border: 1px solid var(--divider-color); border-radius: 8px; font: inherit; }
     .rack-visualization { width: max-content; max-width: 100%; margin: 4px auto 0; }
     .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; width: 100%; box-sizing: border-box; padding: 0; }

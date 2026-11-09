@@ -66,11 +66,11 @@ export class PlocCellarCard extends LitElement {
     h2 { margin: 0; font-size: 1.25rem; font-weight: 500; }
     button { color: var(--primary-text-color); background: var(--secondary-background-color); border: 0; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
     button[disabled] { opacity: .5; cursor: default; }
-    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 16px 0; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 10px 0; }
     .metric { background: var(--secondary-background-color); border-radius: 10px; padding: 12px; min-width: 0; }
     .value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .label, .muted { color: var(--secondary-text-color); font-size: .85rem; }
-    .section { margin-top: 16px; }
+    .section { margin-top: 10px; }
     .section-title { margin: 0 0 8px; font-size: .95rem; font-weight: 500; }
     details.section > summary { display: list-item; cursor: pointer; }
     details.section > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
@@ -101,9 +101,9 @@ export class PlocCellarCard extends LitElement {
     .diagnostic-wine-tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
     .diagnostic-quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; color: var(--error-color); font-family: var(--ploc-numeric-font-family); font-size: 1.5rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .diagnostic-quantity ha-icon { --mdc-icon-size: 25px; color: var(--error-color); }
-    .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 14px; }
+    .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 10px; }
     .group { min-width: 0; border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; }
-    .group-title { margin: 0 0 12px; font-size: 1rem; font-weight: 500; }
+    .group-title { margin: 0px; font-size: 1rem; font-weight: 500; }
     .chart-content { display: grid; grid-template-columns: minmax(112px, .85fr) minmax(0, 1.15fr); gap: 12px; align-items: center; }
     .chart-content.chart-content-no-legend { grid-template-columns: minmax(0, 1fr); }
     .donut { position: relative; display: block; width: 100%; max-width: 150px; aspect-ratio: 1; justify-self: center; }
@@ -544,12 +544,11 @@ export class PlocCellarCard extends LitElement {
           ${showStatistics ? html`
             <details class="section" open>
               <summary class="section-title">${t("statistics_title")}</summary>
-              <p class="muted">${t("statistics_distribution_scope")}</p>
               <div class="groups">
                 ${this.renderDistribution("color", "statistics_color")}
-                ${this.renderDistribution("region", "statistics_region")}
-                ${this.renderDistribution("appellation", "statistics_appellation")}
                 ${this.renderDistribution("vintage", "statistics_vintage")}
+                ${this.renderDistribution("appellation", "statistics_appellation")}
+                ${this.renderDistribution("region", "statistics_region")}
                 ${this.renderDistribution("bottle_format", "statistics_format")}
               </div>
             </details>
