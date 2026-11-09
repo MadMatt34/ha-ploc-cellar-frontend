@@ -15,7 +15,7 @@ import type {
   WineDiagnostic,
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
-import { fetchInventory } from "./inventory-client";
+import { fetchInventory, getInventorySyncMarker } from "./inventory-client";
 import "./donut-chart";
 
 interface DistributionItem {
@@ -53,6 +53,9 @@ export class PlocCellarCard extends LitElement {
   @state() private activeDiagnostic?: "unlocated" | "negative" | "surplus";
   @state() private selectedWine?: Wine;
   private requestGeneration = 0;
+  private lastSyncMarker: string | null = null;
+  private hasObservedSyncMarker = false;
+  private refreshPending = false;
 
   static styles = css`
     :host { display: block; }
@@ -133,6 +136,7 @@ export class PlocCellarCard extends LitElement {
   setConfig(config: PlocCellarCardConfig): void {
     this.requestGeneration += 1;
     this.loading = false;
+    this.refreshPending = false;
     this.config = {
       ...config,
       show_occupancy: config.show_occupancy !== false,
@@ -146,6 +150,14 @@ export class PlocCellarCard extends LitElement {
   }
 
   protected updated(): void {
+    const marker = this.hass ? getInventorySyncMarker(this.hass) : null;
+    if (!this.hasObservedSyncMarker) {
+      this.lastSyncMarker = marker;
+      this.hasObservedSyncMarker = true;
+    } else if (marker !== this.lastSyncMarker) {
+      this.lastSyncMarker = marker;
+      if (marker) void this.refresh();
+    }
     if (this.hass && this.config && !this.inventory && !this.loading && !this.error) {
       void this.refresh();
     }
@@ -154,7 +166,11 @@ export class PlocCellarCard extends LitElement {
   private async refresh(): Promise<void> {
     const hass = this.hass;
     const config = this.config;
-    if (!hass || !config?.config_entry_id || this.loading) return;
+    if (!hass || !config?.config_entry_id) return;
+    if (this.loading) {
+      this.refreshPending = true;
+      return;
+    }
     const configEntryId = config.config_entry_id;
     const generation = ++this.requestGeneration;
     this.loading = true;
@@ -167,7 +183,13 @@ export class PlocCellarCard extends LitElement {
         this.error = error instanceof Error ? error.message : String(error);
       }
     } finally {
-      if (generation === this.requestGeneration) this.loading = false;
+      if (generation === this.requestGeneration) {
+        this.loading = false;
+        if (this.refreshPending) {
+          this.refreshPending = false;
+          void this.refresh();
+        }
+      }
     }
   }
 
@@ -411,9 +433,6 @@ export class PlocCellarCard extends LitElement {
       <ha-card>
         <header>
           <h2>${title}</h2>
-          <button ?disabled=${this.loading} @click=${() => this.refresh()}>
-            ${this.loading ? t("loading") : t("refresh")}
-          </button>
         </header>
         ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
         ${!this.config?.config_entry_id
