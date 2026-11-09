@@ -43,3 +43,14 @@ export function fetchInventory(
   requests.set(configEntryId, trackedRequest);
   return trackedRequest;
 }
+
+/** The entity state changes after each successful PLOUD synchronization. */
+export const LAST_SYNC_ENTITY_ID =
+  "sensor.ploc_cellar_last_successful_synchronization";
+
+export function getInventorySyncMarker(hass: HomeAssistant): string | null {
+  const state = hass.states?.[LAST_SYNC_ENTITY_ID]?.state;
+  return state && state !== "unknown" && state !== "unavailable"
+    ? state
+    : null;
+}
