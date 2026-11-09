@@ -78,17 +78,18 @@ export class PlocCellarCard extends LitElement {
     .diagnostic:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .diagnostic-value { display: block; color: var(--error-color); font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .diagnostic-hint { display: block; align-self: flex-end; margin-top: auto; padding-top: 8px; color: var(--secondary-text-color); font-size: .75rem; text-align: right; }
-    .diagnostic-detail-list { display: grid; gap: 12px; max-height: min(60vh, 520px); overflow: auto; }
-    .diagnostic-detail-item { border-bottom: 1px solid var(--divider-color); padding: 0 0 10px; }
-    .diagnostic-detail-name { margin: 0 0 6px; font-family: var(--ploc-wine-font-family); font-size: 1.08rem; font-weight: 500; line-height: 1.25; }
-    .diagnostic-wine-link { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: inherit; text-align: left; cursor: pointer; }
-    .diagnostic-wine-link:hover { color: var(--primary-color); text-decoration: underline; }
-    .diagnostic-wine-link:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 2px; }
-    .diagnostic-detail-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px 14px; }
-    .diagnostic-detail-meta div { display: flex; justify-content: space-between; gap: 12px; }
-    .diagnostic-detail-meta dt { color: var(--secondary-text-color); }
-    .numeric-value { font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
-    .diagnostic-detail-meta dd { margin: 0; font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
+    .diagnostic-detail-list { display: grid; gap: 8px; max-height: min(60vh, 520px); overflow: auto; }
+    .diagnostic-wine { display: flex; width: 100%; box-sizing: border-box; align-items: stretch; justify-content: space-between; gap: 12px; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; }
+    button.diagnostic-wine { cursor: pointer; }
+    button.diagnostic-wine:hover { background: var(--secondary-background-color); }
+    button.diagnostic-wine:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+    .diagnostic-wine-main { min-width: 0; flex: 1 1 auto; }
+    .diagnostic-wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
+    .diagnostic-wine-metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
+    .diagnostic-wine-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+    .diagnostic-wine-tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
+    .diagnostic-quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; color: var(--error-color); font-family: var(--ploc-numeric-font-family); font-size: 1.5rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .diagnostic-quantity ha-icon { --mdc-icon-size: 25px; color: var(--error-color); }
     .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 14px; }
     .group { min-width: 0; border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; }
     .group-title { margin: 0 0 12px; font-size: 1rem; font-weight: 500; }
@@ -324,31 +325,48 @@ export class PlocCellarCard extends LitElement {
     const amount = (wine: WineDiagnostic): number => kind === "unlocated"
       ? wine.unlocated_bottles ?? 0
       : kind === "negative" ? wine.negative_movement_bottles ?? 0 : wine.physical_surplus_bottles ?? 0;
+    const diagnosticLabel = t("diagnostic_detail_quantity");
     return html`
       <ha-dialog .open=${true} header-title=${t(titleKey)} @closed=${() => { this.activeDiagnostic = undefined; }}>
         <div class="diagnostic-detail-list">
           <p class="muted">${t(detailKey)}</p>
-          ${wines.length ? wines.map((wine) => html`
-            <section class="diagnostic-detail-item">
-              <h4 class="diagnostic-detail-name">
-                ${this.inventory?.wines.some((item) => item.id === wine.id) || wine.wine
-                  ? html`<button class="diagnostic-wine-link" type="button"
-                      aria-haspopup="dialog"
-                      @click=${() => this.openDiagnosticWine(wine)}>${wine.name}${wine.vintage ? ` · ${wine.vintage}` : ""}</button>`
-                  : html`${wine.name}${wine.vintage ? ` · ${wine.vintage}` : ""}`}
-              </h4>
-              <dl class="diagnostic-detail-meta">
-                <div><dt>${t("diagnostic_detail_quantity")}</dt><dd>${this.formatNumber(amount(wine))}</dd></div>
-                <div><dt>${t("diagnostic_detail_in_cellar")}</dt><dd>${this.formatNumber(wine.bottles_in_cellar)}</dd></div>
-                <div><dt>${t("diagnostic_detail_stock")}</dt><dd>${this.formatNumber(wine.effective_stock)}</dd></div>
-                ${kind === "negative" ? html`
-                  <div><dt>${t("diagnostic_detail_purchased")}</dt><dd>${this.formatNumber(wine.purchased ?? 0)}</dd></div>
-                  <div><dt>${t("diagnostic_detail_consumed")}</dt><dd>${this.formatNumber(wine.consumed ?? 0)}</dd></div>
-                  <div><dt>${t("diagnostic_detail_balance")}</dt><dd>${this.formatNumber(wine.movement_balance ?? 0)}</dd></div>
-                ` : nothing}
-              </dl>
-            </section>
-          `) : html`<p class="muted">${t("diagnostic_detail_empty")}</p>`}
+          ${wines.length ? wines.map((diagnostic) => {
+            const wine = this.inventory?.wines.find((item) => item.id === diagnostic.id)
+              ?? diagnostic.wine;
+            const color = wine?.color_rgb?.every(Number.isFinite)
+              ? wine.color_rgb.map((component) => Math.round(Math.min(255, Math.max(0, component))))
+              : null;
+            const wineColor = color ? `rgb(${color.join(", ")})` : "";
+            const vintage = diagnostic.vintage === null
+              ? t("unknown_vintage")
+              : String(diagnostic.vintage);
+            const quantity = amount(diagnostic);
+            const rowContent = html`
+              <div class="diagnostic-wine-main">
+                <div class="diagnostic-wine-name">${diagnostic.name}</div>
+                <div class="diagnostic-wine-metadata">${[
+                  wine?.appellation,
+                  wine?.region,
+                  wine?.country,
+                ].filter(Boolean).join(" · ")}</div>
+                <div class="diagnostic-wine-tags">
+                  ${wine?.color ? html`<span class="diagnostic-wine-tag">${wine.color}</span>` : nothing}
+                  <span class="diagnostic-wine-tag">${vintage}</span>
+                  ${wine?.bottle_format ? html`<span class="diagnostic-wine-tag">${wine.bottle_format}</span>` : nothing}
+                </div>
+              </div>
+              <div class="diagnostic-quantity" aria-label=${`${this.formatNumber(quantity)} ${diagnosticLabel}`}
+                title=${`${this.formatNumber(quantity)} ${diagnosticLabel}`}>
+                <span>${this.formatNumber(quantity)}</span>
+                <ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon>
+              </div>
+            `;
+            const style = wineColor ? `--wine-color: ${wineColor}` : "";
+            return wine
+              ? html`<button class="diagnostic-wine" type="button" aria-haspopup="dialog"
+                  style=${style} @click=${() => this.openDiagnosticWine(diagnostic)}>${rowContent}</button>`
+              : html`<div class="diagnostic-wine" style=${style}>${rowContent}</div>`;
+          }) : html`<p class="muted">${t("diagnostic_detail_empty")}</p>`}
         </div>
       </ha-dialog>
     `;
