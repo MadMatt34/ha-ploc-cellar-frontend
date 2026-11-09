@@ -61,15 +61,15 @@ export class PlocCellarInventoryCard extends LitElement {
     .summary { display: flex; color: var(--secondary-text-color); font-size: .85rem; }
     .summary span + span::before { content: "·"; margin: 0 8px; }
     .wine-list { display: grid; gap: 8px; }
-    .wine { display: block; width: 100%; box-sizing: border-box; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; cursor: pointer; }
+    .wine { position: relative; display: block; width: 100%; box-sizing: border-box; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; cursor: pointer; }
     .wine:hover { background: var(--secondary-background-color); }
     .wine:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
     .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
     .quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; font-family: var(--ploc-numeric-font-family); font-size: 1.5rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .quantity ha-icon { --mdc-icon-size: 25px; color: var(--wine-color, var(--secondary-text-color)); }
-    .quantity-column { position: relative; display: flex; justify-content: flex-end; align-items: flex-start; flex: 0 0 auto; min-width: 0; max-width: 42%; padding-right: 38px; }
-    .wine-alert { position: absolute; top: 0; right: 0; display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--error-color); border-radius: 50%; background: var(--card-background-color, var(--ha-card-background, var(--primary-background-color))); color: var(--error-color); }
+    .quantity-column { position: static; display: flex; justify-content: flex-end; align-items: flex-start; flex: 0 0 auto; min-width: 0; max-width: 42%; }
+    .wine-alert { position: absolute; right: 8px; bottom: 8px; display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--error-color); border-radius: 50%; background: var(--card-background-color, var(--ha-card-background, var(--primary-background-color))); color: var(--error-color); pointer-events: none; }
     .wine-alert ha-icon { --mdc-icon-size: 20px; }
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
