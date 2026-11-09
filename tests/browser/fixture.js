@@ -110,15 +110,31 @@ const inventory = {
   ],
 };
 
+const syncListeners = new Set();
+
 window.__plocFixture = {
   inventory,
   fail: false,
   calls: 0,
   imageFetches: 0,
+  emitSync(configEntryId) {
+    for (const listener of syncListeners) {
+      listener({ data: { config_entry_id: configEntryId } });
+    }
+  },
 };
 
 window.testHass = {
   language: "en",
+  connection: {
+    subscribeEvents: async (callback, eventType) => {
+      if (eventType !== "ploc_cellar_sync_completed") {
+        throw new Error(`Unexpected event subscription: ${eventType}`);
+      }
+      syncListeners.add(callback);
+      return () => syncListeners.delete(callback);
+    },
+  },
   callWS: async () => {
     window.__plocFixture.calls += 1;
     if (window.__plocFixture.fail) {
