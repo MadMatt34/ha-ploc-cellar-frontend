@@ -73,10 +73,16 @@ export class PlocCellarCard extends LitElement {
     .occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
     .diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
-    .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; cursor: pointer; }
-    .diagnostic:hover { background: var(--secondary-background-color); }
-    .diagnostic:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
-    .diagnostic-value { display: block; color: var(--error-color); font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; background: transparent; font: inherit; }
+    button.diagnostic { cursor: pointer; }
+    button.diagnostic:hover { background: var(--secondary-background-color); }
+    button.diagnostic:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+    .diagnostic.has-issues { border-color: var(--error-color); }
+    .diagnostic-heading { display: flex; align-items: center; gap: 8px; }
+    .diagnostic-icon { --mdc-icon-size: 21px; color: var(--secondary-text-color); flex: 0 0 auto; }
+    .diagnostic.has-issues .diagnostic-icon { color: var(--error-color); }
+    .diagnostic-value { display: block; color: var(--primary-text-color); font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .diagnostic.has-issues .diagnostic-value { color: var(--error-color); }
     .diagnostic-hint { display: block; align-self: flex-end; margin-top: auto; padding-top: 8px; color: var(--secondary-text-color); font-size: .75rem; text-align: right; }
     .diagnostic-detail-list { display: grid; gap: 8px; max-height: min(60vh, 520px); overflow: auto; }
     .diagnostic-wine { display: flex; width: 100%; box-sizing: border-box; align-items: stretch; justify-content: space-between; gap: 12px; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; }
@@ -388,10 +394,10 @@ export class PlocCellarCard extends LitElement {
       : 0;
     const diagnostics = data?.stock_reconstruction_complete
       ? [
-          { key: "diagnostic_unlocated" as const, value: data.unlocated_bottles ?? 0 },
-          { key: "diagnostic_negative" as const, value: data.negative_movement_bottles ?? 0 },
-          { key: "diagnostic_surplus" as const, value: data.physical_surplus_bottles ?? 0 },
-        ].filter((item) => item.value > 0)
+          { key: "diagnostic_unlocated" as const, icon: "mdi:map-marker-question-outline", kind: "unlocated" as const, value: data.unlocated_bottles ?? 0 },
+          { key: "diagnostic_negative" as const, icon: "mdi:minus-circle-outline", kind: "negative" as const, value: data.negative_movement_bottles ?? 0 },
+          { key: "diagnostic_surplus" as const, icon: "mdi:plus-circle-outline", kind: "surplus" as const, value: data.physical_surplus_bottles ?? 0 },
+        ]
       : [];
     const hasDiagnostics = Boolean(data && (
       !data.stock_reconstruction_complete ||
@@ -452,16 +458,21 @@ export class PlocCellarCard extends LitElement {
               ${diagnostics.length ? html`
                 <div class="diagnostics">
                   ${diagnostics.map((item) => {
-                    const kind = item.key === "diagnostic_unlocated" ? "unlocated"
-                      : item.key === "diagnostic_negative" ? "negative" : "surplus";
-                    return html`
-                      <button class="diagnostic" type="button" aria-haspopup="dialog"
-                        @click=${() => { this.activeDiagnostic = kind; }}>
+                    const hasIssues = item.value > 0;
+                    const tileContent = html`
+                      <span class="diagnostic-heading">
+                        <ha-icon class="diagnostic-icon" icon=${item.icon} aria-hidden="true"></ha-icon>
                         <span class="diagnostic-value">${this.formatNumber(item.value)}</span>
-                        <span class="label">${t(item.key)}</span>
-                        <span class="diagnostic-hint">${t("diagnostic_detail_open")}</span>
-                      </button>
+                      </span>
+                      <span class="label">${t(item.key)}</span>
+                      ${hasIssues
+                        ? html`<span class="diagnostic-hint">${t("diagnostic_detail_open")}</span>`
+                        : nothing}
                     `;
+                    return hasIssues
+                      ? html`<button class="diagnostic has-issues" type="button" aria-haspopup="dialog"
+                          @click=${() => { this.activeDiagnostic = item.kind; }}>${tileContent}</button>`
+                      : html`<div class="diagnostic">${tileContent}</div>`;
                   })}
                 </div>
               ` : nothing}
