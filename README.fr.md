@@ -13,7 +13,7 @@ Ce dépôt fournit trois cartes personnalisées :
 - **Casiers Ploc Cellar** (`custom:ploc-cellar-rack-card`) : sélection du casier et représentation des emplacements selon les coordonnées réelles ligne/colonne de PLOUD. Chaque emplacement occupé est représenté individuellement et reprend la couleur du vin lorsqu'elle est disponible.
   L'éditeur permet de masquer la barre d'occupation du casier ; elle est affichée par défaut et sa largeur suit celle de la représentation des emplacements.
 
-L'ancien type de carte **Ploc Cellar Statistics** reste enregistré comme alias de compatibilité : les tableaux de bord utilisant `custom:ploc-cellar-statistics-card` continuent d'afficher la vue d'ensemble unifiée. Pour les nouveaux tableaux de bord, utilisez `custom:ploc-cellar-card`.
+ 
 
 Chaque carte utilise le sélecteur natif d'entrée de configuration dans son éditeur et conserve son propre `config_entry_id`. Les cartes communiquent uniquement avec Home Assistant via le service WebSocket de réponse `ploc_cellar.get_inventory` fourni par l'intégration. Elles ne communiquent jamais directement avec PLOUD. L'intégration backend doit être installée et configurée au préalable.
 
@@ -32,13 +32,7 @@ Les cartes récupèrent l’inventaire à leur initialisation et proposent une a
    ```
 5. Ajoutez l'une des trois cartes depuis le sélecteur de cartes et sélectionnez l'entrée de configuration Ploc Cellar dans son éditeur.
 
-Les types de cartes et leurs clés de configuration existants sont conservés. Il n'est pas nécessaire de recréer les configurations de cartes lors de la migration depuis la ressource servie par l'intégration.
-
-### Migration depuis la ressource servie par l'intégration
-
-Si vous aviez ajouté manuellement la ressource `/ploc_cellar_static/ploc-cellar-card.js`, installez d'abord ce paquet Dashboard HACS, puis remplacez l'ancienne ressource Lovelace par celle installée par HACS. Ne chargez pas les deux modules JavaScript simultanément : ils enregistrent les mêmes types de cartes.
-
-Dans une vue **Sections**, la carte de vue d'ensemble utilise par défaut une largeur de 12 colonnes sans imposer de hauteur de ligne. Vous pouvez activer **Adapter la hauteur au contenu** dans l'onglet **Disposition** si vous souhaitez que sa hauteur suive son contenu.
+ Dans une vue **Sections**, la carte de vue d'ensemble utilise par défaut une largeur de 12 colonnes sans imposer de hauteur de ligne. Vous pouvez activer **Adapter la hauteur au contenu** dans l'onglet **Disposition** si vous souhaitez que sa hauteur suive son contenu.
 
 ## Développement
 
@@ -61,7 +55,7 @@ Consultez le [contrat backend](docs/CONTRAT_BACKEND.fr.md) pour la requête WebS
 
 Le frontend dépend du service WebSocket Home Assistant `ploc_cellar.get_inventory` fourni par l'intégration. Le contrat du service et le modèle d'inventaire sont maintenus dans le [dépôt backend](https://github.com/MadMatt34/ha-ploc-cellar). Toute évolution de la réponse doit rester compatible avec les interfaces TypeScript de `src/types.ts`.
 
-Le champ facultatif `Wine.meals` contient les indicateurs d'accords mets-vins PLOUD sous forme de masque de bits brut. La [documentation du contrat backend](docs/CONTRAT_BACKEND.fr.md) présente la correspondance complète entre les bits et les catégories, les règles de combinaison et le traitement des indicateurs inconnus.
+Le champ nullable `Wine.meals` contient les indicateurs d'accords mets-vins PLOUD sous forme de masque de bits brut. La [documentation du contrat backend](docs/CONTRAT_BACKEND.fr.md) présente la correspondance complète entre les bits et les catégories, les règles de combinaison et le traitement des indicateurs inconnus.
 
 ## Langues
 
@@ -73,11 +67,11 @@ La modale de détail utilise des sections repliables indépendantes pour le stoc
 
 ## Photos des vins
 
-La fenêtre de détail d'un vin affiche la photo PLOUD mise en cache lorsque le backend fournit un champ `image_url` non nul. Le backend privilégie l'image principale et utilise l'image de couverture si l'image principale n'est pas disponible localement.
+La fenêtre de détail d'un vin affiche la photo PLOUD mise en cache lorsque le champ `image_url` est non nul. Le backend privilégie l'image principale et utilise l'image de couverture si l'image principale n'est pas disponible localement.
 
 Les images sont servies par une route Home Assistant authentifiée. La carte les récupère avec `hass.fetchWithAuth()` ; elle ne contacte jamais directement PLOUD et ne stocke aucun identifiant PLOUD. Le contenu reçu sous forme de blob est affiché au moyen d'une URL d'objet du navigateur. Cette URL est révoquée lorsqu'elle est remplacée ou lorsque l'élément de la fenêtre modale est déconnecté. Si le backend modifie `image_url` (y compris son paramètre de version lorsque le document PLOUD conserve le même identifiant), la carte télécharge la nouvelle image et libère l'ancienne URL d'objet.
 
-Le champ est facultatif afin de rester compatible avec les réponses d'anciennes versions du backend. S'il est absent ou nul, la fenêtre de détail reste utilisable et n'affiche simplement aucune photo.
+Le champ `image_url` est nullable. Lorsqu'il vaut `null`, la fenêtre de détail reste utilisable et n'affiche simplement aucune photo.
 
 ## Typographie des noms de vins
 
