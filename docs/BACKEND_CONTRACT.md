@@ -60,7 +60,7 @@ Top-level response fields:
 - `Wine.ploud_bottles` is the raw PLOUD stock value and is informational only.
 - Wine location coordinates (`row`, `column`) may be `null`; consumers must handle missing coordinates.
 - Wine characteristics can be `null`; the frontend must not assume that appellation, color, region, vintage or bottle format is always present.
-- `Wine.meals` is the optional raw PLOUD `ml` integer bitmask for food-pairing associations. Known flags are decoded by the frontend; unknown bits are retained by the backend and ignored for display. The field is optional in the frontend type so older backend versions remain usable.
+- `Wine.meals` is the raw nullable PLOUD `ml` integer bitmask for food-pairing associations. The backend always provides this field; its value may be `null`. The frontend decodes known flags and ignores unknown bits for display.
 - Unresolved wine references on occupied positions remain part of physical totals even when the corresponding wine record is unavailable.
 - Backend filters must not change global totals.
 
@@ -72,11 +72,11 @@ Treat a change to the service response as a coordinated backend/frontend contrac
 2. **Frontend types:** update the corresponding interface in `src/types.ts` and the mirrored assertions in `src/backend-inventory-contract.ts`. Keep the key sets exact; update nullability and primitive-type assertions when those semantics change.
 3. **Review consumers:** search all three cards and their editors for the affected field. Handle `null` explicitly where applicable; preserve the distinction between physical rack positions and reconstructed stock.
 4. **Documentation:** update this contract document and its French counterpart, including field meaning and any changed semantics.
-5. **Validation and release:** run `npm ci`, `npm run check` and `npm run build`. Merge/release the backend and frontend in a coordinated order so users do not receive a frontend expecting fields that an installed backend does not yet provide. For a breaking change, keep the frontend compatible with the old backend during the transition or clearly require the matching backend version.
+5. **Validation and release:** run `npm ci`, `npm run check` and `npm run build`. Merge/release the backend and frontend in a coordinated order so users do not receive a frontend expecting fields that an installed backend does not yet provide. For any contract change, publish the corresponding backend and frontend versions in a coordinated manner.
 
 An additive response field is still added to both the backend's exact contract test and the frontend's exact key assertion. This deliberate strictness makes the two repositories' declared shapes move together.
 
-## Compatibility rules
+## Strict contract
 
 Preserve the physical-position versus reconstructed-stock distinction. New nullable fields must be handled as nullable in the UI. Do not change the service domain, service name, response mode or request shape without coordinating a frontend release.
 
@@ -103,16 +103,16 @@ The PLOUD `ml` field is exposed as the optional raw integer `Wine.meals`. It is 
 | `4096` | Dessert |
 | `8192` | Spicy dishes |
 
-The frontend decodes and displays the known categories in the wine detail dialog using the Home Assistant language (English or French). The backend must preserve the raw value, including bits it does not recognize; the frontend ignores unknown bits and must remain compatible when `meals` is absent or null.
+The frontend decodes and displays the known categories in the wine detail dialog using the Home Assistant language (English or French). The backend always provides `meals`, which may be `null`, and preserves unknown bits; the frontend ignores them for display.
 
 The `8192` flag is confirmed by the PLOUD application as the spicy-food pairing category. For example, the value `10341` combines `1 + 4 + 32 + 64 + 2048 + 8192`, corresponding to aperitif, starter, fish, white meat, cheese and spicy dishes.
 ### Wine image
 
-The `Wine` response may include the optional field `image_url: string | null`.
+The `Wine` response always includes the field `image_url: string | null`.
 
 - A non-null value is a local Home Assistant endpoint for the cached primary wine image, or the cached cover image when the primary image is unavailable.
 - The endpoint requires Home Assistant authentication. Consumers must fetch it with `hass.fetchWithAuth(image_url)`; assigning the endpoint directly to an unauthenticated remote image request is not supported.
 - The URL may include a version query component. A changed URL signals that the cached document version changed and the image should be fetched again, even if the PLOUD document identifier did not change.
-- The field may be null or absent for older backend versions, wines without image references, documents not yet downloaded, or unavailable images. The UI must treat it as optional and must not make the wine detail view depend on it.
+- The field is `null` when an image is unavailable for a wine, when its document has not yet been downloaded, or when the wine has no image reference. The wine detail view remains usable without an image.
 
 The card displays the fetched blob through an object URL. It revokes the previous object URL when the image is replaced and releases the active URL when the component disconnects. A failed image request must not prevent the inventory or wine details from being displayed.
