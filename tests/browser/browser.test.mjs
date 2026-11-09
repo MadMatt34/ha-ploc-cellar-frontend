@@ -204,7 +204,7 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
-  it("surfaces a WebSocket error and recovers after a manual refresh", async () => {
+  it("surfaces a WebSocket error and recovers after a successful sync event", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
       await page.evaluate(() => {
@@ -213,10 +213,21 @@ describe("Ploc Cellar browser interactions", () => {
       });
       const card = page.locator("ploc-cellar-inventory-card");
       await card.locator(".error").getByText("Fixture WebSocket failure").waitFor();
-      await page.evaluate(() => { window.__plocFixture.fail = false; });
-      await card.getByRole("button", { name: "Refresh" }).click();
+      const callsBeforeSync = await page.evaluate(() => window.__plocFixture.calls);
+      await page.evaluate(() => {
+        window.__plocFixture.fail = false;
+        window.__plocFixture.emitSync("another-entry");
+      });
+      await page.waitForTimeout(50);
+      assert.equal(await page.evaluate(() => window.__plocFixture.calls), callsBeforeSync);
+
+      await page.evaluate(() => window.__plocFixture.emitSync("fixture-entry"));
       await card.locator(".wine").first().waitFor();
       assert.equal(await card.locator(".error").count(), 0);
+      assert.equal(
+        await page.evaluate(() => window.__plocFixture.calls),
+        callsBeforeSync + 1,
+      );
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();
