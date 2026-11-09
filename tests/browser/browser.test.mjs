@@ -325,7 +325,10 @@ describe("Ploc Cellar browser interactions", () => {
       await diagnosticWine.waitFor();
       assert.equal(await diagnosticWine.locator(".diagnostic-wine-name").innerText(), "Château A");
       assert.equal(await diagnosticWine.locator(".diagnostic-wine-metadata").innerText(), "Pauillac · Bordeaux · France");
-      assert.equal(await diagnosticWine.locator(".diagnostic-wine-tags").innerText(), "Rouge2018Bouteille");
+      assert.deepEqual(
+        (await diagnosticWine.locator(".diagnostic-wine-tags").innerText()).split("\n"),
+        ["Rouge", "2018", "Bouteille"],
+      );
       assert.equal(await diagnosticWine.locator(".diagnostic-quantity").innerText(), "2");
       assert.equal(await diagnosticWine.locator("ha-icon[icon='mdi:alert-circle']").count(), 1);
       assert.equal(await diagnosticWine.evaluate((element) => getComputedStyle(element).borderLeftColor), "rgb(150, 20, 30)");
