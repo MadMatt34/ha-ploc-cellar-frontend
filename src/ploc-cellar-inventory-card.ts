@@ -68,6 +68,9 @@ export class PlocCellarInventoryCard extends LitElement {
     .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
     .quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; font-family: var(--ploc-numeric-font-family); font-size: 1.5rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .quantity ha-icon { --mdc-icon-size: 25px; color: var(--wine-color, var(--secondary-text-color)); }
+    .quantity-column { display: grid; justify-items: end; align-content: start; gap: 5px; flex: 0 0 auto; min-width: 0; max-width: 42%; }
+    .wine-alert { display: flex; align-items: flex-start; justify-content: flex-end; gap: 4px; color: var(--error-color); font-size: .72rem; line-height: 1.25; text-align: right; overflow-wrap: anywhere; }
+    .wine-alert ha-icon { --mdc-icon-size: 15px; flex: 0 0 auto; margin-top: 1px; }
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
@@ -247,6 +250,11 @@ export class PlocCellarInventoryCard extends LitElement {
   private renderWine(wine: Wine) {
     const t = (key: TranslationKey): string =>
       translate(this.hass?.language ?? "en", key);
+    const diagnosticIssues = [
+      { key: "wine_detail_issue_unlocated" as const, count: wine.unlocated_bottles ?? 0 },
+      { key: "wine_detail_issue_negative" as const, count: wine.negative_movement_bottles ?? 0 },
+      { key: "wine_detail_issue_surplus" as const, count: wine.physical_surplus_bottles ?? 0 },
+    ].filter((issue) => issue.count > 0);
     const vintage = wine.vintage === null ? t("unknown_vintage") : String(wine.vintage);
     const color = wine.color_rgb?.every(Number.isFinite)
       ? wine.color_rgb.map((component) => Math.round(Math.min(255, Math.max(0, component))))
@@ -267,7 +275,16 @@ export class PlocCellarInventoryCard extends LitElement {
               wine.country,
             ].filter(Boolean).join(" · ")}</div>
           </div>
-          <div class="quantity"><span>${new Intl.NumberFormat(this.hass?.language ?? undefined).format(wine.bottles_in_cellar)}</span><ha-icon icon="mdi:bottle-wine" aria-hidden="true"></ha-icon></div>
+          <div class="quantity-column">
+            <div class="quantity"><span>${new Intl.NumberFormat(this.hass?.language ?? undefined).format(wine.bottles_in_cellar)}</span><ha-icon icon="mdi:bottle-wine" aria-hidden="true"></ha-icon></div>
+            ${diagnosticIssues.length ? html`
+              <div class="wine-alert" role="img"
+                aria-label=${diagnosticIssues.map((issue) => t(issue.key).replace("{count}", new Intl.NumberFormat(this.hass?.language ?? undefined).format(issue.count))).join(" · ")}>
+                <ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon>
+                <span>${diagnosticIssues.map((issue) => t(issue.key).replace("{count}", new Intl.NumberFormat(this.hass?.language ?? undefined).format(issue.count))).join(" · ")}</span>
+              </div>
+            ` : nothing}
+          </div>
         </div>
         <div class="tags">
           ${wine.color ? html`<span class="tag">${wine.color}</span>` : nothing}
