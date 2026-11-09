@@ -304,8 +304,7 @@ export class PlocCellarCard extends LitElement {
   }
 
   private openDiagnosticWine(diagnostic: WineDiagnostic): void {
-    const wine = this.inventory?.wines.find((item) => item.id === diagnostic.id)
-      ?? diagnostic.wine;
+    const wine = diagnostic.wine;
     if (!wine) return;
     this.activeDiagnostic = undefined;
     this.selectedWine = wine;
@@ -331,8 +330,7 @@ export class PlocCellarCard extends LitElement {
         <div class="diagnostic-detail-list">
           <p class="muted">${t(detailKey)}</p>
           ${wines.length ? wines.map((diagnostic) => {
-            const wine = this.inventory?.wines.find((item) => item.id === diagnostic.id)
-              ?? diagnostic.wine;
+            const wine = diagnostic.wine;
             const color = wine?.color_rgb?.every(Number.isFinite)
               ? wine.color_rgb.map((component) => Math.round(Math.min(255, Math.max(0, component))))
               : null;
@@ -509,13 +507,6 @@ export class PlocCellarCard extends LitElement {
   }
 }
 
-/**
- * Keep existing dashboards using the former statistics card type working.
- * Both card types now render the unified overview and statistics experience.
- */
-@customElement("ploc-cellar-statistics-card")
-export class PlocCellarStatisticsCard extends PlocCellarCard {}
-
 declare global {
   interface Window {
     customCards?: Array<Record<string, string>>;
@@ -523,7 +514,6 @@ declare global {
 
   interface HTMLElementTagNameMap {
     "ploc-cellar-card": PlocCellarCard;
-    "ploc-cellar-statistics-card": PlocCellarStatisticsCard;
   }
 }
 
