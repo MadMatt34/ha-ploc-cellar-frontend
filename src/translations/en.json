@@ -57,6 +57,7 @@
   "editor_configuration_helper": "Select the PLOUD connection used by this card.",
   "editor_title": "Card title",
   "editor_title_helper": "Optional. Leave empty to use the default title.",
+  "editor_default_sort": "Default sort order",
   "statistics_title": "Cellar statistics",
   "statistics_bottles": "Bottles in stock",
   "statistics_references": "wine references",
