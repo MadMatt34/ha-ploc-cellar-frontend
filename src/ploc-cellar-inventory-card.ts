@@ -105,6 +105,7 @@ export class PlocCellarInventoryCard extends LitElement {
     this.requestGeneration += 1;
     this.loading = false;
     this.config = config;
+    this.sort = config.default_sort ?? "name-asc";
     this.inventory = undefined;
     this.error = undefined;
     if (config.config_entry_id) void this.refresh();
@@ -187,7 +188,7 @@ export class PlocCellarInventoryCard extends LitElement {
     this.appellation = ALL_FILTER_VALUES;
     this.vintage = ALL_FILTER_VALUES;
     this.meal = "";
-    this.sort = "name-asc";
+    this.sort = this.config?.default_sort ?? "name-asc";
   }
 
   private mealValues(): MealTranslationKey[] {
