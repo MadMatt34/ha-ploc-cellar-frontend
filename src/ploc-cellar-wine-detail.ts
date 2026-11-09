@@ -86,7 +86,7 @@ export class PlocCellarWineDetail extends LitElement {
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
     .characteristic-value.is-error { color: var(--error-color); }
     .grapes-list { display: grid; gap: 2px; }
-    .grape-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 16px; padding: 0 0 7px 0; }
+    .grape-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 16px; }
     .grape-name { min-width: 0; overflow-wrap: anywhere; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .grape-percentage { flex: 0 0 42px; text-align: right; font-variant-numeric: tabular-nums; }
@@ -324,18 +324,18 @@ export class PlocCellarWineDetail extends LitElement {
         </div>
         ${hasMovementData ? html`
           <div class="section-subtitle"><ha-icon icon="mdi:swap-horizontal" aria-hidden="true"></ha-icon>&nbsp;${this.t("wine_detail_movements")}</div>
-          <div class="section-body">
+          <div class="section-body"><dl>
             ${this.characteristic("mdi:cart-plus", "wine_detail_purchased", wine.purchased)}
             ${this.characteristic("mdi:glass-wine", "wine_detail_consumed", wine.consumed)}
             ${this.characteristic("mdi:swap-horizontal", "wine_detail_balance", wine.movement_balance)}
             ${this.characteristic("mdi:calculator-variant", "wine_detail_calculated", wine.calculated_stock)}
-          </div>
+          </dl></div>
           <div class="section-subtitle"><ha-icon icon="mdi:alert-circle-outline" aria-hidden="true"></ha-icon>&nbsp;${this.t("wine_detail_diagnostics")}</div>
-          <div class="section-body">
-            ${this.characteristic("mdi:alert-circle-outline", "wine_detail_negative", wine.negative_movement_bottles, true)}
+          <div class="section-body"><dl>
+            ${this.characteristic("mdi:minus-circle-outline", "wine_detail_negative", wine.negative_movement_bottles, true)}
             ${this.characteristic("mdi:plus-circle-outline", "wine_detail_surplus", wine.physical_surplus_bottles, true)}
             ${this.characteristic("mdi:map-marker-question-outline", "wine_detail_unlocated", wine.unlocated_bottles, true)}
-          </div>
+          </dl></div>
         ` : nothing}
         </div>
       </details>
