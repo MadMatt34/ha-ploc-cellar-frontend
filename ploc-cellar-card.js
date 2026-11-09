@@ -2124,7 +2124,7 @@ var ht = class extends je {
 		};
 	}
 	get isOverviewCard() {
-		return this.config?.type === "custom:ploc-cellar-card" || this.config?.type === "custom:ploc-cellar-statistics-card";
+		return this.config?.type === "custom:ploc-cellar-card";
 	}
 	get isRackCard() {
 		return this.config?.type === "custom:ploc-cellar-rack-card";
@@ -2175,7 +2175,7 @@ var ht = class extends je {
 		this.isOverviewType(e.type) ? (t.show_occupancy = e.show_occupancy !== !1, t.show_diagnostics = e.show_diagnostics !== !1, t.show_statistics = e.show_statistics !== !1, t.show_statistics_legends = e.show_statistics_legends !== !1) : e.type === "custom:ploc-cellar-rack-card" && (t.rack_picker_mode = e.rack_picker_mode ?? "buttons", t.show_rack_occupancy = e.show_rack_occupancy !== !1), this.config = t;
 	}
 	isOverviewType(e) {
-		return e === "custom:ploc-cellar-card" || e === "custom:ploc-cellar-statistics-card";
+		return e === "custom:ploc-cellar-card";
 	}
 	valueChanged(e) {
 		e.stopPropagation();
@@ -19634,8 +19634,8 @@ var HO = [
 		return (this.inventory?.wine_diagnostics ?? []).filter((e) => (e[t] ?? 0) > 0).sort((e, n) => (n[t] ?? 0) - (e[t] ?? 0) || e.name.localeCompare(n.name, this.hass?.language));
 	}
 	openDiagnosticWine(e) {
-		let t = this.inventory?.wines.find((t) => t.id === e.id) ?? e.wine;
-		t && (this.activeDiagnostic = void 0, this.selectedWine = t);
+		let t = e.wine;
+		this.activeDiagnostic = void 0, this.selectedWine = t;
 	}
 	renderDiagnosticDialog() {
 		let e = this.activeDiagnostic;
@@ -19648,16 +19648,16 @@ var HO = [
         <div class="diagnostic-detail-list">
           <p class="muted">${i(n)}</p>
           ${r.length ? r.map((e) => {
-			let t = this.inventory?.wines.find((t) => t.id === e.id) ?? e.wine, n = t?.color_rgb?.every(Number.isFinite) ? t.color_rgb.map((e) => Math.round(Math.min(255, Math.max(0, e)))) : null, r = n ? `rgb(${n.join(", ")})` : "", s = e.vintage === null ? i("unknown_vintage") : String(e.vintage), c = a(e), l = N`
+			let t = e.wine, n = t.color_rgb?.every(Number.isFinite) ? t.color_rgb.map((e) => Math.round(Math.min(255, Math.max(0, e)))) : null, r = n ? `rgb(${n.join(", ")})` : "", s = e.vintage === null ? i("unknown_vintage") : String(e.vintage), c = a(e), l = N`
               <div class="diagnostic-wine-main">
                 <div class="diagnostic-wine-name">${e.name}</div>
                 <div class="diagnostic-wine-metadata">${[
-				t?.appellation,
+				t.appellation,
 				t?.region,
 				t?.country
 			].filter(Boolean).join(" · ")}</div>
                 <div class="diagnostic-wine-tags">
-                  ${t?.color ? N`<span class="diagnostic-wine-tag">${t.color}</span>` : P}
+                  ${t.color ? N`<span class="diagnostic-wine-tag">${t.color}</span>` : P}
                   <span class="diagnostic-wine-tag">${s}</span>
                   ${t?.bottle_format ? N`<span class="diagnostic-wine-tag">${t.bottle_format}</span>` : P}
                 </div>
@@ -19789,11 +19789,9 @@ var HO = [
 		};
 	}
 };
-I([Ve({ attribute: !1 })], UO.prototype, "hass", void 0), I([F()], UO.prototype, "config", void 0), I([F()], UO.prototype, "inventory", void 0), I([F()], UO.prototype, "loading", void 0), I([F()], UO.prototype, "error", void 0), I([F()], UO.prototype, "activeDiagnostic", void 0), I([F()], UO.prototype, "selectedWine", void 0), UO = I([Re("ploc-cellar-card")], UO);
-var WO = class extends UO {};
-WO = I([Re("ploc-cellar-statistics-card")], WO), window.customCards ??= [], window.customCards.push({
+I([Ve({ attribute: !1 })], UO.prototype, "hass", void 0), I([F()], UO.prototype, "config", void 0), I([F()], UO.prototype, "inventory", void 0), I([F()], UO.prototype, "loading", void 0), I([F()], UO.prototype, "error", void 0), I([F()], UO.prototype, "activeDiagnostic", void 0), I([F()], UO.prototype, "selectedWine", void 0), UO = I([Re("ploc-cellar-card")], UO), window.customCards ??= [], window.customCards.push({
 	type: "ploc-cellar-card",
 	name: Ge("picker_overview_name"),
 	description: Ge("picker_overview_description")
 });
-export { UO as PlocCellarCard, WO as PlocCellarStatisticsCard };
+export { UO as PlocCellarCard };
