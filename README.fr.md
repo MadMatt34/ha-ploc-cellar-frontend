@@ -6,6 +6,26 @@ Frontend Lovelace indépendant pour l'intégration Home Assistant [Ploc Cellar](
 
 [English version](README.md)
 
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Tableau%20de%20bord-blue)](https://www.home-assistant.io/dashboards/)
+[![HACS](https://img.shields.io/badge/HACS-Plugin%20Dashboard-blue)](https://www.hacs.xyz/)
+[![CI frontend](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml)
+[![Validation HACS](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml)
+[![Licence : MIT](https://img.shields.io/badge/Licence-MIT-green.svg)](LICENSE)
+
+## Navigation
+
+- [Cartes et fonctionnalités](#cartes-ploc-cellar)
+- [Installation](#installation)
+- [Développement et CI](#développement)
+- [Contrat backend](#contrat-backend)
+- [Caractéristiques des vins](#caractéristiques-des-vins)
+- [Photos des vins](#photos-des-vins)
+- [Typographie](#typographie-des-noms-de-vins)
+- [Dépannage](#dépannage)
+- [Désinstallation](#désinstallation)
+- [Licence et avertissement](#licence-et-avertissement)
+
+
 Ce dépôt fournit trois cartes personnalisées :
 
 - **Vue d'ensemble Ploc Cellar** (`custom:ploc-cellar-card`) : synthèse et statistiques de la cave : stock physique et reconstitué, occupation des casiers, diagnostics du stock et graphiques en anneau par couleur, région, appellation, millésime et format de bouteille. Les répartitions des graphiques concernent les références de vins connues ; les emplacements occupés dont le vin n'est pas résolu restent inclus dans les totaux physiques globaux et sont signalés séparément.
@@ -57,6 +77,10 @@ Le frontend dépend du service WebSocket Home Assistant `ploc_cellar.get_invento
 
 Le champ nullable `Wine.meals` contient les indicateurs d'accords mets-vins PLOUD sous forme de masque de bits brut. La [documentation du contrat backend](docs/CONTRAT_BACKEND.fr.md) présente la correspondance complète entre les bits et les catégories, les règles de combinaison et le traitement des indicateurs inconnus.
 
+### Actualisation automatique après synchronisation
+
+Après son initialisation, chaque carte écoute l'événement Home Assistant `ploc_cellar_sync_completed`. Elle ne s'actualise que si le champ `config_entry_id` de l'événement correspond à l'entrée sélectionnée dans cette carte. Le backend déclenche cet événement uniquement après validation et enregistrement de la synchronisation dans l'inventaire actif.
+
 ## Langues
 
 Le français et l'anglais sont pris en charge.
@@ -81,3 +105,28 @@ Les noms des vins utilisent la police Cormorant Garamond, intégrée localement 
 ## Typographie des chiffres
 
 Les valeurs de la vue d’ensemble, les nombres de bouteilles par casier et les valeurs des diagnostics utilisent la police DJB Get Digital intégrée localement. Les coordonnées des emplacements de bouteilles utilisent la typographie standard de Home Assistant. Les totaux au centre des graphiques en anneau utilisent DJB Get Digital ; les légendes et les valeurs de répartition conservent la typographie standard de l’interface. DJB Get Digital est une police propriétaire intégrée avec l’autorisation du titulaire des droits ; elle n’est pas couverte par la licence logicielle de ce dépôt.
+
+
+## Dépannage
+
+- **Le type de carte n'est pas proposé :** vérifier que le plugin Dashboard est installé dans HACS et que la ressource `ploc-cellar-card.js` est enregistrée dans Home Assistant.
+- **L'éditeur ne trouve aucune cave :** installer et configurer d'abord l'[intégration backend Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar), puis recharger l'éditeur du tableau de bord.
+- **La carte affiche une erreur ou aucun inventaire :** vérifier l'entrée de configuration sélectionnée et consulter les journaux Home Assistant pour les erreurs de `ploc_cellar`.
+- **La carte ne s'actualise pas après une synchronisation :** vérifier la compatibilité des versions backend et frontend et s'assurer que la carte utilise l'entrée qui vient d'être synchronisée. Les cartes n'effectuent aucun polling et ne nécessitent aucune actualisation manuelle.
+
+Pour signaler un problème frontend, préciser la version de Home Assistant, le navigateur, la version/le commit du dépôt frontend, le type de carte et les messages pertinents de la console du navigateur ou des journaux Home Assistant. Ne pas joindre d'identifiants ni de jetons d'accès.
+
+## Désinstallation
+
+1. Retirer des tableaux de bord les cartes Ploc Cellar qui y sont utilisées.
+2. Dans HACS, désinstaller **Ploc Cellar Cards**.
+3. Si la ressource du tableau de bord a été ajoutée manuellement, supprimer la ressource `/hacsfiles/ha-ploc-cellar-frontend/ploc-cellar-card.js` de la configuration des ressources.
+4. Redémarrer ou recharger le tableau de bord selon le besoin.
+
+L'intégration backend et son inventaire sont indépendants : la désinstallation des cartes ne supprime ni l'intégration Ploc Cellar ni ses données.
+
+## Licence et avertissement
+
+Ce projet est distribué sous [licence MIT](LICENSE).
+
+Ploc Cellar Cards est un frontend indépendant pour Home Assistant. Il n'est ni affilié à PLOC ou PLOUD, ni approuvé ou pris en charge par ces services.
