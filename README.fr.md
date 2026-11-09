@@ -17,7 +17,7 @@ Ce dépôt fournit trois cartes personnalisées :
 
 Chaque carte utilise le sélecteur natif d'entrée de configuration dans son éditeur et conserve son propre `config_entry_id`. Les cartes communiquent uniquement avec Home Assistant via le service WebSocket de réponse `ploc_cellar.get_inventory` fourni par l'intégration. Elles ne communiquent jamais directement avec PLOUD. L'intégration backend doit être installée et configurée au préalable.
 
-Les cartes récupèrent l’inventaire à leur initialisation et proposent une actualisation manuelle. Elles n’interrogent pas périodiquement les événements de synchronisation du backend : utilisez **Actualiser** après une synchronisation PLOUD si le tableau de bord est resté ouvert.
+Les cartes récupèrent l’inventaire à leur initialisation et l’actualisent automatiquement lorsque l’intégration termine une synchronisation PLOUD réussie. La notification est transmise par un événement Home Assistant associé à l’entrée de configuration sélectionnée ; aucun identifiant d’entité, polling ou rafraîchissement manuel n’est nécessaire.
 
 ## Installation
 
