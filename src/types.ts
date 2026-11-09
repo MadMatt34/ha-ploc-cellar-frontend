@@ -1,5 +1,6 @@
 export interface HomeAssistant {
   language: string;
+  states?: Record<string, { state: string }>;
   callWS<T>(message: Record<string, unknown>): Promise<T>;
   fetchWithAuth(url: string, init?: RequestInit): Promise<Response>;
 }
