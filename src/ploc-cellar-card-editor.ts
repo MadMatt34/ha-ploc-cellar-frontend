@@ -78,7 +78,6 @@ export class PlocCellarCardEditor extends LitElement {
     } else if (this.isRackCard) {
       fields.push(
         { name: "title", selector: { text: {} } },
-        { name: "show_rack_occupancy", selector: { boolean: {} } },
         {
           name: "rack_picker_mode",
           selector: {
@@ -97,6 +96,7 @@ export class PlocCellarCardEditor extends LitElement {
             },
           },
         },
+        { name: "show_rack_occupancy", selector: { boolean: {} } },
       );
     }
 
