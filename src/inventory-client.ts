@@ -54,7 +54,7 @@ export function subscribeToInventorySync(
   configEntryId: string,
   onSync: () => void,
 ): Promise<() => void> {
-  return hass.connection.subscribeEvents(
+  return hass.connection.subscribeEvents<{ config_entry_id?: string }>(
     (event) => {
       if (event.data.config_entry_id === configEntryId) onSync();
     },
