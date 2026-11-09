@@ -58,7 +58,7 @@ export class PlocCellarInventoryCard extends LitElement {
     input { box-sizing: border-box; width: 100%; }
     .toolbar { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; margin: 10px 0 0; }
     .search { grid-column: 1 / -1; }
-    .summary { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0; color: var(--secondary-text-color); font-size: .85rem; 0margin: 12px 0; text-align: right; }
+    .summary { display: flex; color: var(--secondary-text-color); font-size: .85rem; }
     .summary span + span::before { content: "·"; margin: 0 8px; }
     .wine-list { display: grid; gap: 8px; }
     .wine { display: block; width: 100%; box-sizing: border-box; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; cursor: pointer; }
@@ -71,8 +71,8 @@ export class PlocCellarInventoryCard extends LitElement {
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
-    .filters { margin: 14px 0; }
-    .filters[open] { padding: 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
+    .filters { margin: 10px 0; padding: 1px 10px 0px 10px}
+    .filters[open] { padding: 0 10px 10px 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
     .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { margin-left: auto; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
     .filters[open] > summary { color: var(--primary-text-color); padding-bottom: 8px; border-bottom: 1px solid var(--divider-color); }
     .filters > summary::-webkit-details-marker { display: none; }
