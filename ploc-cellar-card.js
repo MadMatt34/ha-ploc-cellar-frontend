@@ -1901,7 +1901,7 @@ var ht = class extends je {
     .summary { display: flex; color: var(--secondary-text-color); font-size: .85rem; }
     .summary span + span::before { content: "·"; margin: 0 8px; }
     .wine-list { display: grid; gap: 8px; }
-    .wine { position: relative; display: block; width: 100%; box-sizing: border-box; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; cursor: pointer; }
+    .wine { position: relative; display: block; width: 100%; box-sizing: border-box; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 10px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; cursor: pointer; }
     .wine:hover { background: var(--secondary-background-color); }
     .wine:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -1912,7 +1912,7 @@ var ht = class extends je {
     .wine-alert { position: absolute; right: 8px; bottom: 8px; display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--error-color); border-radius: 50%; background: var(--card-background-color, var(--ha-card-background, var(--primary-background-color))); color: var(--error-color); }
     .wine-alert ha-icon { --mdc-icon-size: 20px; }
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
     .filters { margin: 10px 0; padding: 1px 10px 0px 10px}
     .filters[open] { padding: 0 10px 10px 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
