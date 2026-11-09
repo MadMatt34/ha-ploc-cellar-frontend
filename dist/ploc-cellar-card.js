@@ -2043,9 +2043,9 @@ var mt = class extends je {
 			this.search = e.target.value;
 		}} />
           <details class="filters">
-            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span>${r ? N`<button class="filters-clear" type="button" @click=${(e) => {
+            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon>${r ? N`<button class="filters-clear" type="button" @click=${(e) => {
 			e.stopPropagation(), this.clearFilters();
-		}}>${e("clear_filters")}</button>` : P}<ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
+		}}>${e("clear_filters")}</button>` : P}</summary>
             <div class="toolbar">
               ${this.selectFilter("color", e("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", e("filter_region"), this.region, this.valuesFor("region"))}
