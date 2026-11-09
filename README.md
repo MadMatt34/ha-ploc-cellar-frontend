@@ -115,7 +115,7 @@ Cellar overview values, rack counts and diagnostic quantities use the locally bu
 - **The card displays an error or no inventory:** verify the selected configuration entry and check Home Assistant logs for errors from `ploc_cellar`.
 - **The card does not refresh after synchronization:** make sure the backend and frontend are compatible and that the card is configured for the same entry that was synchronized. The cards do not poll and do not require a manual refresh action.
 
-When reporting a frontend issue, include the Home Assistant version, browser, frontend repository version/commit, the card type and relevant browser-console or Home Assistant log messages. Do not include credentials or access tokens.
+When reporting a frontend issue, [open an issue on GitHub](https://github.com/MadMatt34/ha-ploc-cellar-frontend/issues/new) and include the Home Assistant version, browser, frontend repository version/commit, the card type and relevant browser-console or Home Assistant log messages. Do not include credentials or access tokens.
 
 ## Uninstallation
 
