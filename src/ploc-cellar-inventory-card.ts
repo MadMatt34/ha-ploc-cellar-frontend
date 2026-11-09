@@ -311,7 +311,7 @@ export class PlocCellarInventoryCard extends LitElement {
             placeholder=${t("search_placeholder")} .value=${this.search}
             @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; }} />
           <details class="filters">
-            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span>${activeFilters ? html`<button class="filters-clear" type="button" @click=${(event: Event) => { event.stopPropagation(); this.clearFilters(); }}>${t("clear_filters")}</button>` : nothing}<ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
+            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon>${activeFilters ? html`<button class="filters-clear" type="button" @click=${(event: Event) => { event.stopPropagation(); this.clearFilters(); }}>${t("clear_filters")}</button>` : nothing}</summary>
             <div class="toolbar">
               ${this.selectFilter("color", t("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", t("filter_region"), this.region, this.valuesFor("region"))}
