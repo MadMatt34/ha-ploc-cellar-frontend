@@ -24,6 +24,19 @@ The cards call the Home Assistant `call_service` WebSocket command and request a
 
 The backend service also supports optional `search` and `color` filters. The cards currently request the inventory for the selected config entry and apply their presentation/filtering behavior in the frontend.
 
+## Successful synchronization event
+
+After a PLOUD synchronization has been fully validated, persisted and committed to the coordinator, the integration fires the Home Assistant event `ploc_cellar_sync_completed`. Its event data contains:
+
+```ts
+{
+  config_entry_id: string;
+  last_sync: string;
+}
+```
+
+The frontend subscribes to this event through the active Home Assistant WebSocket connection and refreshes only cards whose configured `config_entry_id` matches the event. The event is not fired for failed or uncommitted synchronizations. The frontend does not depend on the generated entity ID of the diagnostic last-sync sensor and does not poll.
+
 ## Response
 
 The response shape is represented by `InventoryResponse`, `Rack`, `RackItem`, `Wine` and `WineDiagnostic` in `src/types.ts`.
