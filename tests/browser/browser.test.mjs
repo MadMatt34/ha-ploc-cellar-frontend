@@ -319,6 +319,7 @@ describe("Ploc Cellar browser interactions", () => {
           unlocated_bottles: 2,
           negative_movement_bottles: 1,
           physical_surplus_bottles: 0,
+          wine: window.__plocFixture.inventory.wines[0],
         }];
       });
       const mainCard = page.locator("ploc-cellar-card");
