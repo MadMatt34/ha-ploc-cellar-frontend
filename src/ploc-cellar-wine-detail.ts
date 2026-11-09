@@ -85,9 +85,9 @@ export class PlocCellarWineDetail extends LitElement {
     .characteristic-label { color: var(--secondary-text-color); font-size: .9rem; }
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
     .characteristic-value.is-error { color: var(--error-color); }
-    .grapes-list { display: grid; gap: 2px; }
-    .grape-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(90px, 1fr); align-items: center; gap: 16px; }
-    .grape-name { min-width: 0; overflow-wrap: anywhere; }
+    .grapes-list { display: grid; gap: 2px; margin: 0 20% 0 10%; }
+    .grape-row { display: grid; grid-template-columns: minmax(0px, 1fr) minmax(90px, 2fr); align-items: center; gap: 16px; }
+    .grape-name { min-width: 0; overflow-wrap: anywhere; text-align: end; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .grape-percentage { flex: 0 0 42px; text-align: right; font-variant-numeric: tabular-nums; }
     .grape-track { display: block; flex: 1 1 0; width: 100%; min-width: 0; height: 7px; overflow: hidden; border-radius: 999px; background: var(--divider-color); }
@@ -200,7 +200,6 @@ export class PlocCellarWineDetail extends LitElement {
     if (!grapes.length) return nothing;
     return html`
       <div class="characteristic">
-        <ha-icon icon="mdi:grape" aria-hidden="true"></ha-icon>
         <div class="characteristic-value">
           <div class="grapes-list" style=${this.grapeAccentStyle}>
             ${grapes.map((grape) => html`
