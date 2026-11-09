@@ -51,9 +51,9 @@ The production bundle is generated at `dist/ploc-cellar-card.js`, then copied to
 
 ## Backend contract
 
-See the [backend contract](docs/BACKEND_CONTRACT.md) for the WebSocket request, response fields, inventory semantics and compatibility rules.
+See the [backend contract](docs/BACKEND_CONTRACT.md) for the WebSocket request, response fields, inventory semantics and contract rules.
 
-The frontend depends on the `ploc_cellar.get_inventory` Home Assistant WebSocket response service exposed by the integration. The service contract and inventory model are maintained in the [backend repository](https://github.com/MadMatt34/ha-ploc-cellar). Changes to the backend response must remain compatible with the TypeScript interfaces in `src/types.ts`.
+The frontend depends on the `ploc_cellar.get_inventory` Home Assistant WebSocket response service exposed by the integration. The service contract and inventory model are maintained in the [backend repository](https://github.com/MadMatt34/ha-ploc-cellar). Changes to the backend response must conform to the TypeScript interfaces in `src/types.ts`.
 
 The nullable `Wine.meals` field contains PLOUD food-pairing flags as a raw bitmask. The complete flag-to-category mapping, bitwise combination rules and handling of unknown flags are documented in the [backend contract](docs/BACKEND_CONTRACT.md).
 
