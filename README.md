@@ -13,7 +13,7 @@ This repository contains three custom cards:
 - **Ploc Cellar rack** (`custom:ploc-cellar-rack-card`): rack selector and a position map based on the actual PLOUD row/column coordinates. Occupied positions are represented individually and use the wine color when available.
   The editor lets you hide the rack occupancy bar; it is shown by default and matches the width of the position map.
 
-The former **Ploc Cellar Statistics** card type remains registered as a compatibility alias: existing dashboards using `custom:ploc-cellar-statistics-card` continue to display the unified overview. New dashboards should use `custom:ploc-cellar-card`.
+ 
 
 Each card uses the native configuration-entry selector in its editor and stores its own `config_entry_id`. The cards communicate only with Home Assistant through the integration's `ploc_cellar.get_inventory` WebSocket response service. They do not connect to PLOUD directly. The backend integration must be installed and configured before the cards can display data.
 
@@ -32,13 +32,7 @@ The cards request the inventory when they are initialized and expose a manual re
    ```
 5. Add one of the three cards from the dashboard card picker and select the Ploc Cellar configuration entry in its editor.
 
-The existing card types and their configuration keys are retained. Existing card configurations do not need to be recreated when migrating from the integration-served resource.
-
-### Migrating from the integration-served resource
-
-If you previously added `/ploc_cellar_static/ploc-cellar-card.js` manually, install this HACS Dashboard package first, then replace the old Lovelace resource with the one installed by HACS. Do not load both JavaScript modules at the same time: they register the same custom card types.
-
-In a **Sections** view, the overview card uses a default width of 12 columns without forcing a row height. You can enable **Fit height to content** in the **Layout** tab if you want its height to follow its content.
+ In a **Sections** view, the overview card uses a default width of 12 columns without forcing a row height. You can enable **Fit height to content** in the **Layout** tab if you want its height to follow its content.
 
 ## Development
 
@@ -61,7 +55,7 @@ See the [backend contract](docs/BACKEND_CONTRACT.md) for the WebSocket request, 
 
 The frontend depends on the `ploc_cellar.get_inventory` Home Assistant WebSocket response service exposed by the integration. The service contract and inventory model are maintained in the [backend repository](https://github.com/MadMatt34/ha-ploc-cellar). Changes to the backend response must remain compatible with the TypeScript interfaces in `src/types.ts`.
 
-The optional `Wine.meals` field contains PLOUD food-pairing flags as a raw bitmask. The complete flag-to-category mapping, bitwise combination rules and handling of unknown flags are documented in the [backend contract](docs/BACKEND_CONTRACT.md).
+The nullable `Wine.meals` field contains PLOUD food-pairing flags as a raw bitmask. The complete flag-to-category mapping, bitwise combination rules and handling of unknown flags are documented in the [backend contract](docs/BACKEND_CONTRACT.md).
 
 ## Languages
 
@@ -73,11 +67,11 @@ The wine detail dialog uses independently collapsible sections for stock, food p
 
 ## Wine photos
 
-The wine detail dialog displays the cached PLOUD wine image when the backend provides a non-null `image_url`. The backend selects the primary image first and falls back to the cover image when the primary image is unavailable locally.
+The wine detail dialog displays the cached PLOUD wine image when `image_url` is non-null. The backend selects the primary image first and falls back to the cover image when the primary image is unavailable locally.
 
 Images are served by an authenticated Home Assistant endpoint. The card retrieves them with `hass.fetchWithAuth()`; it does not contact PLOUD directly and does not store PLOUD credentials. The returned blob is displayed through a browser object URL. Object URLs are revoked when replaced or when the dialog element is disconnected. If the backend changes `image_url` (including its version query when the same PLOUD document is updated), the card fetches the new image and releases the previous object URL.
 
-The field is optional for compatibility with older backend responses. When it is absent or null, the wine dialog remains usable and simply displays no photo.
+The `image_url` field is nullable. When it is null, the wine dialog remains usable and simply displays no photo.
 
 ## Wine-name typography
 
