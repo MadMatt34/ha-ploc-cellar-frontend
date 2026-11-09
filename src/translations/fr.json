@@ -57,6 +57,7 @@
   "editor_configuration_helper": "Sélectionnez la connexion PLOUD utilisée par cette carte.",
   "editor_title": "Titre de la carte",
   "editor_title_helper": "Facultatif. Laissez vide pour utiliser le titre par défaut.",
+  "editor_default_sort": "Tri par défaut",
   "statistics_title": "Statistiques de la cave",
   "statistics_bottles": "Bouteilles en stock",
   "statistics_references": "références de vin",
