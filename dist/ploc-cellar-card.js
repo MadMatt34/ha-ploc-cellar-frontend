@@ -19539,7 +19539,7 @@ var HO = [
     .diagnostic.has-issues .diagnostic-icon { color: var(--error-color); }
     .diagnostic-value { display: block; color: var(--primary-text-color); font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
     .diagnostic.has-issues .diagnostic-value { color: var(--error-color); }
-    .diagnostic-hint { display: block; align-self: flex-end; margin-top: auto; padding-top: 8px; color: var(--secondary-text-color); font-size: .75rem; text-align: right; }
+    .diagnostic-hint { display: block; align-self: flex-end; margin-top: auto; color: var(--secondary-text-color); font-size: .75rem; text-align: right; }
     .diagnostic-detail-list { display: grid; gap: 8px; max-height: min(60vh, 520px); overflow: auto; }
     .diagnostic-wine { display: flex; width: 100%; box-sizing: border-box; align-items: stretch; justify-content: space-between; gap: 12px; border: 1px solid var(--divider-color); border-left: 6px solid var(--wine-color, var(--divider-color)); border-radius: 10px; padding: 12px; min-width: 0; background: var(--card-background-color, var(--ha-card-background)); color: var(--primary-text-color); font: inherit; text-align: left; }
     button.diagnostic-wine { cursor: pointer; }
