@@ -20,10 +20,7 @@ export class PlocCellarCardEditor extends LitElement {
   @state() private config?: PlocCellarCardConfig;
 
   private get isOverviewCard(): boolean {
-    return (
-      this.config?.type === "custom:ploc-cellar-card" ||
-      this.config?.type === "custom:ploc-cellar-statistics-card"
-    );
+    return this.config?.type === "custom:ploc-cellar-card";
   }
 
   private get isRackCard(): boolean {
@@ -98,10 +95,7 @@ export class PlocCellarCardEditor extends LitElement {
   }
 
   private isOverviewType(type: string): boolean {
-    return (
-      type === "custom:ploc-cellar-card" ||
-      type === "custom:ploc-cellar-statistics-card"
-    );
+    return type === "custom:ploc-cellar-card";
   }
 
   private computeLabel = (schema: { name: string }): string => {
