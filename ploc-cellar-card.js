@@ -1243,6 +1243,7 @@ var it = class extends je {
 		let t = et(e);
 		return t.length ? N`
       <div class="characteristic">
+        <ha-icon icon="mdi:fruit-grapes" aria-hidden="true"></ha-icon>
         <div class="characteristic-value">
           <div class="grapes-list" style=${this.grapeAccentStyle}>
             ${t.map((e) => N`
