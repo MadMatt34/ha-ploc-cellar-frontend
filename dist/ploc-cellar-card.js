@@ -2261,9 +2261,6 @@ var gt = class extends je {
 			name: "title",
 			selector: { text: {} }
 		}, {
-			name: "show_rack_occupancy",
-			selector: { boolean: {} }
-		}, {
 			name: "rack_picker_mode",
 			selector: { select: {
 				mode: "dropdown",
@@ -2275,6 +2272,9 @@ var gt = class extends je {
 					value: "dropdown"
 				}]
 			} }
+		}, {
+			name: "show_rack_occupancy",
+			selector: { boolean: {} }
 		}), e;
 	}
 	setConfig(e) {
