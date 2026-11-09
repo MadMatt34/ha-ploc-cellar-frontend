@@ -129,7 +129,7 @@ export class PlocCellarCardEditor extends LitElement {
     const labels: Record<EditorField, TranslationKey> = {
       config_entry_id: "editor_configuration",
       title: "editor_title",
-      default_sort: "sort_by",
+      default_sort: "editor_default_sort",
       rack_picker_mode: "editor_rack_picker_mode",
       show_rack_occupancy: "editor_show_rack_occupancy",
       show_occupancy: "editor_show_occupancy",
