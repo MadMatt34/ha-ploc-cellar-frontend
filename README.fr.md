@@ -12,7 +12,7 @@ Frontend Lovelace indépendant pour l'intégration Home Assistant [Ploc Cellar](
 [![Validation HACS](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml)
 [![Licence : MIT](https://img.shields.io/badge/Licence-MIT-green.svg)](LICENSE)
 
-## Navigation
+## 📚 Navigation
 
 - [Cartes et fonctionnalités](#cartes-ploc-cellar)
 - [Installation](#installation)
@@ -39,7 +39,7 @@ Chaque carte utilise le sélecteur natif d'entrée de configuration dans son éd
 
 Les cartes récupèrent l’inventaire à leur initialisation et l’actualisent automatiquement lorsque l’intégration termine une synchronisation PLOUD réussie. La notification est transmise par un événement Home Assistant associé à l’entrée de configuration sélectionnée ; aucun identifiant d’entité, polling ou rafraîchissement manuel n’est nécessaire.
 
-## Installation
+## 🧩 Installation
 
 1. Installez et configurez l'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar).
 2. Dans HACS, ouvrez **Dépôts personnalisés**, ajoutez `MadMatt34/ha-ploc-cellar-frontend` et sélectionnez la catégorie **Dashboard**. Cette étape manuelle est nécessaire tant que le dépôt ne figure pas dans le catalogue HACS par défaut.
@@ -54,7 +54,7 @@ Les cartes récupèrent l’inventaire à leur initialisation et l’actualisent
 
  Dans une vue **Sections**, la carte de vue d'ensemble utilise par défaut une largeur de 12 colonnes sans imposer de hauteur de ligne. Vous pouvez activer **Adapter la hauteur au contenu** dans l'onglet **Disposition** si vous souhaitez que sa hauteur suive son contenu.
 
-## Développement
+## 🧑‍💻 Développement
 
 Node.js `^20.19.0` ou `>=22.12.0` est requis (versions prises en charge par Vite 8). Les tests d'interaction navigateur utilisent Playwright 1.65.0, version verrouillée, et Chromium.
 
@@ -69,7 +69,7 @@ npm run build
 
 Le bundle de production est généré dans `dist/ploc-cellar-card.js`, puis copié à la racine sous `ploc-cellar-card.js`, nom attendu par HACS (`hacs.json`). Les deux fichiers sont versionnés. Les dépendances sont intégrées au module JavaScript autonome. Le workflow CI du frontend exécute la vérification TypeScript stricte, les tests unitaires et la compilation de production lors des push et des pull requests. Un job Chromium distinct exécute les tests d'interaction navigateur à chaque push et pull request ; la publication des bundles sur `main` attend la réussite des deux jobs.
 
-## Contrat backend
+## 🔗 Contrat backend
 
 Consultez le [contrat backend](docs/CONTRAT_BACKEND.fr.md) pour la requête WebSocket, les champs de réponse, la sémantique de l'inventaire et les règles du contrat.
 
@@ -77,19 +77,19 @@ Le frontend dépend du service WebSocket Home Assistant `ploc_cellar.get_invento
 
 Le champ nullable `Wine.meals` contient les indicateurs d'accords mets-vins PLOUD sous forme de masque de bits brut. La [documentation du contrat backend](docs/CONTRAT_BACKEND.fr.md) présente la correspondance complète entre les bits et les catégories, les règles de combinaison et le traitement des indicateurs inconnus.
 
-### Actualisation automatique après synchronisation
+### 🔄 Actualisation automatique après synchronisation
 
 Après son initialisation, chaque carte écoute l'événement Home Assistant `ploc_cellar_sync_completed`. Elle ne s'actualise que si le champ `config_entry_id` de l'événement correspond à l'entrée sélectionnée dans cette carte. Le backend déclenche cet événement uniquement après validation et enregistrement de la synchronisation dans l'inventaire actif.
 
-## Langues
+## 🌐 Langues
 
 Le français et l'anglais sont pris en charge.
 
-## Caractéristiques des vins
+## 🍷 Caractéristiques des vins
 
 La modale de détail utilise des sections repliables indépendantes pour le stock, les accords mets-vins, les caractéristiques, les emplacements et les notes. Les emplacements sont regroupés dans une seule tuile par casier ; la partie connue d’une coordonnée reste affichée même si la ligne ou la colonne est absente. Les mouvements de stock disposent de leur propre sous-section repliable. Les caractéristiques sont regroupées entre origine/identification et dégustation/composition, sous forme de lignes associant une icône, un libellé et sa valeur. Les cépages sont regroupés dans un encart dédié ; les pourcentages placés avant ou après le nom du cépage sont représentés par des barres proportionnelles, teintées selon la couleur du vin. Lorsqu'un cépage ne comporte pas de pourcentage explicite, il est considéré à 100 % et représenté par une barre pleine. Les pourcentages explicites invalides restent non déterminés.
 
-## Photos des vins
+## 🖼️ Photos des vins
 
 La fenêtre de détail d'un vin affiche la photo PLOUD mise en cache lorsque le champ `image_url` est non nul. Le backend privilégie l'image principale et utilise l'image de couverture si l'image principale n'est pas disponible localement.
 
@@ -97,17 +97,17 @@ Les images sont servies par une route Home Assistant authentifiée. La carte les
 
 Le champ `image_url` est nullable. Lorsqu'il vaut `null`, la fenêtre de détail reste utilisable et n'affiche simplement aucune photo.
 
-## Typographie des noms de vins
+## 🔤 Typographie des noms de vins
 
 Les noms des vins utilisent la police Cormorant Garamond, intégrée localement (licence SIL Open Font License), dans les lignes d'inventaire, les liens de vins des diagnostics et le titre de la fiche détaillée. Les libellés des emplacements de cave et les infobulles utilisent la typographie standard de Home Assistant. Les autres textes conservent la typographie habituelle de Home Assistant. La police est intégrée à la carte : aucun service de polices externe ni accès réseau n'est nécessaire à l'exécution.
 
 
-## Typographie des chiffres
+## 🔢 Typographie des chiffres
 
 Les valeurs de la vue d’ensemble, les nombres de bouteilles par casier et les valeurs des diagnostics utilisent la police DJB Get Digital intégrée localement. Les coordonnées des emplacements de bouteilles utilisent la typographie standard de Home Assistant. Les totaux au centre des graphiques en anneau utilisent DJB Get Digital ; les légendes et les valeurs de répartition conservent la typographie standard de l’interface. DJB Get Digital est une police propriétaire intégrée avec l’autorisation du titulaire des droits ; elle n’est pas couverte par la licence logicielle de ce dépôt.
 
 
-## Dépannage
+## 🛠️ Dépannage
 
 - **Le type de carte n'est pas proposé :** vérifier que le plugin Dashboard est installé dans HACS et que la ressource `ploc-cellar-card.js` est enregistrée dans Home Assistant.
 - **L'éditeur ne trouve aucune cave :** installer et configurer d'abord l'[intégration backend Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar), puis recharger l'éditeur du tableau de bord.
@@ -116,7 +116,7 @@ Les valeurs de la vue d’ensemble, les nombres de bouteilles par casier et les 
 
 Pour signaler un problème frontend, [ouvrir un ticket sur GitHub](https://github.com/MadMatt34/ha-ploc-cellar-frontend/issues/new) en précisant la version de Home Assistant, le navigateur, la version/le commit du dépôt frontend, le type de carte et les messages pertinents de la console du navigateur ou des journaux Home Assistant. Ne pas joindre d'identifiants ni de jetons d'accès.
 
-## Désinstallation
+## 🗑️ Désinstallation
 
 1. Retirer des tableaux de bord les cartes Ploc Cellar qui y sont utilisées.
 2. Dans HACS, désinstaller **Ploc Cellar Cards**.
@@ -125,7 +125,7 @@ Pour signaler un problème frontend, [ouvrir un ticket sur GitHub](https://githu
 
 L'intégration backend et son inventaire sont indépendants : la désinstallation des cartes ne supprime ni l'intégration Ploc Cellar ni ses données.
 
-## Licence et avertissement
+## ⚖️ Licence et avertissement
 
 Ce projet est distribué sous [licence MIT](LICENSE).
 
