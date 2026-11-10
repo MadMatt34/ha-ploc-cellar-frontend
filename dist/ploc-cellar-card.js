@@ -632,7 +632,7 @@ var He = {
 	unknown_wine: "Unknown wine",
 	empty_position: "Empty position",
 	row: "Row",
-	column: "Column",
+	column: "Col",
 	no_coordinates: "No row/column coordinates are available for this rack.",
 	positions_without_coordinates: "Positions without coordinates",
 	not_mapped: "Not mapped",
@@ -796,8 +796,8 @@ var He = {
 	free: "libres",
 	unknown_wine: "Vin inconnu",
 	empty_position: "Emplacement libre",
-	row: "Rangée",
-	column: "Colonne",
+	row: "Rang",
+	column: "Col",
 	no_coordinates: "Aucune coordonnée de rangée/colonne disponible pour ce casier.",
 	positions_without_coordinates: "Emplacements sans coordonnées",
 	not_mapped: "Non renseigné",
@@ -1164,7 +1164,7 @@ var it = class extends je {
     .characteristic-label { color: var(--secondary-text-color); font-size: .9rem; }
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
     .characteristic-value.is-error { color: var(--error-color); }
-    .grapes-list { display: grid; gap: 2px; margin: 0 20% 0 0; }
+    .grapes-list { display: grid; gap: 2px; margin: 0 8% 0 0; }
     .grape-row { display: grid; grid-template-columns: minmax(0px, 1fr) minmax(90px, 2fr); align-items: center; gap: 16px; }
     .grape-name { min-width: 0; overflow-wrap: anywhere; text-align: end; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -1410,7 +1410,7 @@ var it = class extends je {
 			let r = this.isSelectedLocation(e.rackId, t, n);
 			return N`<span class="location-coordinate ${r ? "selected" : ""}">
                               ${r ? N`<ha-icon icon="mdi:target" aria-hidden="true"></ha-icon>` : P}
-                              ${this.t("row")} ${t + 1}, ${this.t("column")} ${n + 1}
+                              ${this.t("row")} ${t + 1}&nbsp;·&nbsp;${this.t("column")} ${n + 1}
                             </span>`;
 		})}
                     </div>
