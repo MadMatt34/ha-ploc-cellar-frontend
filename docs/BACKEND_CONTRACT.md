@@ -34,8 +34,15 @@ After a PLOUD synchronization has been fully validated, persisted and committed 
   last_sync: string;
   trigger: "recurring" | "forced_incremental" | "forced_full";
   sync_type: "full" | "incremental";
-  changes: Record<string, { added: string[]; updated: string[]; deleted: string[] }>;
-  change_counts: Record<string, { added: number; updated: number; deleted: number }>;
+  changes: {
+    wines: { added: string[]; updated: string[]; deleted: string[] };
+    racks: { added: string[]; updated: string[]; deleted: string[] };
+    rack_items: { added: string[]; updated: string[]; deleted: string[] };
+    orders: { added: string[]; updated: string[]; deleted: string[] };
+  };
+  change_counts: {
+    [collection: string]: { added: number; updated: number; deleted: number };
+  };
 }
 ```
 
