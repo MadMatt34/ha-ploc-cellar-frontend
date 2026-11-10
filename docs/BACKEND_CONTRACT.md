@@ -129,7 +129,7 @@ The `8192` flag is confirmed by the PLOUD application as the spicy-food pairing 
 
 The `Wine` response always includes the field `image_url: string | null`.
 
-- A non-null value is a local Home Assistant endpoint for the cached primary wine image, or the cached cover image when the primary image is unavailable.
+- A non-null value is a local Home Assistant endpoint for the cached primary wine image, or the cached cover image when the primary image is unavailable. Image-cache downloads are best-effort and have a 10-second total budget per synchronization; a slow batch cannot delay publication of the already committed inventory. Images not downloaded within that budget are retried during a later synchronization.
 - The endpoint requires Home Assistant authentication. Consumers must fetch it with `hass.fetchWithAuth(image_url)`; assigning the endpoint directly to an unauthenticated remote image request is not supported.
 - The URL may include a version query component. A changed URL signals that the cached document version changed and the image should be fetched again, even if the PLOUD document identifier did not change.
 - The field is `null` when an image is unavailable for a wine, when its document has not yet been downloaded, or when the wine has no image reference. The wine detail view remains usable without an image.
