@@ -3,7 +3,7 @@ name: Frontend CI
 
 on:
   push:
-    branches: [main, chore/ubuntu-26-04-ci-compatibility]
+    branches: [main, chore/ubuntu-26-04-ci-compatibility, fix/audit-p2-consistency]
   pull_request:
   workflow_dispatch:
 
