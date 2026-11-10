@@ -39,6 +39,8 @@ Après validation complète, persistance et validation du nouvel état par le co
 }
 ```
 
+`trigger` indique l'action à l'origine de la synchronisation. `sync_type` distingue un instantané complet d'un delta incrémental. `changes` liste les identifiants effectivement ajoutés, modifiés ou supprimés dans chaque collection de la cave ; `change_counts` fournit les totaux correspondants. Les cartes utilisent actuellement uniquement `config_entry_id` et ignorent les autres champs. `last_sync` est informatif et n'est pas utilisé comme curseur de polling.
+
 Le frontend s'abonne à cet événement via la connexion WebSocket Home Assistant active et actualise uniquement les cartes dont le `config_entry_id` configuré correspond à celui de l'événement. L'événement n'est pas déclenché lorsqu'une synchronisation échoue ou n'est pas validée. Le frontend ne dépend pas de l'identifiant généré de l'entité de diagnostic de dernière synchronisation et n'effectue aucun polling.
 
 ## Réponse
