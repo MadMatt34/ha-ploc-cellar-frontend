@@ -16,7 +16,7 @@ test("English and French backend contracts document the same critical inventory 
 
   for (const field of ["stale", "last_sync", "stocked_wines", "wine_references"]) {
     assert.ok(english.includes(`\`${field}\``), `English contract is missing ${field}`);
-    assert.ok(french.includes(`\`${field}\`\`), `French contract is missing ${field}`);
+    assert.ok(french.includes(`\`${field}\``), `French contract is missing ${field}`);
   }
 });
 
@@ -28,7 +28,7 @@ test("both frontend READMEs link the compatibility and release policy", async ()
   ]);
 
   assert.ok(english.includes("docs/COMPATIBILITY_AND_RELEASES.md"));
-  assert.ok(french.includes("docs/COMPATIBILITY_AND_RELEASES.md"));
+    assert.ok(french.includes(`\`${field}\``), `French contract is missing ${field}`);
   assert.ok(policy.includes("| 0.8.0 development baseline | 0.1.0 development baseline |"));
   assert.ok(policy.includes("not a claim that corresponding GitHub Releases have been published"));
 });
