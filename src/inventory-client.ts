@@ -92,6 +92,11 @@ export class InventorySyncSubscription {
       }
     }).catch((error: unknown) => {
       console.error("Unable to subscribe to Ploc Cellar synchronization events", error);
+      if (generation === this.generation) {
+        // Permit the next hass/config update to retry the failed subscription.
+        this.connection = undefined;
+        this.configEntryId = undefined;
+      }
     });
   }
 
