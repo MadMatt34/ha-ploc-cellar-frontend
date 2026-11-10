@@ -86,7 +86,7 @@ export class PlocCellarWineDetail extends LitElement {
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
     .characteristic-value.is-error { color: var(--error-color); }
     .grapes-list { display: grid; gap: 2px; margin: 0 8% 0 0; }
-    .grape-row { display: grid; grid-template-columns: minmax(0px, 1fr) minmax(90px, 2fr); align-items: center; gap: 16px; }
+    .grape-row { display: grid; grid-template-columns: minmax(0px, 1fr) minmax(90px, 2fr); align-items: center; gap: 8px; }
     .grape-name { min-width: 0; overflow-wrap: anywhere; text-align: end; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .grape-percentage { flex: 0 0 42px; text-align: right; font-variant-numeric: tabular-nums; }
