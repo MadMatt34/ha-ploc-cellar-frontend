@@ -37,6 +37,7 @@ export class PlocCellarInventoryCard extends LitElement {
   @state() private vintage: InventoryFilterSelection = ALL_FILTER_VALUES;
   @state() private meal: MealTranslationKey | "" = "";
   @state() private sort: SortMode = "name-asc";
+  @state() private currentPage = 1;
   @state() private selectedWine?: Wine;
   private requestGeneration = 0;
   private refreshPending = false;
@@ -90,6 +91,10 @@ export class PlocCellarInventoryCard extends LitElement {
     .sort-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .sort-row > span { flex: 0 0 auto; color: var(--secondary-text-color); font-size: .9rem; }
     .sort-row select { flex: 1; width: 100%; }
+    .pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 12px; color: var(--secondary-text-color); font-size: .85rem; }
+    .pagination-controls { display: flex; align-items: center; gap: 8px; }
+    .pagination-controls button { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; min-height: 36px; }
+    .pagination-controls ha-icon { --mdc-icon-size: 20px; }
     .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
     .error { color: var(--error-color); padding: 8px 0; }
@@ -113,11 +118,20 @@ export class PlocCellarInventoryCard extends LitElement {
     this.requestGeneration += 1;
     this.loading = false;
     this.refreshPending = false;
+    const pageSizeChanged = this.config?.page_size !== config.page_size;
+    const configEntryChanged = this.config?.config_entry_id !== config.config_entry_id;
     this.config = config;
     this.sort = config.default_sort ?? "name-asc";
+    if (pageSizeChanged || configEntryChanged) this.currentPage = 1;
     this.inventory = undefined;
     this.error = undefined;
     if (config.config_entry_id) void this.refresh();
+  }
+
+  private get pageSize(): number {
+    const configured = this.config?.page_size ?? 40;
+    if (!Number.isFinite(configured)) return 40;
+    return Math.min(200, Math.max(10, Math.round(configured / 10) * 10));
   }
 
   connectedCallback(): void {
@@ -255,6 +269,7 @@ export class PlocCellarInventoryCard extends LitElement {
     this.vintage = ALL_FILTER_VALUES;
     this.meal = "";
     this.sort = this.config?.default_sort ?? "name-asc";
+    this.currentPage = 1;
   }
 
   private mealValues(): MealTranslationKey[] {
@@ -277,6 +292,7 @@ export class PlocCellarInventoryCard extends LitElement {
       <select aria-label=${t("filter_meal")} .value=${this.meal}
         @change=${(event: Event) => {
           this.meal = (event.target as HTMLSelectElement).value as MealTranslationKey | "";
+          this.currentPage = 1;
         }}>
         <option value="" ?selected=${!this.meal}>${t("filter_meal")}</option>
         ${this.mealValues().map((key) => html`<option value=${key} ?selected=${key === this.meal}>${t(key)}</option>`)}
@@ -302,6 +318,7 @@ export class PlocCellarInventoryCard extends LitElement {
           else if (key === "region") this.region = nextSelection;
           else if (key === "appellation") this.appellation = nextSelection;
           else this.vintage = nextSelection;
+          this.currentPage = 1;
         }}>
         <option value="all" ?selected=${selection.kind === "all"}>${label}</option>
         <option value="unknown" ?selected=${selection.kind === "unknown"}>${translate(this.hass?.language ?? "en", "filter_unknown")}</option>
@@ -363,6 +380,11 @@ export class PlocCellarInventoryCard extends LitElement {
       translate(this.hass?.language ?? "en", key);
     const wines = this.filteredWines;
     const total = wines.reduce((sum, wine) => sum + wine.bottles_in_cellar, 0);
+    const pageSize = this.pageSize;
+    const pageCount = Math.max(1, Math.ceil(wines.length / pageSize));
+    const page = Math.min(this.currentPage, pageCount);
+    const pageOffset = (page - 1) * pageSize;
+    const pageWines = wines.slice(pageOffset, pageOffset + pageSize);
     const activeFilters = Boolean(
       this.search
       || this.color.kind !== "all"
@@ -386,7 +408,7 @@ export class PlocCellarInventoryCard extends LitElement {
         ${this.inventory ? html`
           <input class="search" type="search" aria-label=${t("search_wine")}
             placeholder=${t("search_placeholder")} .value=${this.search}
-            @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; }} />
+            @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; this.currentPage = 1; }} />
           <details class="filters">
             <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon>${activeFilters ? html`<button class="filters-clear" type="button" @click=${(event: Event) => { event.stopPropagation(); this.clearFilters(); }}>${t("clear_filters")}</button>` : nothing}</summary>
             <div class="toolbar">
@@ -399,7 +421,7 @@ export class PlocCellarInventoryCard extends LitElement {
             <label class="sort-row">
               <span>${t("sort_by")}</span>
               <select aria-label=${t("sort_by")} .value=${this.sort}
-                @change=${(event: Event) => { this.sort = (event.target as HTMLSelectElement).value as SortMode; }}>
+                @change=${(event: Event) => { this.sort = (event.target as HTMLSelectElement).value as SortMode; this.currentPage = 1; }}>
                 <option value="name-asc">${t("sort_name_asc")}</option>
                 <option value="name-desc">${t("sort_name_desc")}</option>
                 <option value="bottles-asc">${t("sort_bottles_asc")}</option>
