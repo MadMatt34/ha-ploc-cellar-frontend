@@ -37,6 +37,8 @@ jobs:
         run: npm test
       - name: Build standalone dashboard module
         run: npm run build
+      - name: Enforce production bundle size budget
+        run: npm run check:bundle-size
       - name: Prepare HACS distributable
         run: cp dist/ploc-cellar-card.js ploc-cellar-card.js
       - name: Verify distributables exist
