@@ -117,6 +117,10 @@ export class PlocCellarCard extends LitElement {
     .warning { color: var(--warning-color); padding: 8px 0; }
     .sync-status { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
     .sync-warning { color: var(--warning-color); font-size: .85rem; }
+    .loading { display: flex; align-items: center; gap: 8px; color: var(--secondary-text-color); padding: 8px 0; }
+    .loading::before { content: ""; width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid var(--divider-color); border-top-color: var(--primary-color); border-radius: 50%; animation: ploc-cellar-loading 0.8s linear infinite; }
+    @keyframes ploc-cellar-loading { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .loading::before { animation: none; } }
     .error { color: var(--error-color); padding: 8px 0; }
     @media (max-width: 420px) {
       ha-card { padding: 12px; }
@@ -459,10 +463,11 @@ export class PlocCellarCard extends LitElement {
       : t("physical_wine_references");
 
     return html`
-      <ha-card>
+      <ha-card aria-busy=${this.loading ? "true" : "false"}>
         <header>
           <h2>${title}</h2>
         </header>
+        ${this.loading ? html`<div class="loading" role="status" aria-live="polite">${t("loading")}</div>` : nothing}
         ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
         ${!this.config?.config_entry_id
           ? html`<div class="muted">${t("select_config")}</div>`
