@@ -19,6 +19,7 @@ export interface PlocCellarCardConfig {
   config_entry_id?: string;
   title?: string;
   default_sort?: "name-asc" | "name-desc" | "bottles-asc" | "bottles-desc" | "vintage-asc" | "vintage-desc";
+  page_size?: number;
   rack_picker_mode?: "buttons" | "dropdown";
   show_rack_occupancy?: boolean;
   show_occupancy?: boolean;
