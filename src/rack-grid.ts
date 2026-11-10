@@ -62,7 +62,9 @@ export function buildRackGridLayout(
       item.column >= 0,
   );
   const coordinatesAreUnique =
-    new Set(items.map((item) => String(item.row) + ":" + String(item.column))).size === items.length;
+    new Set(
+      items.map((item) => String(item.row) + ":" + String(item.column)),
+    ).size === items.length;
   const isBounded =
     coordinatesAreValid &&
     coordinatesAreUnique &&
