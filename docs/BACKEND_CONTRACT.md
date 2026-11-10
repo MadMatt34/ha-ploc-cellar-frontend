@@ -52,8 +52,8 @@ Top-level response fields:
 | `stock_reconstruction_complete` | Whether a complete Orders snapshot is available for stock reconstruction. |
 | `total_bottles` | Number of physically occupied rack positions. |
 | `total_stock_bottles` | Reconstructed total stock; `null` until reconstruction is complete. |
-| `stocked_wines` | Number of known wine references represented in the inventory. |
-| `wine_references` | Number of wine references, or `null` when unavailable. |
+| `stocked_wines` | Number of wine references with at least one bottle physically assigned to a rack position. This count remains available before stock reconstruction is complete. |
+| `wine_references` | Number of wine references with positive reconstructed stock; `null` until stock reconstruction is complete. |
 | `total_positions`, `empty_positions`, `occupied_positions` | Rack-position totals. |
 | `unlocated_wines`, `unlocated_bottles` | Reconstructed stock not assigned to rack positions; `null` until reconstruction is complete. |
 | `negative_movement_wines`, `negative_movement_bottles` | Negative movement-balance diagnostics; `null` until reconstruction is complete. |
