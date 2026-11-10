@@ -78,6 +78,7 @@
   "statistics_empty": "No data available for this category.",
   "unknown_value": "Unknown",
   "stocked_references": "Wine references in stock",
+  "physical_wine_references": "Wine references in the cellar",
   "rack_occupancy": "Rack occupancy",
   "inventory_diagnostics": "Stock diagnostics",
   "diagnostic_unlocated": "Unlocated bottles",
