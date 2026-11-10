@@ -39,6 +39,8 @@ After a PLOUD synchronization has been fully validated, persisted and committed 
 }
 ```
 
+`trigger` identifies the action that initiated synchronization. `sync_type` distinguishes a full snapshot from an incremental delta. `changes` lists the effective identifiers added, updated or deleted in each cellar collection; `change_counts` contains the corresponding totals. The cards currently use only `config_entry_id` and ignore the other event fields. `last_sync` is informational and is not used as a polling cursor.
+
 The frontend subscribes to this event through the active Home Assistant WebSocket connection and refreshes only cards whose configured `config_entry_id` matches the event. The event is not fired for failed or uncommitted synchronizations. The frontend does not depend on the generated entity ID of the diagnostic last-sync sensor and does not poll.
 
 ## Response
