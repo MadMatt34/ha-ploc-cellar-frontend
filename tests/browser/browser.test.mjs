@@ -605,3 +605,35 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 });
+
+
+  it("announces loading state accessibly on all three cards", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      for (const tag of [
+        "ploc-cellar-card",
+        "ploc-cellar-inventory-card",
+        "ploc-cellar-rack-card",
+      ]) {
+        await page.evaluate((cardTag) => {
+          window.testHass.callWS = () => new Promise((resolve) => {
+            window.__resolveInventory = resolve;
+          });
+          return window.mountPlocCard(cardTag, {});
+        }, tag);
+
+        const card = page.locator(tag);
+        await card.locator('.loading[role="status"][aria-live="polite"]').waitFor();
+        assert.equal(await card.locator("ha-card").getAttribute("aria-busy"), "true");
+
+        await page.evaluate(() => {
+          window.__resolveInventory({ response: window.__plocFixture.inventory });
+        });
+        await card.locator('.loading[role="status"]').waitFor({ state: "detached" });
+        assert.equal(await card.locator("ha-card").getAttribute("aria-busy"), "false");
+      }
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
