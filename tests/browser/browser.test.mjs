@@ -240,7 +240,7 @@ describe("Ploc Cellar browser interactions", () => {
       await detail.waitFor();
       const selected = detail.locator(".location-coordinate.selected");
       await selected.waitFor();
-      assert.match(await selected.innerText(), /row\s*1.*column\s*1/i);
+      assert.match(await selected.innerText(), /row\s*1.*col\s*1/i);
       assert.equal(await selected.locator('ha-icon[icon="mdi:target"]').count(), 1);
       await detail.locator("ha-dialog").evaluate((dialog) => {
         dialog.dispatchEvent(new Event("closed", { bubbles: true }));

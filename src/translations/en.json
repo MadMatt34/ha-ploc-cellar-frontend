@@ -22,7 +22,7 @@
   "unknown_wine": "Unknown wine",
   "empty_position": "Empty position",
   "row": "Row",
-  "column": "Col.",
+  "column": "Col",
   "no_coordinates": "No row/column coordinates are available for this rack.",
   "positions_without_coordinates": "Positions without coordinates",
   "not_mapped": "Not mapped",

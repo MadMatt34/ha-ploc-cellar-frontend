@@ -22,7 +22,7 @@
   "unknown_wine": "Vin inconnu",
   "empty_position": "Emplacement libre",
   "row": "Rang",
-  "column": "Col.",
+  "column": "Col",
   "no_coordinates": "Aucune coordonnée de rangée/colonne disponible pour ce casier.",
   "positions_without_coordinates": "Emplacements sans coordonnées",
   "not_mapped": "Non renseigné",
