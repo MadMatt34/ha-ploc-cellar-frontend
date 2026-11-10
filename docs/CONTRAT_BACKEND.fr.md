@@ -129,7 +129,7 @@ L'indicateur `8192` est confirmé par l'application PLOUD comme la catégorie de
 
 La réponse `Wine` contient toujours le champ `image_url: string | null`.
 
-- Une valeur non nulle désigne une route locale Home Assistant vers l'image principale mise en cache, ou vers l'image de couverture si l'image principale n'est pas disponible.
+- Une valeur non nulle désigne une route locale Home Assistant vers l'image principale mise en cache, ou vers l'image de couverture si l'image principale n'est pas disponible. Le téléchargement du cache d'images est facultatif et dispose d'un budget total de 10 secondes par synchronisation : un lot lent ne retarde pas la publication de l'inventaire déjà enregistré. Les images non téléchargées dans ce délai seront réessayées lors d'une synchronisation ultérieure.
 - La route exige une authentification Home Assistant. Le consommateur doit récupérer l'image avec `hass.fetchWithAuth(image_url)` ; une requête d'image distante non authentifiée n'est pas prise en charge.
 - L'URL peut contenir un paramètre de version. Une URL modifiée indique que la version du document mis en cache a changé : l'image doit être téléchargée à nouveau, même si l'identifiant du document PLOUD est identique.
 - Le champ vaut `null` lorsqu'aucune image n'est disponible pour un vin, lorsque le document n'a pas encore été téléchargé ou lorsque le vin ne possède pas de référence d'image. La fiche vin reste utilisable sans image.
