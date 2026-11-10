@@ -32,6 +32,10 @@ After a PLOUD synchronization has been fully validated, persisted and committed 
 {
   config_entry_id: string;
   last_sync: string;
+  trigger: "recurring" | "forced_incremental" | "forced_full";
+  sync_type: "full" | "incremental";
+  changes: Record<string, { added: string[]; updated: string[]; deleted: string[] }>;
+  change_counts: Record<string, { added: number; updated: number; deleted: number }>;
 }
 ```
 
