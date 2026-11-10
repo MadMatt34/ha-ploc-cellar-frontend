@@ -54,7 +54,18 @@ export function buildRackGridLayout(
   }
   const rowSpan = maxRow - minRow + 1;
   const columnSpan = maxColumn - minColumn + 1;
+  const coordinatesAreValid = items.every(
+    (item) =>
+      Number.isSafeInteger(item.row) &&
+      Number.isSafeInteger(item.column) &&
+      item.row >= 0 &&
+      item.column >= 0,
+  );
+  const coordinatesAreUnique =
+    new Set(items.map((item) => \`\${item.row}:\${item.column}\`)).size === items.length;
   const isBounded =
+    coordinatesAreValid &&
+    coordinatesAreUnique &&
     Number.isSafeInteger(rowSpan) &&
     Number.isSafeInteger(columnSpan) &&
     rowSpan > 0 &&
