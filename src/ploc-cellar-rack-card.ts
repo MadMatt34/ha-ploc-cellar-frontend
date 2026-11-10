@@ -8,7 +8,7 @@ import type {
   Wine,
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
-import { fetchInventory, subscribeToInventorySync } from "./inventory-client";
+import { fetchInventory, InventorySyncSubscription } from "./inventory-client";
 import "./ploc-cellar-wine-detail";
 import "./numeric-typography";
 import { buildRackGridLayout, clampTooltipPosition } from "./rack-grid";
@@ -27,10 +27,7 @@ export class PlocCellarRackCard extends LitElement {
   @state() private selectedLocation?: { rackId: string; row: number; column: number };
   private requestGeneration = 0;
   private refreshPending = false;
-  private syncConnection?: HomeAssistant["connection"];
-  private syncEntryId?: string;
-  private syncUnsubscribe?: () => void;
-  private syncSubscriptionGeneration = 0;
+  private readonly syncSubscription = new InventorySyncSubscription();
 
   static styles = css`
     :host { display: block; }
@@ -110,44 +107,17 @@ export class PlocCellarRackCard extends LitElement {
   }
 
   disconnectedCallback(): void {
-    this.syncSubscriptionGeneration += 1;
-    this.syncUnsubscribe?.();
-    this.syncUnsubscribe = undefined;
-    this.syncConnection = undefined;
-    this.syncEntryId = undefined;
+    this.syncSubscription.disconnect();
     super.disconnectedCallback();
   }
 
   private ensureSyncSubscription(): void {
-    const connection = this.hass?.connection;
-    const entryId = this.config?.config_entry_id;
-    if (connection === this.syncConnection && entryId === this.syncEntryId) return;
-
-    this.syncSubscriptionGeneration += 1;
-    this.syncUnsubscribe?.();
-    this.syncUnsubscribe = undefined;
-    this.syncConnection = connection;
-    this.syncEntryId = entryId;
-
-    if (!this.isConnected || !this.hass || !connection || !entryId) return;
-
-    const generation = this.syncSubscriptionGeneration;
-    void subscribeToInventorySync(this.hass, entryId, () => {
-      if (generation === this.syncSubscriptionGeneration) void this.refresh();
-    }).then((unsubscribe) => {
-      if (
-        generation === this.syncSubscriptionGeneration &&
-        this.isConnected &&
-        this.hass?.connection === connection &&
-        this.config?.config_entry_id === entryId
-      ) {
-        this.syncUnsubscribe = unsubscribe;
-      } else {
-        unsubscribe();
-      }
-    }).catch((error: unknown) => {
-      console.error("Unable to subscribe to Ploc Cellar synchronization events", error);
-    });
+    this.syncSubscription.update(
+      this.hass,
+      this.config?.config_entry_id,
+      this.isConnected,
+      () => void this.refresh(),
+    );
   }
 
   protected updated(): void {
