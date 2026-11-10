@@ -47,9 +47,6 @@ export function fetchInventory(
 }
 
 /**
- * Subscribe to successful synchronization events for one configuration entry.
- */
-/**
  * Own the lifecycle and race protection for a card's synchronization listener.
  * Inventory fetching itself remains coalesced by fetchInventory().
  */
