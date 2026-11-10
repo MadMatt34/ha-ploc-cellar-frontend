@@ -90,8 +90,13 @@ describe("Ploc Cellar browser interactions", () => {
       assert.equal(await card.locator(".wine").count(), 1);
       await card.getByText("Vin inconnu", { exact: true }).waitFor();
 
-      const clearFilters = card.locator(".filters > summary .filters-clear");
+      const clearFilters = card.locator(".filters-clear");
       await clearFilters.waitFor();
+      assert.equal(
+        await clearFilters.evaluate((button) => button.closest("summary")),
+        null,
+        "the clear-filters button must not be nested inside summary",
+      );
       await clearFilters.click();
       assert.equal(await card.locator(".wine").count(), 3);
       assert.equal(await card.locator(".filters").getAttribute("open"), "");
