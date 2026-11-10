@@ -49,15 +49,60 @@ export function fetchInventory(
 /**
  * Subscribe to successful synchronization events for one configuration entry.
  */
-export function subscribeToInventorySync(
-  hass: HomeAssistant,
-  configEntryId: string,
-  onSync: () => void,
-): Promise<() => void> {
-  return hass.connection.subscribeEvents<{ config_entry_id?: string }>(
-    (event) => {
-      if (event.data.config_entry_id === configEntryId) onSync();
-    },
-    SYNC_COMPLETED_EVENT,
-  );
+/**
+ * Own the lifecycle and race protection for a card's synchronization listener.
+ * Inventory fetching itself remains coalesced by fetchInventory().
+ */
+export class InventorySyncSubscription {
+  private connection?: HomeAssistant["connection"];
+  private configEntryId?: string;
+  private unsubscribe?: () => void;
+  private generation = 0;
+
+  update(
+    hass: HomeAssistant | undefined,
+    configEntryId: string | undefined,
+    connected: boolean,
+    onSync: () => void,
+  ): void {
+    const connection = hass?.connection;
+    if (connection === this.connection && configEntryId === this.configEntryId) return;
+
+    this.generation += 1;
+    this.unsubscribe?.();
+    this.unsubscribe = undefined;
+    this.connection = connection;
+    this.configEntryId = configEntryId;
+
+    if (!connected || !connection || !configEntryId) return;
+
+    const generation = this.generation;
+    void connection.subscribeEvents<{ config_entry_id?: string }>(
+      (event) => {
+        if (event.data.config_entry_id === configEntryId) onSync();
+      },
+      SYNC_COMPLETED_EVENT,
+    ).then((unsubscribe) => {
+      if (
+        generation === this.generation &&
+        connected &&
+        this.connection === connection &&
+        this.configEntryId === configEntryId
+      ) {
+        this.unsubscribe = unsubscribe;
+      } else {
+        unsubscribe();
+      }
+    }).catch((error: unknown) => {
+      console.error("Unable to subscribe to Ploc Cellar synchronization events", error);
+    });
+  }
+
+  disconnect(): void {
+    this.generation += 1;
+    this.unsubscribe?.();
+    this.unsubscribe = undefined;
+    this.connection = undefined;
+    this.configEntryId = undefined;
+  }
 }
