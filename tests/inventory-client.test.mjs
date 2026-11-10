@@ -123,3 +123,35 @@ test("unsubscribes a listener that resolves after the card disconnects", async (
 
   assert.equal(unsubscribeCount, 1);
 });
+
+test("retries a synchronization subscription after the first attempt rejects", async () => {
+  let attempts = 0;
+  let unsubscribeCount = 0;
+  const originalConsoleError = console.error;
+  console.error = () => {};
+  const hass = {
+    connection: {
+      subscribeEvents: async () => {
+        attempts += 1;
+        if (attempts === 1) throw new Error("temporary websocket failure");
+        return () => { unsubscribeCount += 1; };
+      },
+    },
+  };
+  const subscription = new InventorySyncSubscription();
+
+  try {
+    subscription.update(hass, "entry-1", true, () => {});
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(attempts, 1);
+
+    subscription.update(hass, "entry-1", true, () => {});
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(attempts, 2);
+
+    subscription.disconnect();
+    assert.equal(unsubscribeCount, 1);
+  } finally {
+    console.error = originalConsoleError;
+  }
+});
