@@ -206,7 +206,7 @@ describe("Ploc Cellar browser interactions", () => {
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
       const card = page.locator("ploc-cellar-card");
       await card.locator(".metric").nth(2).waitFor();
-      assert.match(await card.locator(".metric").nth(2).innerText(), /2.*Wine references in the cellar/);
+      assert.match(await card.locator(".metric").nth(2).innerText(), /2\s*Wine references in the cellar/);
 
       await page.evaluate(() => {
         window.__plocFixture.inventory.stock_reconstruction_complete = true;
@@ -214,7 +214,7 @@ describe("Ploc Cellar browser interactions", () => {
       });
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
       await card.locator(".metric").nth(2).waitFor();
-      assert.match(await card.locator(".metric").nth(2).innerText(), /1.*Wine references in stock/);
+      assert.match(await card.locator(".metric").nth(2).innerText(), /1\s*Wine references in stock/);
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();
