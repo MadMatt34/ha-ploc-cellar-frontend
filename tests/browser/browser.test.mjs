@@ -175,6 +175,26 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
+  it("shows stale inventory state beside the last successful synchronization", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => {
+        window.__plocFixture.inventory.stale = true;
+      });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+      const card = page.locator("ploc-cellar-card");
+      const syncStatus = card.locator(".sync-status");
+      await syncStatus.waitFor();
+      await syncStatus.getByText("Data may be stale: the latest synchronization failed.").waitFor();
+      assert.match(await syncStatus.innerText(), /Last successful synchronization:/);
+      assert.equal(await card.locator(".summary + .warning").count(), 0);
+      assert.equal(await card.locator(".sync-warning[role=" + '"status"' + "]").count(), 1);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
   it("uses physical wine references until reconstructed stock is available", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
