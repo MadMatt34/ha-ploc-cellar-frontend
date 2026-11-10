@@ -1,9 +1,6 @@
 name: Frontend CI
-# The compatibility branch pins Ubuntu 26.04 to validate the new runner image.
-
 on:
   push:
-    branches: [main, chore/ubuntu-26-04-ci-compatibility, fix/audit-p2-consistency]
   pull_request:
   workflow_dispatch:
 
