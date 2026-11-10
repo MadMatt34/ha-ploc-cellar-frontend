@@ -116,6 +116,21 @@ describe("Ploc Cellar browser interactions", () => {
   it("clears account-specific selections and filters when switching cellar", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
+      await page.evaluate(() => {
+        window.__plocFixture.inventory.unlocated_bottles = 1;
+        return window.mountPlocCard("ploc-cellar-card", {});
+      });
+      const overviewCard = page.locator("ploc-cellar-card");
+      await overviewCard.locator(".diagnostic").filter({ hasText: "Unlocated bottles" }).click();
+      await overviewCard.locator("ha-dialog").waitFor();
+      await overviewCard.evaluate((element) => {
+        element.setConfig({
+          type: "custom:ploc-cellar-card",
+          config_entry_id: "second-entry",
+        });
+      });
+      assert.equal(await overviewCard.locator("ha-dialog").count(), 0);
+
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
       const inventoryCard = page.locator("ploc-cellar-inventory-card");
       await inventoryCard.locator(".wine").first().waitFor();
