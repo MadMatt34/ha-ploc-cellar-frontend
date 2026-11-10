@@ -1,4 +1,5 @@
 name: Frontend CI
+# The compatibility branch pins Ubuntu 26.04 to validate the new runner image.
 
 on:
   push:
