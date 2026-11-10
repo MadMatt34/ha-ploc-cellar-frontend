@@ -113,6 +113,77 @@ describe("Ploc Cellar browser interactions", () => {
   });
 
 
+  it("clears account-specific selections and filters when switching cellar", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
+      const inventoryCard = page.locator("ploc-cellar-inventory-card");
+      await inventoryCard.locator(".wine").first().waitFor();
+      await inventoryCard.locator(".search").fill("Château A");
+      await inventoryCard.locator(".wine").first().click();
+      await inventoryCard.locator("ploc-cellar-wine-detail").waitFor();
+
+      await inventoryCard.evaluate((element) => {
+        element.setConfig({
+          type: "custom:ploc-cellar-inventory-card",
+          config_entry_id: "second-entry",
+        });
+      });
+      await inventoryCard.locator(".wine").first().waitFor();
+      assert.equal(await inventoryCard.locator(".search").inputValue(), "");
+      assert.equal(await inventoryCard.locator("ploc-cellar-wine-detail").count(), 0);
+
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {
+        rack_picker_mode: "dropdown",
+      }));
+      const rackCard = page.locator("ploc-cellar-rack-card");
+      await rackCard.locator(".rack-name").getByText("Cave principale").waitFor();
+      await rackCard.locator(".rack-picker-select").selectOption("rack-b");
+      await rackCard.locator(".rack-name").getByText("Cave secondaire").waitFor();
+      await rackCard.locator(".slot.occupied").first().click();
+      await rackCard.locator("ploc-cellar-wine-detail").waitFor();
+
+      await rackCard.evaluate((element) => {
+        element.setConfig({
+          type: "custom:ploc-cellar-rack-card",
+          config_entry_id: "second-entry",
+          rack_picker_mode: "dropdown",
+        });
+      });
+      await rackCard.locator(".rack-name").getByText("Cave principale").waitFor();
+      assert.equal(await rackCard.locator("ploc-cellar-wine-detail").count(), 0);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it("uses physical wine references until reconstructed stock is available", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => {
+        window.__plocFixture.inventory.stock_reconstruction_complete = false;
+        window.__plocFixture.inventory.wine_references = null;
+        window.__plocFixture.inventory.stocked_wines = 2;
+      });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+      const card = page.locator("ploc-cellar-card");
+      await card.locator(".metric").nth(2).waitFor();
+      assert.match(await card.locator(".metric").nth(2).innerText(), /2.*Wine references in the cellar/);
+
+      await page.evaluate(() => {
+        window.__plocFixture.inventory.stock_reconstruction_complete = true;
+        window.__plocFixture.inventory.wine_references = 1;
+      });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+      await card.locator(".metric").nth(2).waitFor();
+      assert.match(await card.locator(".metric").nth(2).innerText(), /1.*Wine references in stock/);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
   it("paginates inventory results and resets to the first page after filtering", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
