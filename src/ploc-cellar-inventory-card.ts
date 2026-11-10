@@ -95,6 +95,10 @@ export class PlocCellarInventoryCard extends LitElement {
     .pagination-controls ha-icon { --mdc-icon-size: 20px; }
     .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
+    .loading { display: flex; align-items: center; gap: 8px; color: var(--secondary-text-color); padding: 8px 0; }
+    .loading::before { content: ""; width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid var(--divider-color); border-top-color: var(--primary-color); border-radius: 50%; animation: ploc-cellar-loading 0.8s linear infinite; }
+    @keyframes ploc-cellar-loading { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .loading::before { animation: none; } }
     .error { color: var(--error-color); padding: 8px 0; }
     .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .actions { display: flex; gap: 8px; align-items: center; }
@@ -381,11 +385,12 @@ export class PlocCellarInventoryCard extends LitElement {
     );
 
     return html`
-      <ha-card>
+      <ha-card aria-busy=${this.loading ? "true" : "false"}>
         <header>
           <h2>${this.config?.title ?? t("inventory_title")}</h2>
 
         </header>
+        ${this.loading ? html`<div class="loading" role="status" aria-live="polite">${t("loading")}</div>` : nothing}
         ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
         ${!this.config?.config_entry_id
           ? html`<div class="muted">${t("select_config")}</div>`
