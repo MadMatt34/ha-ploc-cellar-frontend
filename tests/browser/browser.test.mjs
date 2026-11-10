@@ -124,7 +124,7 @@ describe("Ploc Cellar browser interactions", () => {
       await card.locator(".wine").first().waitFor();
       assert.equal(await card.locator(".wine").count(), 10);
       assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 01");
-      assert.equal(await card.locator(".pagination").innerText(), "1–10 of 45\\nPage 1 of 5");
+      assert.equal(await card.locator(".pagination").innerText(), "1–10 of 45\nPage 1 of 5");
 
       await card.locator(".pagination button[aria-label=\"Next page\"]").click();
       assert.equal(await card.locator(".wine").count(), 10);
