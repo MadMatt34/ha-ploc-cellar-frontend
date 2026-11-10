@@ -129,7 +129,7 @@ describe("Ploc Cellar browser interactions", () => {
           config_entry_id: "second-entry",
         });
       });
-      assert.equal(await overviewCard.locator("ha-dialog").count(), 0);
+      await overviewCard.locator("ha-dialog").waitFor({ state: "detached" });
 
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
       const inventoryCard = page.locator("ploc-cellar-inventory-card");
@@ -144,9 +144,11 @@ describe("Ploc Cellar browser interactions", () => {
           config_entry_id: "second-entry",
         });
       });
+      await inventoryCard.locator("ploc-cellar-wine-detail").waitFor({ state: "detached" });
+      await page.waitForFunction(() =>
+        document.querySelector("ploc-cellar-inventory-card")?.shadowRoot?.querySelector(".search")?.value === "",
+      );
       await inventoryCard.locator(".wine").first().waitFor();
-      assert.equal(await inventoryCard.locator(".search").inputValue(), "");
-      assert.equal(await inventoryCard.locator("ploc-cellar-wine-detail").count(), 0);
 
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {
         rack_picker_mode: "dropdown",
@@ -166,7 +168,7 @@ describe("Ploc Cellar browser interactions", () => {
         });
       });
       await rackCard.locator(".rack-name").getByText("Cave principale").waitFor();
-      assert.equal(await rackCard.locator("ploc-cellar-wine-detail").count(), 0);
+      await rackCard.locator("ploc-cellar-wine-detail").waitFor({ state: "detached" });
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();
