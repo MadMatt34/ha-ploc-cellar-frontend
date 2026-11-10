@@ -439,8 +439,29 @@ export class PlocCellarInventoryCard extends LitElement {
             ? html`<div class="warning">${t("reconstruction_incomplete")}</div>`
             : nothing}
           <div class="wine-list">
-            ${wines.map((wine) => this.renderWine(wine))}
+            ${pageWines.map((wine) => this.renderWine(wine))}
           </div>
+          ${wines.length > pageSize ? html`
+            <nav class="pagination" aria-label=${t("inventory_pagination")}>
+              <span aria-live="polite">${t("inventory_pagination_range")
+                .replace("{start}", String(pageOffset + 1))
+                .replace("{end}", String(Math.min(pageOffset + pageSize, wines.length)))
+                .replace("{total}", String(wines.length))}</span>
+              <div class="pagination-controls">
+                <button type="button" aria-label=${t("pagination_previous")} ?disabled=${page <= 1}
+                  @click=${() => { this.currentPage = Math.max(1, page - 1); }}>
+                  <ha-icon icon="mdi:chevron-left" aria-hidden="true"></ha-icon>
+                </button>
+                <span>${t("inventory_pagination_page")
+                  .replace("{page}", String(page))
+                  .replace("{pages}", String(pageCount))}</span>
+                <button type="button" aria-label=${t("pagination_next")} ?disabled=${page >= pageCount}
+                  @click=${() => { this.currentPage = Math.min(pageCount, page + 1); }}>
+                  <ha-icon icon="mdi:chevron-right" aria-hidden="true"></ha-icon>
+                </button>
+              </div>
+            </nav>
+          ` : nothing}
           ${wines.length === 0 ? html`<p class="muted">${t("no_matching_wines")}</p>` : nothing}
           ${this.selectedWine ? html`
             <ploc-cellar-wine-detail
