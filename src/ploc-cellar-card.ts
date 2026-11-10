@@ -118,6 +118,8 @@ export class PlocCellarCard extends LitElement {
     .legend-value { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
     .legend-meta { grid-column: 2 / 4; margin-top: -2px; color: var(--secondary-text-color); font-size: .72rem; }
     .warning { color: var(--warning-color); padding: 8px 0; }
+    .sync-status { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+    .sync-warning { color: var(--warning-color); font-size: .85rem; }
     .error { color: var(--error-color); padding: 8px 0; }
     @media (max-width: 420px) {
       ha-card { padding: 12px; }
@@ -496,7 +498,6 @@ export class PlocCellarCard extends LitElement {
           ? html`<div class="muted">${t("select_config")}</div>`
           : nothing}
         ${data ? html`
-          ${data.stale ? html`<div class="warning">${t("stale")}</div>` : nothing}
           <div class="summary">
             ${this.metric(data.total_bottles, t("bottles_in_cellar"))}
             ${this.metric(
@@ -569,7 +570,10 @@ export class PlocCellarCard extends LitElement {
               </div>
             </details>
           ` : nothing}
-          <div class="muted section">${t("last_sync")}: ${this.formatSync(data.last_sync)}</div>
+          <div class="muted section sync-status">
+            <span>${t("last_sync")}: ${this.formatSync(data.last_sync)}</span>
+            ${data.stale ? html`<span class="sync-warning" role="status">${t("stale")}</span>` : nothing}
+          </div>
           ${this.renderDiagnosticDialog()}
           ${this.selectedWine ? html`
             <ploc-cellar-wine-detail
