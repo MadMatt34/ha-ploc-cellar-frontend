@@ -85,7 +85,7 @@ export class PlocCellarWineDetail extends LitElement {
     .characteristic-label { color: var(--secondary-text-color); font-size: .9rem; }
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
     .characteristic-value.is-error { color: var(--error-color); }
-    .grapes-list { display: grid; gap: 2px; margin: 0 20% 0 0; }
+    .grapes-list { display: grid; gap: 2px; margin: 0 8% 0 0; }
     .grape-row { display: grid; grid-template-columns: minmax(0px, 1fr) minmax(90px, 2fr); align-items: center; gap: 16px; }
     .grape-name { min-width: 0; overflow-wrap: anywhere; text-align: end; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -382,7 +382,7 @@ export class PlocCellarWineDetail extends LitElement {
                             const selected = this.isSelectedLocation(rack.rackId, row, column);
                             return html`<span class="location-coordinate ${selected ? "selected" : ""}">
                               ${selected ? html`<ha-icon icon="mdi:target" aria-hidden="true"></ha-icon>` : nothing}
-                              ${this.t("row")} ${row + 1}, ${this.t("column")} ${column + 1}
+                              ${this.t("row")} ${row + 1}&nbsp;·&nbsp;${this.t("column")} ${column + 1}
                             </span>`;
                           })}
                     </div>
