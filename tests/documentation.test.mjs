@@ -28,7 +28,6 @@ test("both frontend READMEs link the compatibility and release policy", async ()
   ]);
 
   assert.ok(english.includes("docs/COMPATIBILITY_AND_RELEASES.md"));
-    assert.ok(french.includes(`\`${field}\``), `French contract is missing ${field}`);
   assert.ok(policy.includes("| 0.8.0 development baseline | 0.1.0 development baseline |"));
   assert.ok(policy.includes("not a claim that corresponding GitHub Releases have been published"));
 });
