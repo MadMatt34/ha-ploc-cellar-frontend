@@ -69,7 +69,7 @@ npm run test:e2e
 npm run build
 ```
 
-Le bundle de production est généré dans `dist/ploc-cellar-card.js`, puis copié à la racine sous `ploc-cellar-card.js`, nom attendu par HACS (`hacs.json`). Les deux fichiers sont versionnés. Les dépendances sont intégrées au module JavaScript autonome. Le workflow CI du frontend exécute la vérification TypeScript stricte, les tests unitaires et la compilation de production lors des push et des pull requests. Un job Chromium distinct exécute les tests d'interaction navigateur à chaque push et pull request ; la publication des bundles sur `main` attend la réussite des deux jobs.
+Le bundle de production est généré dans `dist/ploc-cellar-card.js`, puis copié à la racine sous `ploc-cellar-card.js`, nom attendu par HACS (`hacs.json`). Les deux fichiers sont versionnés. Les dépendances sont intégrées au module JavaScript autonome. Le workflow CI du frontend exécute la vérification TypeScript stricte, les tests unitaires et la compilation de production lors des push et des pull requests. Un job Chromium distinct exécute les tests d'interaction navigateur à chaque push et pull request ; la publication des bundles sur `main` attend la réussite des deux jobs. La CI impose également une limite de 800 000 octets (bundle JavaScript de production non compressé) afin de détecter toute augmentation inattendue.
 
 ## 🔗 Contrat backend
 
