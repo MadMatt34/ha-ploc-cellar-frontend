@@ -32,6 +32,10 @@ Après validation complète, persistance et validation du nouvel état par le co
 {
   config_entry_id: string;
   last_sync: string;
+  trigger: "recurring" | "forced_incremental" | "forced_full";
+  sync_type: "full" | "incremental";
+  changes: Record<string, { added: string[]; updated: string[]; deleted: string[] }>;
+  change_counts: Record<string, { added: number; updated: number; deleted: number }>;
 }
 ```
 
