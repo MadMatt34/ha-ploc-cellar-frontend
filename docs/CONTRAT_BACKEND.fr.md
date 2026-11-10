@@ -52,8 +52,8 @@ Principaux champs de la réponse :
 | `stock_reconstruction_complete` | Indique si un instantané complet des mouvements Orders est disponible. |
 | `total_bottles` | Nombre d'emplacements physiquement occupés. |
 | `total_stock_bottles` | Stock total reconstitué ; `null` tant que la reconstitution n'est pas complète. |
-| `stocked_wines` | Nombre de références de vins connues représentées dans l'inventaire. |
-| `wine_references` | Nombre de références de vins, ou `null` si indisponible. |
+| `stocked_wines` | Nombre de références de vins ayant au moins une bouteille physiquement affectée à un emplacement de casier. Ce compteur reste disponible avant la fin de la reconstitution du stock. |
+| `wine_references` | Nombre de références de vins dont le stock reconstitué est positif ; `null` tant que la reconstitution du stock n'est pas terminée. |
 | `total_positions`, `empty_positions`, `occupied_positions` | Totaux des emplacements des casiers. |
 | `unlocated_wines`, `unlocated_bottles` | Stock reconstitué non affecté à un emplacement ; `null` tant que la reconstitution n'est pas complète. |
 | `negative_movement_wines`, `negative_movement_bottles` | Diagnostics de soldes de mouvements négatifs ; `null` tant que la reconstitution n'est pas complète. |
