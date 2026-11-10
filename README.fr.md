@@ -14,6 +14,8 @@ Frontend Lovelace indépendant pour l'intégration Home Assistant [Ploc Cellar](
 
 ## 📚 Navigation
 
+Release compatibility and version policy: [Compatibility matrix and releases](docs/COMPATIBILITY_AND_RELEASES.md).
+
 - [Cartes et fonctionnalités](#cartes-ploc-cellar)
 - [Installation](#installation)
 - [Développement et CI](#développement)
