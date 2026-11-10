@@ -132,3 +132,5 @@ L'intégration backend et son inventaire sont indépendants : la désinstallatio
 Ce projet est distribué sous [licence MIT](LICENSE).
 
 Ploc Cellar Cards est un frontend indépendant pour Home Assistant. Il n'est ni affilié à PLOC ou PLOUD, ni approuvé ou pris en charge par ces services.
+
+L'intégration backend communique avec PLOUD au moyen d'interfaces privées et non documentées. Leur fonctionnement a été reconstitué à partir de recherches techniques indépendantes et de rétro-ingénierie ; il ne s'agit pas d'un contrat d'API public ou pris en charge, et ces interfaces peuvent changer sans préavis. PLOC a été contacté au sujet de la documentation ou de la prise en charge de cet accès ; aucune réponse n'avait été reçue à la date de rédaction de cet avertissement. Les cartes elles-mêmes ne contactent pas PLOUD : elles communiquent uniquement avec l'intégration backend Home Assistant.
