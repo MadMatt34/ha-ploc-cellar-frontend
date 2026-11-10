@@ -648,6 +648,11 @@ var He = {
 	filter_unknown: "Unknown",
 	sort_by: "Sort by:",
 	inventory_results: "{count} wine(s)",
+	inventory_pagination: "Inventory pagination",
+	inventory_pagination_range: "{start}–{end} of {total}",
+	inventory_pagination_page: "Page {page} of {pages}",
+	pagination_previous: "Previous page",
+	pagination_next: "Next page",
 	inventory_bottle_total: "{count} bottle(s)",
 	clear_filters: "Clear filters",
 	bottles_short: "btl.",
@@ -668,6 +673,8 @@ var He = {
 	editor_title: "Card title",
 	editor_title_helper: "Optional. Leave empty to use the default title.",
 	editor_default_sort: "Default sort order",
+	editor_page_size: "Wine references per page",
+	editor_page_size_helper: "From 10 to 200 references, in steps of 10. Default: 40.",
 	statistics_title: "Cellar statistics",
 	statistics_bottles: "Bottles in stock",
 	statistics_references: "wine references",
@@ -806,6 +813,11 @@ var He = {
 	filter_unknown: "Inconnu",
 	sort_by: "Trier par :",
 	inventory_results: "{count} référence(s)",
+	inventory_pagination: "Pagination de l’inventaire",
+	inventory_pagination_range: "{start}–{end} sur {total}",
+	inventory_pagination_page: "Page {page} / {pages}",
+	pagination_previous: "Page précédente",
+	pagination_next: "Page suivante",
 	inventory_bottle_total: "{count} bouteille(s)",
 	clear_filters: "Effacer les filtres",
 	bottles_short: "bt.",
@@ -826,6 +838,8 @@ var He = {
 	editor_title: "Titre de la carte",
 	editor_title_helper: "Facultatif. Laissez vide pour utiliser le titre par défaut.",
 	editor_default_sort: "Tri par défaut",
+	editor_page_size: "Nombre de références par page",
+	editor_page_size_helper: "De 10 à 200 références, par pas de 10. Valeur par défaut : 40.",
 	statistics_title: "Statistiques de la cave",
 	statistics_bottles: "Bouteilles en stock",
 	statistics_references: "références de vin",
@@ -1877,7 +1891,7 @@ function mt(e, t) {
 // src/ploc-cellar-inventory-card.ts
 var ht = class extends je {
 	constructor(...e) {
-		super(...e), this.loading = !1, this.search = "", this.color = lt, this.region = lt, this.appellation = lt, this.vintage = lt, this.meal = "", this.sort = "name-asc", this.requestGeneration = 0, this.refreshPending = !1, this.syncSubscriptionGeneration = 0;
+		super(...e), this.loading = !1, this.search = "", this.color = lt, this.region = lt, this.appellation = lt, this.vintage = lt, this.meal = "", this.sort = "name-asc", this.currentPage = 1, this.requestGeneration = 0, this.refreshPending = !1, this.syncSubscriptionGeneration = 0;
 	}
 	static {
 		this.styles = c`
@@ -1925,6 +1939,10 @@ var ht = class extends je {
     .sort-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .sort-row > span { flex: 0 0 auto; color: var(--secondary-text-color); font-size: .9rem; }
     .sort-row select { flex: 1; width: 100%; }
+    .pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 12px; color: var(--secondary-text-color); font-size: .85rem; }
+    .pagination-controls { display: flex; align-items: center; gap: 8px; }
+    .pagination-controls button { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; min-height: 36px; }
+    .pagination-controls ha-icon { --mdc-icon-size: 20px; }
     .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
     .error { color: var(--error-color); padding: 8px 0; }
@@ -1943,7 +1961,13 @@ var ht = class extends je {
 		return {};
 	}
 	setConfig(e) {
-		this.requestGeneration += 1, this.loading = !1, this.refreshPending = !1, this.config = e, this.sort = e.default_sort ?? "name-asc", this.inventory = void 0, this.error = void 0, e.config_entry_id && this.refresh();
+		this.requestGeneration += 1, this.loading = !1, this.refreshPending = !1;
+		let t = this.config?.page_size !== e.page_size, n = this.config?.config_entry_id !== e.config_entry_id;
+		this.config = e, this.sort = e.default_sort ?? "name-asc", (t || n) && (this.currentPage = 1), this.inventory = void 0, this.error = void 0, e.config_entry_id && this.refresh();
+	}
+	get pageSize() {
+		let e = this.config?.page_size ?? 40;
+		return Number.isFinite(e) ? Math.min(200, Math.max(10, Math.round(e / 10) * 10)) : 40;
 	}
 	connectedCallback() {
 		super.connectedCallback(), this.requestUpdate();
@@ -2012,7 +2036,7 @@ var ht = class extends je {
 		});
 	}
 	clearFilters() {
-		this.search = "", this.color = lt, this.region = lt, this.appellation = lt, this.vintage = lt, this.meal = "", this.sort = this.config?.default_sort ?? "name-asc";
+		this.search = "", this.color = lt, this.region = lt, this.appellation = lt, this.vintage = lt, this.meal = "", this.sort = this.config?.default_sort ?? "name-asc", this.currentPage = 1;
 	}
 	mealValues() {
 		let e = /* @__PURE__ */ new Set();
@@ -2024,7 +2048,7 @@ var ht = class extends je {
 		return N`
       <select aria-label=${e("filter_meal")} .value=${this.meal}
         @change=${(e) => {
-			this.meal = e.target.value;
+			this.meal = e.target.value, this.currentPage = 1;
 		}}>
         <option value="" ?selected=${!this.meal}>${e("filter_meal")}</option>
         ${this.mealValues().map((t) => N`<option value=${t} ?selected=${t === this.meal}>${e(t)}</option>`)}
@@ -2036,7 +2060,7 @@ var ht = class extends je {
       <select aria-label=${t} .value=${pt(n, r)}
         @change=${(t) => {
 			let n = mt(t.target.value, r);
-			e === "color" ? this.color = n : e === "region" ? this.region = n : e === "appellation" ? this.appellation = n : this.vintage = n;
+			e === "color" ? this.color = n : e === "region" ? this.region = n : e === "appellation" ? this.appellation = n : this.vintage = n, this.currentPage = 1;
 		}}>
         <option value="all" ?selected=${n.kind === "all"}>${t}</option>
         <option value="unknown" ?selected=${n.kind === "unknown"}>${I(this.hass?.language ?? "en", "filter_unknown")}</option>
@@ -2095,7 +2119,7 @@ var ht = class extends je {
     `;
 	}
 	render() {
-		let e = (e) => I(this.hass?.language ?? "en", e), t = this.filteredWines, n = t.reduce((e, t) => e + t.bottles_in_cellar, 0), r = !!(this.search || this.color.kind !== "all" || this.region.kind !== "all" || this.appellation.kind !== "all" || this.vintage.kind !== "all" || this.meal);
+		let e = (e) => I(this.hass?.language ?? "en", e), t = this.filteredWines, n = t.reduce((e, t) => e + t.bottles_in_cellar, 0), r = this.pageSize, i = Math.max(1, Math.ceil(t.length / r)), a = Math.min(this.currentPage, i), o = (a - 1) * r, s = t.slice(o, o + r), c = !!(this.search || this.color.kind !== "all" || this.region.kind !== "all" || this.appellation.kind !== "all" || this.vintage.kind !== "all" || this.meal);
 		return N`
       <ha-card>
         <header>
@@ -2109,10 +2133,10 @@ var ht = class extends je {
           <input class="search" type="search" aria-label=${e("search_wine")}
             placeholder=${e("search_placeholder")} .value=${this.search}
             @input=${(e) => {
-			this.search = e.target.value;
+			this.search = e.target.value, this.currentPage = 1;
 		}} />
           <details class="filters">
-            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon>${r ? N`<button class="filters-clear" type="button" @click=${(e) => {
+            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon>${c ? N`<button class="filters-clear" type="button" @click=${(e) => {
 			e.stopPropagation(), this.clearFilters();
 		}}>${e("clear_filters")}</button>` : P}</summary>
             <div class="toolbar">
@@ -2126,7 +2150,7 @@ var ht = class extends je {
               <span>${e("sort_by")}</span>
               <select aria-label=${e("sort_by")} .value=${this.sort}
                 @change=${(e) => {
-			this.sort = e.target.value;
+			this.sort = e.target.value, this.currentPage = 1;
 		}}>
                 <option value="name-asc">${e("sort_name_asc")}</option>
                 <option value="name-desc">${e("sort_name_desc")}</option>
@@ -2143,8 +2167,28 @@ var ht = class extends je {
           </div>
           ${this.inventory.stock_reconstruction_complete ? P : N`<div class="warning">${e("reconstruction_incomplete")}</div>`}
           <div class="wine-list">
-            ${t.map((e) => this.renderWine(e))}
+            ${s.map((e) => this.renderWine(e))}
           </div>
+          ${t.length > r ? N`
+            <nav class="pagination" aria-label=${e("inventory_pagination")}>
+              <span aria-live="polite">${e("inventory_pagination_range").replace("{start}", String(o + 1)).replace("{end}", String(Math.min(o + r, t.length))).replace("{total}", String(t.length))}</span>
+              <div class="pagination-controls">
+                <button type="button" aria-label=${e("pagination_previous")} ?disabled=${a <= 1}
+                  @click=${() => {
+			this.currentPage = Math.max(1, a - 1);
+		}}>
+                  <ha-icon icon="mdi:chevron-left" aria-hidden="true"></ha-icon>
+                </button>
+                <span>${e("inventory_pagination_page").replace("{page}", String(a)).replace("{pages}", String(i))}</span>
+                <button type="button" aria-label=${e("pagination_next")} ?disabled=${a >= i}
+                  @click=${() => {
+			this.currentPage = Math.min(i, a + 1);
+		}}>
+                  <ha-icon icon="mdi:chevron-right" aria-hidden="true"></ha-icon>
+                </button>
+              </div>
+            </nav>
+          ` : P}
           ${t.length === 0 ? N`<p class="muted">${e("no_matching_wines")}</p>` : P}
           ${this.selectedWine ? N`
             <ploc-cellar-wine-detail
@@ -2170,7 +2214,7 @@ var ht = class extends je {
 		};
 	}
 };
-L([Ve({ attribute: !1 })], ht.prototype, "hass", void 0), L([F()], ht.prototype, "config", void 0), L([F()], ht.prototype, "inventory", void 0), L([F()], ht.prototype, "loading", void 0), L([F()], ht.prototype, "error", void 0), L([F()], ht.prototype, "search", void 0), L([F()], ht.prototype, "color", void 0), L([F()], ht.prototype, "region", void 0), L([F()], ht.prototype, "appellation", void 0), L([F()], ht.prototype, "vintage", void 0), L([F()], ht.prototype, "meal", void 0), L([F()], ht.prototype, "sort", void 0), L([F()], ht.prototype, "selectedWine", void 0), ht = L([Re("ploc-cellar-inventory-card")], ht), window.customCards ??= [], window.customCards.push({
+L([Ve({ attribute: !1 })], ht.prototype, "hass", void 0), L([F()], ht.prototype, "config", void 0), L([F()], ht.prototype, "inventory", void 0), L([F()], ht.prototype, "loading", void 0), L([F()], ht.prototype, "error", void 0), L([F()], ht.prototype, "search", void 0), L([F()], ht.prototype, "color", void 0), L([F()], ht.prototype, "region", void 0), L([F()], ht.prototype, "appellation", void 0), L([F()], ht.prototype, "vintage", void 0), L([F()], ht.prototype, "meal", void 0), L([F()], ht.prototype, "sort", void 0), L([F()], ht.prototype, "currentPage", void 0), L([F()], ht.prototype, "selectedWine", void 0), ht = L([Re("ploc-cellar-inventory-card")], ht), window.customCards ??= [], window.customCards.push({
 	type: "ploc-cellar-inventory-card",
 	name: We("picker_inventory_name"),
 	description: We("picker_inventory_description")
@@ -2182,6 +2226,7 @@ var gt = class extends je {
 			config_entry_id: "editor_configuration",
 			title: "editor_title",
 			default_sort: "editor_default_sort",
+			page_size: "editor_page_size",
 			rack_picker_mode: "editor_rack_picker_mode",
 			show_rack_occupancy: "editor_show_rack_occupancy",
 			show_occupancy: "editor_show_occupancy",
@@ -2191,6 +2236,7 @@ var gt = class extends je {
 		}[e.name]), this.computeHelper = (e) => {
 			if (e.name === "config_entry_id") return I(this.hass?.language ?? "en", "editor_configuration_helper");
 			if (e.name === "title") return I(this.hass?.language ?? "en", "editor_title_helper");
+			if (e.name === "page_size") return I(this.hass?.language ?? "en", "editor_page_size_helper");
 		};
 	}
 	get isOverviewCard() {
@@ -2226,6 +2272,14 @@ var gt = class extends je {
 		})) : this.isInventoryCard ? e.push({
 			name: "title",
 			selector: { text: {} }
+		}, {
+			name: "page_size",
+			selector: { number: {
+				min: 10,
+				max: 200,
+				step: 10,
+				mode: "box"
+			} }
 		}, {
 			name: "default_sort",
 			selector: { select: {
@@ -2279,7 +2333,7 @@ var gt = class extends je {
 	}
 	setConfig(e) {
 		let t = { ...e };
-		this.isOverviewType(e.type) ? (t.show_occupancy = e.show_occupancy !== !1, t.show_diagnostics = e.show_diagnostics !== !1, t.show_statistics = e.show_statistics !== !1, t.show_statistics_legends = e.show_statistics_legends !== !1) : e.type === "custom:ploc-cellar-inventory-card" ? t.default_sort = e.default_sort ?? "name-asc" : e.type === "custom:ploc-cellar-rack-card" && (t.rack_picker_mode = e.rack_picker_mode ?? "buttons", t.show_rack_occupancy = e.show_rack_occupancy !== !1), this.config = t;
+		this.isOverviewType(e.type) ? (t.show_occupancy = e.show_occupancy !== !1, t.show_diagnostics = e.show_diagnostics !== !1, t.show_statistics = e.show_statistics !== !1, t.show_statistics_legends = e.show_statistics_legends !== !1) : e.type === "custom:ploc-cellar-inventory-card" ? (t.default_sort = e.default_sort ?? "name-asc", t.page_size = e.page_size ?? 40) : e.type === "custom:ploc-cellar-rack-card" && (t.rack_picker_mode = e.rack_picker_mode ?? "buttons", t.show_rack_occupancy = e.show_rack_occupancy !== !1), this.config = t;
 	}
 	isOverviewType(e) {
 		return e === "custom:ploc-cellar-card";
