@@ -64,7 +64,7 @@
   "editor_title_helper": "Optional. Leave empty to use the default title.",
   "editor_default_sort": "Default sort order",
   "editor_page_size": "Wine references per page",
-  "editor_page_size_helper": "From 10 to 200 references, in steps of 10. Default: 40."
+  "editor_page_size_helper": "From 10 to 200 references, in steps of 10. Default: 40.",
   "statistics_title": "Cellar statistics",
   "statistics_bottles": "Bottles in stock",
   "statistics_references": "wine references",
