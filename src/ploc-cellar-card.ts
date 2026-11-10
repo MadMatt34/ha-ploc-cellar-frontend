@@ -136,6 +136,8 @@ export class PlocCellarCard extends LitElement {
   }
 
   setConfig(config: PlocCellarCardConfig): void {
+    const configEntryChanged =
+      this.config?.config_entry_id !== config.config_entry_id;
     this.requestGeneration += 1;
     this.loading = false;
     this.refreshPending = false;
@@ -146,6 +148,10 @@ export class PlocCellarCard extends LitElement {
       show_statistics: config.show_statistics !== false,
       show_statistics_legends: config.show_statistics_legends !== false,
     };
+    if (configEntryChanged) {
+      this.activeDiagnostic = undefined;
+      this.selectedWine = undefined;
+    }
     this.inventory = undefined;
     this.error = undefined;
     if (config.config_entry_id) void this.refresh();
@@ -218,7 +224,13 @@ export class PlocCellarCard extends LitElement {
     this.error = undefined;
     try {
       const inventory = await fetchInventory(hass, configEntryId);
-      if (generation === this.requestGeneration) this.inventory = inventory;
+      if (generation === this.requestGeneration) {
+        this.inventory = inventory;
+        if (this.selectedWine) {
+          this.selectedWine =
+            inventory.wines.find((wine) => wine.id === this.selectedWine?.id);
+        }
+      }
     } catch (error) {
       if (generation === this.requestGeneration) {
         this.error = error instanceof Error ? error.message : String(error);
@@ -467,8 +479,12 @@ export class PlocCellarCard extends LitElement {
       diagnostics.length > 0 ||
       data.positions_with_unknown_wine > 0
     ));
-    const wines = data?.wines ?? [];
-    const referenceCount = data?.wine_references ?? wines.length;
+    const referenceCount = data?.stock_reconstruction_complete
+      ? data.wine_references ?? 0
+      : data?.stocked_wines ?? 0;
+    const referenceLabel = data?.stock_reconstruction_complete
+      ? t("stocked_references")
+      : t("physical_wine_references");
 
     return html`
       <ha-card>
@@ -487,7 +503,7 @@ export class PlocCellarCard extends LitElement {
               data.total_stock_bottles ?? t("unknown_value"),
               t("reconstructed_stock"),
             )}
-            ${this.metric(referenceCount, t("stocked_references"))}
+            ${this.metric(referenceCount, referenceLabel)}
             ${this.metric(data.rack_count, t("racks"))}
           </div>
           ${showOccupancy ? html`
