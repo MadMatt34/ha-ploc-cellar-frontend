@@ -2,7 +2,7 @@ name: Frontend CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, chore/ubuntu-26-04-ci-compatibility]
   pull_request:
   workflow_dispatch:
 
