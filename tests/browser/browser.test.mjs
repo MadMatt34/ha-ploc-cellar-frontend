@@ -146,6 +146,11 @@ describe("Ploc Cellar browser interactions", () => {
       await card.locator(".pagination button[aria-label=\"Next page\"]").click();
       assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 11");
 
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
+      const defaultPageCard = page.locator("ploc-cellar-inventory-card");
+      await defaultPageCard.locator(".wine").first().waitFor();
+      assert.equal(await defaultPageCard.locator(".wine").count(), 40);
+      assert.equal(await defaultPageCard.locator(".pagination").innerText(), "1–40 of 45\nPage 1 of 2");
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", { page_size: 200 }));
       const maxPageCard = page.locator("ploc-cellar-inventory-card");
       await maxPageCard.locator(".wine").first().waitFor();
