@@ -80,9 +80,10 @@ export class PlocCellarInventoryCard extends LitElement {
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
-    .filters { margin: 10px 0; padding: 1px 10px 0px 10px}
+    .filters-row { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+    .filters { flex: 1 1 auto; min-width: 0; margin: 0; padding: 1px 10px 0px 10px; }
     .filters[open] { padding: 0 10px 10px 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
-    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { margin-left: auto; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
+    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { flex: 0 0 auto; margin: 0; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
     .filters[open] > summary { color: var(--primary-text-color); padding-bottom: 8px; border-bottom: 1px solid var(--divider-color); }
     .filters > summary::-webkit-details-marker { display: none; }
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
@@ -115,14 +116,23 @@ export class PlocCellarInventoryCard extends LitElement {
   }
 
   setConfig(config: PlocCellarCardConfig): void {
+    const pageSizeChanged = this.config?.page_size !== config.page_size;
+    const configEntryChanged = this.config?.config_entry_id !== config.config_entry_id;
     this.requestGeneration += 1;
     this.loading = false;
     this.refreshPending = false;
-    const pageSizeChanged = this.config?.page_size !== config.page_size;
-    const configEntryChanged = this.config?.config_entry_id !== config.config_entry_id;
     this.config = config;
     this.sort = config.default_sort ?? "name-asc";
     if (pageSizeChanged || configEntryChanged) this.currentPage = 1;
+    if (configEntryChanged) {
+      this.search = "";
+      this.color = ALL_FILTER_VALUES;
+      this.region = ALL_FILTER_VALUES;
+      this.appellation = ALL_FILTER_VALUES;
+      this.vintage = ALL_FILTER_VALUES;
+      this.meal = "";
+      this.selectedWine = undefined;
+    }
     this.inventory = undefined;
     this.error = undefined;
     if (config.config_entry_id) void this.refresh();
@@ -201,7 +211,13 @@ export class PlocCellarInventoryCard extends LitElement {
     this.error = undefined;
     try {
       const inventory = await fetchInventory(hass, configEntryId);
-      if (generation === this.requestGeneration) this.inventory = inventory;
+      if (generation === this.requestGeneration) {
+        this.inventory = inventory;
+        if (this.selectedWine) {
+          this.selectedWine =
+            inventory.wines.find((wine) => wine.id === this.selectedWine?.id);
+        }
+      }
     } catch (error) {
       if (generation === this.requestGeneration) {
         this.error = error instanceof Error ? error.message : String(error);
@@ -409,9 +425,10 @@ export class PlocCellarInventoryCard extends LitElement {
           <input class="search" type="search" aria-label=${t("search_wine")}
             placeholder=${t("search_placeholder")} .value=${this.search}
             @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; this.currentPage = 1; }} />
-          <details class="filters">
-            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon>${activeFilters ? html`<button class="filters-clear" type="button" @click=${(event: Event) => { event.stopPropagation(); this.clearFilters(); }}>${t("clear_filters")}</button>` : nothing}</summary>
-            <div class="toolbar">
+          <div class="filters-row">
+            <details class="filters">
+              <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
+              <div class="toolbar">
               ${this.selectFilter("color", t("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", t("filter_region"), this.region, this.valuesFor("region"))}
               ${this.selectFilter("appellation", t("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
@@ -429,8 +446,10 @@ export class PlocCellarInventoryCard extends LitElement {
                 <option value="vintage-asc">${t("sort_vintage_asc")}</option>
                 <option value="vintage-desc">${t("sort_vintage_desc")}</option>
               </select>
-            </label>
-          </details>
+              </label>
+            </details>
+            ${activeFilters ? html`<button class="filters-clear" type="button" @click=${() => this.clearFilters()}>${t("clear_filters")}</button>` : nothing}
+          </div>
           <div class="summary">
             <span>${t("inventory_results").replace("{count}", String(wines.length))}</span>
             <span>${t("inventory_bottle_total").replace("{count}", String(total))}</span>
