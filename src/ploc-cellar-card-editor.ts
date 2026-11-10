@@ -8,6 +8,7 @@ type EditorField =
   | "config_entry_id"
   | "title"
   | "default_sort"
+  | "page_size"
   | "rack_picker_mode"
   | "show_rack_occupancy"
   | "show_occupancy"
@@ -58,6 +59,12 @@ export class PlocCellarCardEditor extends LitElement {
     } else if (this.isInventoryCard) {
       fields.push(
         { name: "title", selector: { text: {} } },
+        {
+          name: "page_size",
+          selector: {
+            number: { min: 10, max: 200, step: 10, mode: "box" },
+          },
+        },
         {
           name: "default_sort",
           selector: {
@@ -113,6 +120,7 @@ export class PlocCellarCardEditor extends LitElement {
       nextConfig.show_statistics_legends = config.show_statistics_legends !== false;
     } else if (config.type === "custom:ploc-cellar-inventory-card") {
       nextConfig.default_sort = config.default_sort ?? "name-asc";
+      nextConfig.page_size = config.page_size ?? 40;
     } else if (config.type === "custom:ploc-cellar-rack-card") {
       nextConfig.rack_picker_mode = config.rack_picker_mode ?? "buttons";
       nextConfig.show_rack_occupancy = config.show_rack_occupancy !== false;
@@ -130,6 +138,7 @@ export class PlocCellarCardEditor extends LitElement {
       config_entry_id: "editor_configuration",
       title: "editor_title",
       default_sort: "editor_default_sort",
+      page_size: "editor_page_size",
       rack_picker_mode: "editor_rack_picker_mode",
       show_rack_occupancy: "editor_show_rack_occupancy",
       show_occupancy: "editor_show_occupancy",
@@ -149,6 +158,9 @@ export class PlocCellarCardEditor extends LitElement {
     }
     if (schema.name === "title") {
       return translate(this.hass?.language ?? "en", "editor_title_helper");
+    }
+    if (schema.name === "page_size") {
+      return translate(this.hass?.language ?? "en", "editor_page_size_helper");
     }
     return undefined;
   };
