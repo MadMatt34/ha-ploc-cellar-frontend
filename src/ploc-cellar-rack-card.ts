@@ -86,10 +86,19 @@ export class PlocCellarRackCard extends LitElement {
   }
 
   setConfig(config: PlocCellarCardConfig): void {
+    const configEntryChanged =
+      this.config?.config_entry_id !== config.config_entry_id;
     this.requestGeneration += 1;
     this.loading = false;
     this.refreshPending = false;
     this.config = config;
+    if (configEntryChanged) {
+      this.selectedRackId = undefined;
+      this.selectedWine = undefined;
+      this.selectedLocation = undefined;
+      this.activeTooltip = undefined;
+      this.tooltipPosition = undefined;
+    }
     this.inventory = undefined;
     this.error = undefined;
     if (this.config.config_entry_id) void this.refresh();
@@ -165,8 +174,29 @@ export class PlocCellarRackCard extends LitElement {
       const inventory = await fetchInventory(hass, configEntryId);
       if (generation === this.requestGeneration) {
         this.inventory = inventory;
-        if (!this.selectedRackId || !this.inventory.racks.some((rack) => rack.id === this.selectedRackId)) {
-          this.selectedRackId = this.inventory.racks[0]?.id;
+        if (!this.selectedRackId || !inventory.racks.some((rack) => rack.id === this.selectedRackId)) {
+          this.selectedRackId = inventory.racks[0]?.id;
+        }
+        if (this.selectedWine) {
+          const updatedWine = inventory.wines.find(
+            (wine) => wine.id === this.selectedWine?.id,
+          );
+          if (!updatedWine) {
+            this.selectedWine = undefined;
+            this.selectedLocation = undefined;
+          } else {
+            this.selectedWine = updatedWine;
+            if (this.selectedLocation) {
+              const locationStillMatches = inventory.rack_items.some(
+                (item) =>
+                  item.rack_id === this.selectedLocation?.rackId &&
+                  item.row === this.selectedLocation?.row &&
+                  item.column === this.selectedLocation?.column &&
+                  item.wine_id === updatedWine.id,
+              );
+              if (!locationStillMatches) this.selectedLocation = undefined;
+            }
+          }
         }
       }
     } catch (error) {
