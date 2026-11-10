@@ -108,7 +108,77 @@ describe("Ploc Cellar browser interactions", () => {
   });
 
 
-  it("paginates inventory results and resets to the first page after filtering", async () => {\n    const { context, page, pageErrors } = await openFixture();\n    try {\n      await page.evaluate(() => {\n        const template = window.__plocFixture.inventory.wines[0];\n        window.__plocFixture.inventory.wines = Array.from({ length: 45 }, (_, index) => ({\n          ...template,\n          id: `wine-${index + 1}`,\n          name: `Wine ${String(index + 1).padStart(2, "0")}`,\n        }));\n      });\n      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", { page_size: 10 }));\n      const card = page.locator("ploc-cellar-inventory-card");\n      await card.locator(".wine").first().waitFor();\n      assert.equal(await card.locator(".wine").count(), 10);\n      assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 01");\n      assert.equal(await card.locator(".pagination").innerText(), "1–10 of 45\nPage 1 of 5");\n\n      await card.locator(".pagination button[aria-label=\"Next page\"]").click();\n      assert.equal(await card.locator(".wine").count(), 10);\n      assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 11");\n\n      for (let pageNumber = 3; pageNumber <= 5; pageNumber += 1) {\n        await card.locator(".pagination button[aria-label=\"Next page\"]").click();\n      }\n      assert.equal(await card.locator(".wine").count(), 5);\n      assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 41");\n      assert.equal(await card.locator(".pagination button[aria-label=\"Next page\"]").isDisabled(), true);\n\n      await card.locator(".search").fill("Wine 45");\n      assert.equal(await card.locator(".wine").count(), 1);\n      assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 45");\n      assert.equal(await card.locator(".pagination").count(), 0);\n\n      await card.locator(".search").fill("");\n      await card.locator(".pagination button[aria-label=\"Next page\"]").click();\n      assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 11");\n\n      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", { page_size: 200 }));\n      const maxPageCard = page.locator("ploc-cellar-inventory-card");\n      await maxPageCard.locator(".wine").first().waitFor();\n      assert.equal(await maxPageCard.locator(".wine").count(), 45);\n      assert.equal(await maxPageCard.locator(".pagination").count(), 0);\n      assert.deepEqual(pageErrors, []);\n    } finally {\n      await context.close();\n    }\n  });\n\n  it("exposes a 10-to-200 page-size editor setting with a default of 40", async () => {\n    const { context, page, pageErrors } = await openFixture();\n    try {\n      const editor = await page.evaluate(async () => {\n        const element = document.createElement("ploc-cellar-card-editor");\n        element.hass = window.testHass;\n        element.setConfig({ type: "custom:ploc-cellar-inventory-card", config_entry_id: "fixture-entry" });\n        document.body.append(element);\n        await element.updateComplete;\n        const form = element.shadowRoot.querySelector("ha-form");\n        const field = form.schema.find((item) => item.name === "page_size");\n        return { value: form.data.page_size, selector: field.selector.number };\n      });\n      assert.equal(editor.value, 40);\n      assert.deepEqual(editor.selector, { min: 10, max: 200, step: 10, mode: "box" });\n      assert.deepEqual(pageErrors, []);\n    } finally {\n      await context.close();\n    }\n  });\n\n  it("keeps inventory controls within a narrow mobile viewport", async () => {
+  it("paginates inventory results and resets to the first page after filtering", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => {
+        const template = window.__plocFixture.inventory.wines[0];
+        window.__plocFixture.inventory.wines = Array.from({ length: 45 }, (_, index) => ({
+          ...template,
+          id: `wine-${index + 1}`,
+          name: `Wine ${String(index + 1).padStart(2, "0")}`,
+        }));
+      });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", { page_size: 10 }));
+      const card = page.locator("ploc-cellar-inventory-card");
+      await card.locator(".wine").first().waitFor();
+      assert.equal(await card.locator(".wine").count(), 10);
+      assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 01");
+      assert.equal(await card.locator(".pagination").innerText(), "1–10 of 45\\nPage 1 of 5");
+
+      await card.locator(".pagination button[aria-label=\"Next page\"]").click();
+      assert.equal(await card.locator(".wine").count(), 10);
+      assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 11");
+
+      for (let pageNumber = 3; pageNumber <= 5; pageNumber += 1) {
+        await card.locator(".pagination button[aria-label=\"Next page\"]").click();
+      }
+      assert.equal(await card.locator(".wine").count(), 5);
+      assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 41");
+      assert.equal(await card.locator(".pagination button[aria-label=\"Next page\"]").isDisabled(), true);
+
+      await card.locator(".search").fill("Wine 45");
+      assert.equal(await card.locator(".wine").count(), 1);
+      assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 45");
+      assert.equal(await card.locator(".pagination").count(), 0);
+
+      await card.locator(".search").fill("");
+      await card.locator(".pagination button[aria-label=\"Next page\"]").click();
+      assert.equal(await card.locator(".wine-name").first().innerText(), "Wine 11");
+
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", { page_size: 200 }));
+      const maxPageCard = page.locator("ploc-cellar-inventory-card");
+      await maxPageCard.locator(".wine").first().waitFor();
+      assert.equal(await maxPageCard.locator(".wine").count(), 45);
+      assert.equal(await maxPageCard.locator(".pagination").count(), 0);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it("exposes a 10-to-200 page-size editor setting with a default of 40", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      const editor = await page.evaluate(async () => {
+        const element = document.createElement("ploc-cellar-card-editor");
+        element.hass = window.testHass;
+        element.setConfig({ type: "custom:ploc-cellar-inventory-card", config_entry_id: "fixture-entry" });
+        document.body.append(element);
+        await element.updateComplete;
+        const form = element.shadowRoot.querySelector("ha-form");
+        const field = form.schema.find((item) => item.name === "page_size");
+        return { value: form.data.page_size, selector: field.selector.number };
+      });
+      assert.equal(editor.value, 40);
+      assert.deepEqual(editor.selector, { min: 10, max: 200, step: 10, mode: "box" });
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it("keeps inventory controls within a narrow mobile viewport", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
       await page.setViewportSize({ width: 375, height: 812 });
