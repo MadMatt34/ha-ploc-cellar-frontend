@@ -2,7 +2,7 @@ name: HACS validation
 
 on:
   push:
-    branches: [main]
+    branches: [main, chore/ubuntu-26-04-ci-compatibility]
   pull_request:
   workflow_dispatch:
 
@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   hacs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

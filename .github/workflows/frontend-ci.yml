@@ -1,8 +1,9 @@
 name: Frontend CI
+# The compatibility branch pins Ubuntu 26.04 to validate the new runner image.
 
 on:
   push:
-    branches: [main]
+    branches: [main, chore/ubuntu-26-04-ci-compatibility]
   pull_request:
   workflow_dispatch:
 
@@ -16,7 +17,7 @@ permissions:
 jobs:
   build:
     name: Type-check, test and build (Node ${{ matrix.node-version }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -54,7 +55,7 @@ jobs:
 
   browser:
     name: Browser interaction tests (Chromium)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -74,7 +75,7 @@ jobs:
     name: Update committed distributables
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [build, browser]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     steps:
