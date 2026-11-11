@@ -82,7 +82,7 @@ The nullable `Wine.meals` field contains PLOUD food-pairing flags as a raw bitma
 
 ### 🔄 Automatic synchronization updates
 
-After initialization, each card listens for the `ploc_cellar_sync_completed` Home Assistant event. It refreshes only when the event's `config_entry_id` matches the configuration entry selected in that card. The backend emits this event only after a successful synchronization has been committed to the active inventory.
+After initialization, each card subscribes to the `ploc_cellar/subscribe_sync` WebSocket command for its selected configuration entry. The backend uses an internal signal dedicated to that entry and sends an empty notification after each successfully committed synchronization. Non-admin users can therefore refresh the cards without subscribing to a custom Home Assistant event. The card then reads the inventory through `ploc_cellar.get_inventory`; no cellar data is included in the notification.
 
 ## 🌐 Languages
 
