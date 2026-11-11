@@ -24,11 +24,33 @@ The cards call the Home Assistant `call_service` WebSocket command and request a
 
 The backend service also supports optional `search` and `color` filters. The cards currently request the inventory for the selected config entry and apply their presentation/filtering behavior in the frontend.
 
-## Successful synchronization notification
+## Public successful synchronization event
 
-After the new inventory has been fully validated, persisted and published, the backend emits an internal signal dedicated to that configuration entry. It no longer fires the global `ploc_cellar_sync_completed` event on the Home Assistant event bus.
+After the new inventory has been fully validated, persisted and published, the backend continues to fire the Home Assistant event `ploc_cellar_sync_completed`. The event is retained for compatibility with existing automations and is not fired for failed synchronizations.
 
-Each card subscribes through the `ploc_cellar/subscribe_sync` WebSocket command with its selected `config_entry_id`:
+```ts
+{
+  config_entry_id: string;
+  last_sync: string;
+  trigger: "recurring" | "forced_incremental" | "forced_full";
+  sync_type: "full" | "incremental";
+  changes: {
+    wines: { added: string[]; updated: string[]; deleted: string[] };
+    racks: { added: string[]; updated: string[]; deleted: string[] };
+    rack_items: { added: string[]; updated: string[]; deleted: string[] };
+    orders: { added: string[]; updated: string[]; deleted: string[] };
+  };
+  change_counts: {
+    [collection: string]: { added: number; updated: number; deleted: number };
+  };
+}
+```
+
+`trigger` and `sync_type` distinguish the initiating action from the actual synchronization type. `changes` lists the effective identifiers added, updated or deleted; `change_counts` contains the corresponding totals. Identifiers are calculated by comparing the committed models before and after synchronization. Home Assistant restricts subscriptions to custom events to administrators, so this event remains available to administrator automations.
+
+## Frontend WebSocket subscription
+
+The frontend cards do not use the public event for refreshes. They subscribe through the `ploc_cellar/subscribe_sync` WebSocket command with their selected `config_entry_id`:
 
 ```ts
 connection.subscribeMessage(
@@ -40,9 +62,9 @@ connection.subscribeMessage(
 );
 ```
 
-The backend verifies that the entry exists, belongs to Ploc Cellar and is loaded. The subscription attaches to an internal signal derived from that entry ID, so notifications from one cellar cannot reach subscribers for another. The command does not require administrator privileges and is available to authenticated Home Assistant users.
+The backend verifies that the entry exists, belongs to Ploc Cellar and is loaded. The subscription attaches to an internal signal dedicated to that entry, isolating different cellars. The command does not require administrator privileges and is available to authenticated Home Assistant users.
 
-The notification payload is always empty (`{}`). It is only an invalidation hint; it contains no `config_entry_id`, timestamp, cellar data or object identifiers. The frontend then reloads inventory through `ploc_cellar.get_inventory`. No message is sent when synchronization fails or is not validated and persisted.
+The notification payload is always empty (`{}`). It is only an invalidation hint: it contains no `config_entry_id`, timestamp, cellar data or object identifiers. The frontend then reloads inventory through `ploc_cellar.get_inventory`. No message is sent when synchronization fails or is not validated and persisted.
 
 `subscribeMessage()` provides an unsubscribe function. Home Assistant invokes it on explicit unsubscribe or WebSocket disconnection. The frontend also guards against late asynchronous subscription resolution when a card changes cellar or disconnects. No polling or generated entity ID is required.
 
