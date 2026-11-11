@@ -104,7 +104,6 @@ export class PlocCellarWineDetail extends LitElement {
       background: var(--secondary-background-color);
     }
     .stock-value { display: block; font-size: 1.4rem; }
-    .stock-details .characteristic-value { }
     .stock-label { display: block; margin-top: 3px; color: var(--secondary-text-color); font-size: .8rem; }
     .locations { display: grid; gap: 9px; }
     .location { padding: 10px 12px; border: 1px solid var(--divider-color); border-radius: 9px; background: var(--secondary-background-color); }
