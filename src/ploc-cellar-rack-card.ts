@@ -349,7 +349,7 @@ export class PlocCellarRackCard extends LitElement {
             : nothing}
           <div class="rack-summary">
             <div class="rack-name">${rack?.name ?? ""}</div>
-            ${selectedRackColorCounts.length ? html`<div class="color-counts">${selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: <span >${count}</span></span>`)}</div>` : nothing}
+            ${selectedRackColorCounts.length ? html`<div class="color-counts">${selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: <span>${count}</span></span>`)}</div>` : nothing}
           </div>
           <div class="rack-visualization"
             style=${`width: ${items.length ? `${gridLayout.columnCount * 104 - 6}px` : "100%" };`}>
@@ -363,7 +363,7 @@ export class PlocCellarRackCard extends LitElement {
                 aria-valuetext=${`${selectedItems.length} ${t("positions")}, ${occupiedCount} ${t("occupied")}, ${freeCount} ${t("free")}`}>
                 <div class="rack-occupancy-fill" style=${`width: ${occupancyPercent}%;`}></div>
                 <div class="rack-occupancy-label">
-                  <span >${selectedItems.length}</span>&nbsp;${t("positions")}&nbsp;·&nbsp;<span >${occupiedCount}</span>&nbsp;${t("occupied")}&nbsp;·&nbsp;<span >${freeCount}</span>&nbsp;${t("free")}
+                  <span>${selectedItems.length}</span>&nbsp;${t("positions")}&nbsp;·&nbsp;<span>${occupiedCount}</span>&nbsp;${t("occupied")}&nbsp;·&nbsp;<span>${freeCount}</span>&nbsp;${t("free")}
                 </div>
               </div>
             `}
@@ -434,7 +434,7 @@ export class PlocCellarRackCard extends LitElement {
           ` : nothing}
         ` : html`<p class="muted">${t("no_racks")}</p>`}
         ${rackItemsWithUnknownRack.length ? html`
-          <div class="warning"><span >${rackItemsWithUnknownRack.length}</span> ${t("missing_rack")}</div>
+          <div class="warning"><span>${rackItemsWithUnknownRack.length}</span> ${t("missing_rack")}</div>
         ` : nothing}
         ${this.activeTooltip ? html`
           <div class="wine-tooltip"
