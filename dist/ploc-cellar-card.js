@@ -688,6 +688,7 @@ var He = {
 	statistics_empty: "No data available for this category.",
 	unknown_value: "Unknown",
 	stocked_references: "Wine references in stock",
+	physical_wine_references: "Wine references in the cellar",
 	rack_occupancy: "Rack occupancy",
 	inventory_diagnostics: "Stock diagnostics",
 	diagnostic_unlocated: "Unlocated bottles",
@@ -853,6 +854,7 @@ var He = {
 	statistics_empty: "Aucune donnée disponible pour cette catégorie.",
 	unknown_value: "Inconnu",
 	stocked_references: "Références de vins en stock",
+	physical_wine_references: "Références de vins en cave",
 	rack_occupancy: "Occupation des casiers",
 	inventory_diagnostics: "Diagnostics du stock",
 	diagnostic_unlocated: "Bouteilles non localisées",
@@ -964,13 +966,26 @@ function qe(e, t) {
 		n?.get(t) === a && (n.delete(t), n.size === 0 && Ke.delete(e));
 	}), n.set(t, a), a;
 }
-function Je(e, t, n) {
-	return e.connection.subscribeEvents((e) => {
-		e.data.config_entry_id === t && n();
-	}, Ge);
-}
-// src/wine-image.ts
-var Ye = class {
+var Je = class {
+	constructor() {
+		this.generation = 0;
+	}
+	update(e, t, n, r) {
+		let i = e?.connection;
+		if (i === this.connection && t === this.configEntryId || (this.generation += 1, this.unsubscribe?.(), this.unsubscribe = void 0, this.connection = i, this.configEntryId = t, !n || !i || !t)) return;
+		let a = this.generation;
+		i.subscribeEvents((e) => {
+			e.data.config_entry_id === t && r();
+		}, Ge).then((e) => {
+			a === this.generation && n && this.connection === i && this.configEntryId === t ? this.unsubscribe = e : e();
+		}).catch((e) => {
+			console.error("Unable to subscribe to Ploc Cellar synchronization events", e), a === this.generation && (this.connection = void 0, this.configEntryId = void 0);
+		});
+	}
+	disconnect() {
+		this.generation += 1, this.unsubscribe?.(), this.unsubscribe = void 0, this.connection = void 0, this.configEntryId = void 0;
+	}
+}, Ye = class {
 	constructor(e = (e) => URL.createObjectURL(e), t = (e) => URL.revokeObjectURL(e)) {
 		this.createObjectUrl = e, this.revokeObjectUrl = t, this.objectUrl = null, this.loadedPath = null, this.pendingPath = null, this.attemptedPath = null, this.request = 0;
 	}
@@ -1506,8 +1521,8 @@ function ot(e) {
 	};
 	let t = Infinity, n = -Infinity, r = Infinity, i = -Infinity;
 	for (let a of e) t = Math.min(t, a.row), n = Math.max(n, a.row), r = Math.min(r, a.column), i = Math.max(i, a.column);
-	let a = n - t + 1, o = i - r + 1;
-	if (Number.isSafeInteger(a) && Number.isSafeInteger(o) && a > 0 && o > 0 && a <= 400 / o) {
+	let a = n - t + 1, o = i - r + 1, s = e.every((e) => Number.isSafeInteger(e.row) && Number.isSafeInteger(e.column) && e.row >= 0 && e.column >= 0), c = new Set(e.map((e) => String(e.row) + ":" + String(e.column))).size === e.length;
+	if (s && c && Number.isSafeInteger(a) && Number.isSafeInteger(o) && a > 0 && o > 0 && a <= 400 / o) {
 		let s = new Set(e.map((e) => `${e.row}:${e.column}`)), c = [];
 		for (let e = t; e <= n; e += 1) for (let t = r; t <= i; t += 1) s.has(`${e}:${t}`) || c.push({
 			row: e,
@@ -1528,15 +1543,15 @@ function ot(e) {
 			}))
 		};
 	}
-	let s = Math.min(at, Math.max(1, Math.ceil(Math.sqrt(e.length)))), c = [...e].sort((e, t) => e.row - t.row || e.column - t.column || e.id.localeCompare(t.id));
+	let l = Math.min(at, Math.max(1, Math.ceil(Math.sqrt(e.length)))), u = [...e].sort((e, t) => e.row - t.row || e.column - t.column || e.id.localeCompare(t.id));
 	return {
 		compact: !0,
-		rowCount: Math.ceil(c.length / s),
-		columnCount: s,
-		positions: c.map((e, t) => ({
+		rowCount: Math.ceil(u.length / l),
+		columnCount: l,
+		positions: u.map((e, t) => ({
 			id: e.id,
-			row: Math.floor(t / s) + 1,
-			column: t % s + 1
+			row: Math.floor(t / l) + 1,
+			column: t % l + 1
 		})),
 		missingCoordinates: []
 	};
@@ -1551,7 +1566,7 @@ function st(e, t, n, r, i, a, o = 12) {
 // src/ploc-cellar-rack-card.ts
 var ct = class extends je {
 	constructor(...e) {
-		super(...e), this.loading = !1, this.requestGeneration = 0, this.refreshPending = !1, this.syncSubscriptionGeneration = 0;
+		super(...e), this.loading = !1, this.requestGeneration = 0, this.refreshPending = !1, this.syncSubscription = new Je();
 	}
 	static {
 		this.styles = c`
@@ -1594,6 +1609,10 @@ var ct = class extends je {
     .bottle-marker { display: block; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: var(--bottle-color, var(--secondary-text-color)); border: 2px solid var(--divider-color); box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%); box-sizing: border-box; }
     .legend, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .warning { color: var(--warning-color); padding: 8px 0; }
+    .loading { display: flex; align-items: center; gap: 8px; color: var(--secondary-text-color); padding: 8px 0; }
+    .loading::before { content: ""; width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid var(--divider-color); border-top-color: var(--primary-color); border-radius: 50%; animation: ploc-cellar-loading 0.8s linear infinite; }
+    @keyframes ploc-cellar-loading { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .loading::before { animation: none; } }
     .error { color: var(--error-color); padding: 8px 0; }
     .unplaced { border-top: 1px solid var(--divider-color); padding-top: 10px; margin-top: 10px; }
     .unplaced-item { padding: 5px 0; }
@@ -1606,25 +1625,17 @@ var ct = class extends je {
 		return {};
 	}
 	setConfig(e) {
-		this.requestGeneration += 1, this.loading = !1, this.refreshPending = !1, this.config = e, this.inventory = void 0, this.error = void 0, this.config.config_entry_id && this.refresh();
+		let t = this.config?.config_entry_id !== e.config_entry_id;
+		this.requestGeneration += 1, this.loading = !1, this.refreshPending = !1, this.config = e, t && (this.selectedRackId = void 0, this.selectedWine = void 0, this.selectedLocation = void 0, this.activeTooltip = void 0, this.tooltipPosition = void 0), this.inventory = void 0, this.error = void 0, this.config.config_entry_id && this.refresh();
 	}
 	connectedCallback() {
 		super.connectedCallback(), this.requestUpdate();
 	}
 	disconnectedCallback() {
-		this.syncSubscriptionGeneration += 1, this.syncUnsubscribe?.(), this.syncUnsubscribe = void 0, this.syncConnection = void 0, this.syncEntryId = void 0, super.disconnectedCallback();
+		this.syncSubscription.disconnect(), super.disconnectedCallback();
 	}
 	ensureSyncSubscription() {
-		let e = this.hass?.connection, t = this.config?.config_entry_id;
-		if (e === this.syncConnection && t === this.syncEntryId || (this.syncSubscriptionGeneration += 1, this.syncUnsubscribe?.(), this.syncUnsubscribe = void 0, this.syncConnection = e, this.syncEntryId = t, !this.isConnected || !this.hass || !e || !t)) return;
-		let n = this.syncSubscriptionGeneration;
-		Je(this.hass, t, () => {
-			n === this.syncSubscriptionGeneration && this.refresh();
-		}).then((r) => {
-			n === this.syncSubscriptionGeneration && this.isConnected && this.hass?.connection === e && this.config?.config_entry_id === t ? this.syncUnsubscribe = r : r();
-		}).catch((e) => {
-			console.error("Unable to subscribe to Ploc Cellar synchronization events", e);
-		});
+		this.syncSubscription.update(this.hass, this.config?.config_entry_id, this.isConnected, () => void this.refresh());
 	}
 	updated() {
 		this.ensureSyncSubscription(), this.hass && this.config && !this.inventory && !this.loading && !this.error && this.refresh(), this.activeTooltip && this.applyTooltipPosition();
@@ -1640,7 +1651,10 @@ var ct = class extends je {
 		this.loading = !0, this.error = void 0;
 		try {
 			let t = await qe(e, n);
-			r === this.requestGeneration && (this.inventory = t, this.selectedRackId && this.inventory.racks.some((e) => e.id === this.selectedRackId) || (this.selectedRackId = this.inventory.racks[0]?.id));
+			if (r === this.requestGeneration && (this.inventory = t, this.selectedRackId && t.racks.some((e) => e.id === this.selectedRackId) || (this.selectedRackId = t.racks[0]?.id), this.selectedWine)) {
+				let e = t.wines.find((e) => e.id === this.selectedWine?.id);
+				e ? (this.selectedWine = e, this.selectedLocation && (t.rack_items.some((t) => t.rack_id === this.selectedLocation?.rackId && t.row === this.selectedLocation?.row && t.column === this.selectedLocation?.column && t.wine_id === e.id) || (this.selectedLocation = void 0))) : (this.selectedWine = void 0, this.selectedLocation = void 0);
+			}
 		} catch (e) {
 			r === this.requestGeneration && (this.error = e instanceof Error ? e.message : String(e));
 		} finally {
@@ -1708,10 +1722,11 @@ var ct = class extends je {
 			column: e.column
 		}))), f = new Map(d.positions.map((e) => [e.id, e])), p = r.filter((e) => !Number.isSafeInteger(e.row) || !Number.isSafeInteger(e.column)), m = (t?.rack_items ?? []).filter((e) => !t?.racks.some((t) => t.id === e.rack_id));
 		return N`
-      <ha-card>
+      <ha-card aria-busy=${this.loading ? "true" : "false"}>
         <header>
           <h2>${this.config?.title ?? e("rack_title")}</h2>
         </header>
+        ${this.loading ? N`<div class="loading" role="status" aria-live="polite">${e("loading")}</div>` : P}
         ${this.error ? N`<div class="error">${this.error}</div>` : P}
         ${this.config?.config_entry_id ? P : N`<div class="muted">${e("select_config")}</div>`}
         ${t?.stale ? N`<div class="warning">${e("stale")}</div>` : P}
@@ -1891,7 +1906,7 @@ function mt(e, t) {
 // src/ploc-cellar-inventory-card.ts
 var ht = class extends je {
 	constructor(...e) {
-		super(...e), this.loading = !1, this.search = "", this.color = lt, this.region = lt, this.appellation = lt, this.vintage = lt, this.meal = "", this.sort = "name-asc", this.currentPage = 1, this.requestGeneration = 0, this.refreshPending = !1, this.syncSubscriptionGeneration = 0;
+		super(...e), this.loading = !1, this.search = "", this.color = lt, this.region = lt, this.appellation = lt, this.vintage = lt, this.meal = "", this.sort = "name-asc", this.currentPage = 1, this.requestGeneration = 0, this.refreshPending = !1, this.syncSubscription = new Je();
 	}
 	static {
 		this.styles = c`
@@ -1928,9 +1943,10 @@ var ht = class extends je {
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
-    .filters { margin: 10px 0; padding: 1px 10px 0px 10px}
+    .filters-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .filters { flex: 1 1 180px; min-width: 0; margin: 0; padding: 1px 10px 0px 10px; }
     .filters[open] { padding: 0 10px 10px 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
-    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { margin-left: auto; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
+    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { flex: 0 0 auto; margin: 0; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
     .filters[open] > summary { color: var(--primary-text-color); padding-bottom: 8px; border-bottom: 1px solid var(--divider-color); }
     .filters > summary::-webkit-details-marker { display: none; }
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
@@ -1945,6 +1961,10 @@ var ht = class extends je {
     .pagination-controls ha-icon { --mdc-icon-size: 20px; }
     .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
+    .loading { display: flex; align-items: center; gap: 8px; color: var(--secondary-text-color); padding: 8px 0; }
+    .loading::before { content: ""; width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid var(--divider-color); border-top-color: var(--primary-color); border-radius: 50%; animation: ploc-cellar-loading 0.8s linear infinite; }
+    @keyframes ploc-cellar-loading { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .loading::before { animation: none; } }
     .error { color: var(--error-color); padding: 8px 0; }
     .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .actions { display: flex; gap: 8px; align-items: center; }
@@ -1961,9 +1981,8 @@ var ht = class extends je {
 		return {};
 	}
 	setConfig(e) {
-		this.requestGeneration += 1, this.loading = !1, this.refreshPending = !1;
 		let t = this.config?.page_size !== e.page_size, n = this.config?.config_entry_id !== e.config_entry_id;
-		this.config = e, this.sort = e.default_sort ?? "name-asc", (t || n) && (this.currentPage = 1), this.inventory = void 0, this.error = void 0, e.config_entry_id && this.refresh();
+		this.requestGeneration += 1, this.loading = !1, this.refreshPending = !1, this.config = e, this.sort = e.default_sort ?? "name-asc", (t || n) && (this.currentPage = 1), n && (this.search = "", this.color = lt, this.region = lt, this.appellation = lt, this.vintage = lt, this.meal = "", this.selectedWine = void 0), this.inventory = void 0, this.error = void 0, e.config_entry_id && this.refresh();
 	}
 	get pageSize() {
 		let e = this.config?.page_size ?? 40;
@@ -1973,19 +1992,10 @@ var ht = class extends je {
 		super.connectedCallback(), this.requestUpdate();
 	}
 	disconnectedCallback() {
-		this.syncSubscriptionGeneration += 1, this.syncUnsubscribe?.(), this.syncUnsubscribe = void 0, this.syncConnection = void 0, this.syncEntryId = void 0, super.disconnectedCallback();
+		this.syncSubscription.disconnect(), super.disconnectedCallback();
 	}
 	ensureSyncSubscription() {
-		let e = this.hass?.connection, t = this.config?.config_entry_id;
-		if (e === this.syncConnection && t === this.syncEntryId || (this.syncSubscriptionGeneration += 1, this.syncUnsubscribe?.(), this.syncUnsubscribe = void 0, this.syncConnection = e, this.syncEntryId = t, !this.isConnected || !this.hass || !e || !t)) return;
-		let n = this.syncSubscriptionGeneration;
-		Je(this.hass, t, () => {
-			n === this.syncSubscriptionGeneration && this.refresh();
-		}).then((r) => {
-			n === this.syncSubscriptionGeneration && this.isConnected && this.hass?.connection === e && this.config?.config_entry_id === t ? this.syncUnsubscribe = r : r();
-		}).catch((e) => {
-			console.error("Unable to subscribe to Ploc Cellar synchronization events", e);
-		});
+		this.syncSubscription.update(this.hass, this.config?.config_entry_id, this.isConnected, () => void this.refresh());
 	}
 	updated() {
 		this.ensureSyncSubscription(), this.hass && this.config && !this.inventory && !this.loading && !this.error && this.refresh();
@@ -2001,7 +2011,7 @@ var ht = class extends je {
 		this.loading = !0, this.error = void 0;
 		try {
 			let t = await qe(e, n);
-			r === this.requestGeneration && (this.inventory = t);
+			r === this.requestGeneration && (this.inventory = t, this.selectedWine &&= t.wines.find((e) => e.id === this.selectedWine?.id));
 		} catch (e) {
 			r === this.requestGeneration && (this.error = e instanceof Error ? e.message : String(e));
 		} finally {
@@ -2121,11 +2131,12 @@ var ht = class extends je {
 	render() {
 		let e = (e) => I(this.hass?.language ?? "en", e), t = this.filteredWines, n = t.reduce((e, t) => e + t.bottles_in_cellar, 0), r = this.pageSize, i = Math.max(1, Math.ceil(t.length / r)), a = Math.min(this.currentPage, i), o = (a - 1) * r, s = t.slice(o, o + r), c = !!(this.search || this.color.kind !== "all" || this.region.kind !== "all" || this.appellation.kind !== "all" || this.vintage.kind !== "all" || this.meal);
 		return N`
-      <ha-card>
+      <ha-card aria-busy=${this.loading ? "true" : "false"}>
         <header>
           <h2>${this.config?.title ?? e("inventory_title")}</h2>
 
         </header>
+        ${this.loading ? N`<div class="loading" role="status" aria-live="polite">${e("loading")}</div>` : P}
         ${this.error ? N`<div class="error">${this.error}</div>` : P}
         ${this.config?.config_entry_id ? P : N`<div class="muted">${e("select_config")}</div>`}
         ${this.inventory?.stale ? N`<div class="warning">${e("stale")}</div>` : P}
@@ -2135,11 +2146,10 @@ var ht = class extends je {
             @input=${(e) => {
 			this.search = e.target.value, this.currentPage = 1;
 		}} />
-          <details class="filters">
-            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon>${c ? N`<button class="filters-clear" type="button" @click=${(e) => {
-			e.stopPropagation(), this.clearFilters();
-		}}>${e("clear_filters")}</button>` : P}</summary>
-            <div class="toolbar">
+          <div class="filters-row">
+            <details class="filters">
+              <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
+              <div class="toolbar">
               ${this.selectFilter("color", e("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", e("filter_region"), this.region, this.valuesFor("region"))}
               ${this.selectFilter("appellation", e("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
@@ -2159,8 +2169,10 @@ var ht = class extends je {
                 <option value="vintage-asc">${e("sort_vintage_asc")}</option>
                 <option value="vintage-desc">${e("sort_vintage_desc")}</option>
               </select>
-            </label>
-          </details>
+              </label>
+            </details>
+            ${c ? N`<button class="filters-clear" type="button" @click=${() => this.clearFilters()}>${e("clear_filters")}</button>` : P}
+          </div>
           <div class="summary">
             <span>${e("inventory_results").replace("{count}", String(t.length))}</span>
             <span>${e("inventory_bottle_total").replace("{count}", String(n))}</span>
@@ -19603,7 +19615,7 @@ var WO = [
 	"#6A3D9A"
 ], GO = class extends je {
 	constructor(...e) {
-		super(...e), this.loading = !1, this.requestGeneration = 0, this.refreshPending = !1, this.syncSubscriptionGeneration = 0;
+		super(...e), this.loading = !1, this.requestGeneration = 0, this.refreshPending = !1, this.syncSubscription = new Je();
 	}
 	static {
 		this.styles = c`
@@ -19665,6 +19677,12 @@ var WO = [
     .legend-value { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
     .legend-meta { grid-column: 2 / 4; margin-top: -2px; color: var(--secondary-text-color); font-size: .72rem; }
     .warning { color: var(--warning-color); padding: 8px 0; }
+    .sync-status { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+    .sync-warning { color: var(--warning-color); font-size: .85rem; }
+    .loading { display: flex; align-items: center; gap: 8px; color: var(--secondary-text-color); padding: 8px 0; }
+    .loading::before { content: ""; width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid var(--divider-color); border-top-color: var(--primary-color); border-radius: 50%; animation: ploc-cellar-loading 0.8s linear infinite; }
+    @keyframes ploc-cellar-loading { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .loading::before { animation: none; } }
     .error { color: var(--error-color); padding: 8px 0; }
     @media (max-width: 420px) {
       ha-card { padding: 12px; }
@@ -19681,31 +19699,23 @@ var WO = [
 		return {};
 	}
 	setConfig(e) {
+		let t = this.config?.config_entry_id !== e.config_entry_id;
 		this.requestGeneration += 1, this.loading = !1, this.refreshPending = !1, this.config = {
 			...e,
 			show_occupancy: e.show_occupancy !== !1,
 			show_diagnostics: e.show_diagnostics !== !1,
 			show_statistics: e.show_statistics !== !1,
 			show_statistics_legends: e.show_statistics_legends !== !1
-		}, this.inventory = void 0, this.error = void 0, e.config_entry_id && this.refresh();
+		}, t && (this.activeDiagnostic = void 0, this.selectedWine = void 0), this.inventory = void 0, this.error = void 0, e.config_entry_id && this.refresh();
 	}
 	connectedCallback() {
 		super.connectedCallback(), this.requestUpdate();
 	}
 	disconnectedCallback() {
-		this.syncSubscriptionGeneration += 1, this.syncUnsubscribe?.(), this.syncUnsubscribe = void 0, this.syncConnection = void 0, this.syncEntryId = void 0, super.disconnectedCallback();
+		this.syncSubscription.disconnect(), super.disconnectedCallback();
 	}
 	ensureSyncSubscription() {
-		let e = this.hass?.connection, t = this.config?.config_entry_id;
-		if (e === this.syncConnection && t === this.syncEntryId || (this.syncSubscriptionGeneration += 1, this.syncUnsubscribe?.(), this.syncUnsubscribe = void 0, this.syncConnection = e, this.syncEntryId = t, !this.isConnected || !this.hass || !e || !t)) return;
-		let n = this.syncSubscriptionGeneration;
-		Je(this.hass, t, () => {
-			n === this.syncSubscriptionGeneration && this.refresh();
-		}).then((r) => {
-			n === this.syncSubscriptionGeneration && this.isConnected && this.hass?.connection === e && this.config?.config_entry_id === t ? this.syncUnsubscribe = r : r();
-		}).catch((e) => {
-			console.error("Unable to subscribe to Ploc Cellar synchronization events", e);
-		});
+		this.syncSubscription.update(this.hass, this.config?.config_entry_id, this.isConnected, () => void this.refresh());
 	}
 	updated() {
 		this.ensureSyncSubscription(), this.hass && this.config && !this.inventory && !this.loading && !this.error && this.refresh();
@@ -19721,7 +19731,7 @@ var WO = [
 		this.loading = !0, this.error = void 0;
 		try {
 			let t = await qe(e, n);
-			r === this.requestGeneration && (this.inventory = t);
+			r === this.requestGeneration && (this.inventory = t, this.selectedWine &&= t.wines.find((e) => e.id === this.selectedWine?.id));
 		} catch (e) {
 			r === this.requestGeneration && (this.error = e instanceof Error ? e.message : String(e));
 		} finally {
@@ -19884,20 +19894,20 @@ var WO = [
 				kind: "surplus",
 				value: t.physical_surplus_bottles ?? 0
 			}
-		] : [], u = !!(t && (!t.stock_reconstruction_complete || l.length > 0 || t.positions_with_unknown_wine > 0)), d = t?.wines ?? [], f = t?.wine_references ?? d.length;
+		] : [], u = !!(t && (!t.stock_reconstruction_complete || l.length > 0 || t.positions_with_unknown_wine > 0)), d = t?.stock_reconstruction_complete ? t.wine_references ?? 0 : t?.stocked_wines ?? 0, f = t?.stock_reconstruction_complete ? e("stocked_references") : e("physical_wine_references");
 		return N`
-      <ha-card>
+      <ha-card aria-busy=${this.loading ? "true" : "false"}>
         <header>
           <h2>${n}</h2>
         </header>
+        ${this.loading ? N`<div class="loading" role="status" aria-live="polite">${e("loading")}</div>` : P}
         ${this.error ? N`<div class="error">${this.error}</div>` : P}
         ${this.config?.config_entry_id ? P : N`<div class="muted">${e("select_config")}</div>`}
         ${t ? N`
-          ${t.stale ? N`<div class="warning">${e("stale")}</div>` : P}
           <div class="summary">
             ${this.metric(t.total_bottles, e("bottles_in_cellar"))}
             ${this.metric(t.total_stock_bottles ?? e("unknown_value"), e("reconstructed_stock"))}
-            ${this.metric(f, e("stocked_references"))}
+            ${this.metric(d, f)}
             ${this.metric(t.rack_count, e("racks"))}
           </div>
           ${r ? N`
@@ -19956,7 +19966,10 @@ var WO = [
               </div>
             </details>
           ` : P}
-          <div class="muted section">${e("last_sync")}: ${this.formatSync(t.last_sync)}</div>
+          <div class="muted section sync-status">
+            <span>${e("last_sync")}: ${this.formatSync(t.last_sync)}</span>
+            ${t.stale ? N`<span class="sync-warning" role="status">${e("stale")}</span>` : P}
+          </div>
           ${this.renderDiagnosticDialog()}
           ${this.selectedWine ? N`
             <ploc-cellar-wine-detail
