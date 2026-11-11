@@ -1,9 +1,6 @@
 name: Frontend CI
-# The compatibility branch pins Ubuntu 26.04 to validate the new runner image.
-
 on:
   push:
-    branches: [main, chore/ubuntu-26-04-ci-compatibility]
   pull_request:
   workflow_dispatch:
 
@@ -40,6 +37,8 @@ jobs:
         run: npm test
       - name: Build standalone dashboard module
         run: npm run build
+      - name: Enforce production bundle size budget
+        run: npm run check:bundle-size
       - name: Prepare HACS distributable
         run: cp dist/ploc-cellar-card.js ploc-cellar-card.js
       - name: Verify distributables exist

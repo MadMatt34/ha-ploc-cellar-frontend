@@ -32,8 +32,21 @@ After a PLOUD synchronization has been fully validated, persisted and committed 
 {
   config_entry_id: string;
   last_sync: string;
+  trigger: "recurring" | "forced_incremental" | "forced_full";
+  sync_type: "full" | "incremental";
+  changes: {
+    wines: { added: string[]; updated: string[]; deleted: string[] };
+    racks: { added: string[]; updated: string[]; deleted: string[] };
+    rack_items: { added: string[]; updated: string[]; deleted: string[] };
+    orders: { added: string[]; updated: string[]; deleted: string[] };
+  };
+  change_counts: {
+    [collection: string]: { added: number; updated: number; deleted: number };
+  };
 }
 ```
+
+`trigger` identifies the action that initiated synchronization. `sync_type` distinguishes a full snapshot from an incremental delta. `changes` lists the effective identifiers added, updated or deleted in each cellar collection; `change_counts` contains the corresponding totals. The cards currently use only `config_entry_id` and ignore the other event fields. `last_sync` is informational and is not used as a polling cursor.
 
 The frontend subscribes to this event through the active Home Assistant WebSocket connection and refreshes only cards whose configured `config_entry_id` matches the event. The event is not fired for failed or uncommitted synchronizations. The frontend does not depend on the generated entity ID of the diagnostic last-sync sensor and does not poll.
 
@@ -52,8 +65,8 @@ Top-level response fields:
 | `stock_reconstruction_complete` | Whether a complete Orders snapshot is available for stock reconstruction. |
 | `total_bottles` | Number of physically occupied rack positions. |
 | `total_stock_bottles` | Reconstructed total stock; `null` until reconstruction is complete. |
-| `stocked_wines` | Number of known wine references represented in the inventory. |
-| `wine_references` | Number of wine references, or `null` when unavailable. |
+| `stocked_wines` | Number of wine references with at least one bottle physically assigned to a rack position. This count remains available before stock reconstruction is complete. |
+| `wine_references` | Number of wine references with positive reconstructed stock; `null` until stock reconstruction is complete. |
 | `total_positions`, `empty_positions`, `occupied_positions` | Rack-position totals. |
 | `unlocated_wines`, `unlocated_bottles` | Reconstructed stock not assigned to rack positions; `null` until reconstruction is complete. |
 | `negative_movement_wines`, `negative_movement_bottles` | Negative movement-balance diagnostics; `null` until reconstruction is complete. |
@@ -123,7 +136,7 @@ The `8192` flag is confirmed by the PLOUD application as the spicy-food pairing 
 
 The `Wine` response always includes the field `image_url: string | null`.
 
-- A non-null value is a local Home Assistant endpoint for the cached primary wine image, or the cached cover image when the primary image is unavailable.
+- A non-null value is a local Home Assistant endpoint for the cached primary wine image, or the cached cover image when the primary image is unavailable. Image-cache downloads are best-effort and have a 10-second total budget per synchronization; a slow batch cannot delay publication of the already committed inventory. Images not downloaded within that budget are retried during a later synchronization.
 - The endpoint requires Home Assistant authentication. Consumers must fetch it with `hass.fetchWithAuth(image_url)`; assigning the endpoint directly to an unauthenticated remote image request is not supported.
 - The URL may include a version query component. A changed URL signals that the cached document version changed and the image should be fetched again, even if the PLOUD document identifier did not change.
 - The field is `null` when an image is unavailable for a wine, when its document has not yet been downloaded, or when the wine has no image reference. The wine detail view remains usable without an image.

@@ -95,3 +95,28 @@ test("tooltip remains usable when it is larger than the viewport", () => {
     { left: 12, top: 12 },
   );
 });
+
+test("duplicate coordinates use a compact layout without hiding positions", () => {
+  const layout = buildRackGridLayout([
+    { id: "a", row: 0, column: 0 },
+    { id: "b", row: 0, column: 0 },
+  ]);
+
+  assert.equal(layout.compact, true);
+  assert.equal(layout.positions.length, 2);
+  assert.notDeepEqual(
+    [layout.positions[0].row, layout.positions[0].column],
+    [layout.positions[1].row, layout.positions[1].column],
+  );
+});
+
+test("negative coordinates use a compact layout defensively", () => {
+  const layout = buildRackGridLayout([
+    { id: "a", row: -1, column: 0 },
+    { id: "b", row: 0, column: 1 },
+  ]);
+
+  assert.equal(layout.compact, true);
+  assert.equal(layout.positions.length, 2);
+  assert.ok(layout.positions.every((position) => position.row > 0 && position.column > 0));
+});
