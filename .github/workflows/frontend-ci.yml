@@ -78,11 +78,16 @@ jobs:
     needs: [build, browser]
     runs-on: ubuntu-26.04
     permissions:
-      contents: write
-      pull-requests: write
-    env:
-      GH_TOKEN: ${{ github.token }}
+      contents: read
     steps:
+      - name: Create narrowly scoped publication-app token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.BUNDLE_PUBLISH_APP_CLIENT_ID }}
+          private-key: ${{ secrets.BUNDLE_PUBLISH_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up Node.js
@@ -97,9 +102,11 @@ jobs:
       - name: Create or update generated-bundles pull request
         env:
           BRANCH: automation/update-hacs-bundles
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          gh auth setup-git
+          git config user.name "bundle-publisher[bot]"
+          git config user.email "bundle-publisher[bot]@users.noreply.github.com"
           git switch --force-create "$BRANCH"
           git add dist/ploc-cellar-card.js ploc-cellar-card.js
 
@@ -116,5 +123,5 @@ jobs:
               --base main \
               --head "$BRANCH" \
               --title "Build Ploc Cellar Cards" \
-              --body "Automated update of the committed HACS distributables. This pull request is merged only after all required checks pass (and any required review is approved)."
+              --body "Automated update of the committed HACS distributables. The dedicated publication app may bypass only the review requirement; all required CI checks remain mandatory."
           fi
