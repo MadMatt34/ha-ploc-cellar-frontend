@@ -67,8 +67,46 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Configure bounded APT retries
+        run: |
+          sudo tee /etc/apt/apt.conf.d/80-github-actions-retries >/dev/null <<'EOF'
+          Acquire::Retries "3";
+          Acquire::http::Timeout "30";
+          Acquire::https::Timeout "30";
+          DPkg::Lock::Timeout "60";
+          EOF
+
       - name: Install Chromium and system dependencies
-        run: npx playwright install --with-deps chromium
+        shell: bash
+        run: |
+          set -u
+
+          max_attempts=3
+          attempt_timeout=8m
+
+          for attempt in $(seq 1 "$max_attempts"); do
+            echo "::group::Playwright installation attempt $attempt/$max_attempts"
+
+            if timeout --foreground --signal=TERM --kill-after=30s "$attempt_timeout" \
+              npx playwright install --with-deps chromium; then
+              echo "Playwright and Chromium dependencies installed successfully."
+              exit 0
+            else
+              status=$?
+              echo "::warning::Playwright installation attempt $attempt/$max_attempts failed (exit code: $status)."
+            fi
+
+            echo "::endgroup::"
+
+            if [ "$attempt" -lt "$max_attempts" ]; then
+              delay=$((attempt * 15))
+              echo "Retrying in ${delay}s..."
+              sleep "$delay"
+            fi
+          done
+
+          echo "::error::Playwright installation failed after ${max_attempts} attempts."
+          exit 1
       - name: Run browser interaction tests
         run: npm run test:e2e
 
