@@ -24,11 +24,33 @@ Les cartes utilisent la commande WebSocket Home Assistant `call_service` en dema
 
 Le service backend accepte également les filtres facultatifs `search` et `color`. Les cartes demandent actuellement l'inventaire de l'entrée sélectionnée et appliquent leur présentation et leurs filtres dans le frontend.
 
-## Notification de synchronisation réussie
+## Événement public de synchronisation réussie
 
-Après validation complète, persistance et publication du nouvel inventaire, le backend émet un signal interne propre à l'entrée de configuration. Il n'émet plus l'événement global `ploc_cellar_sync_completed` sur le bus Home Assistant.
+Après validation complète, persistance et publication du nouvel inventaire, le backend continue d'émettre l'événement Home Assistant `ploc_cellar_sync_completed`. Cet événement est conservé pour compatibilité avec les automatisations existantes. Il n'est pas émis en cas d'échec.
 
-Chaque carte s'abonne à la commande WebSocket `ploc_cellar/subscribe_sync` avec le `config_entry_id` sélectionné :
+```ts
+{
+  config_entry_id: string;
+  last_sync: string;
+  trigger: "recurring" | "forced_incremental" | "forced_full";
+  sync_type: "full" | "incremental";
+  changes: {
+    wines: { added: string[]; updated: string[]; deleted: string[] };
+    racks: { added: string[]; updated: string[]; deleted: string[] };
+    rack_items: { added: string[]; updated: string[]; deleted: string[] };
+    orders: { added: string[]; updated: string[]; deleted: string[] };
+  };
+  change_counts: {
+    [collection: string]: { added: number; updated: number; deleted: number };
+  };
+}
+```
+
+Les champs `trigger` et `sync_type` distinguent l'origine et le type réel de synchronisation. `changes` liste les identifiants effectivement ajoutés, modifiés ou supprimés ; `change_counts` fournit les totaux. Les identifiants sont calculés en comparant les modèles validés avant et après synchronisation. Home Assistant réserve l'abonnement aux événements personnalisés aux administrateurs ; cet événement reste donc destiné aux automatisations administrateur.
+
+## Abonnement WebSocket des cartes
+
+Les cartes frontend n'utilisent pas l'événement public pour se rafraîchir. Elles s'abonnent à la commande WebSocket `ploc_cellar/subscribe_sync` avec le `config_entry_id` sélectionné :
 
 ```ts
 connection.subscribeMessage(
@@ -40,11 +62,11 @@ connection.subscribeMessage(
 );
 ```
 
-Le backend vérifie que l'entrée existe, appartient à Ploc Cellar et est chargée. L'abonnement est attaché à un signal interne dérivé de cet identifiant ; les notifications d'une cave ne peuvent donc pas être envoyées aux abonnés d'une autre. La commande ne requiert pas le rôle administrateur : elle est utilisable par les utilisateurs Home Assistant authentifiés.
+Le backend vérifie que l'entrée existe, appartient à Ploc Cellar et est chargée. L'abonnement utilise un signal interne distinct par entrée, ce qui isole les caves. La commande ne requiert pas le rôle administrateur et est accessible aux utilisateurs Home Assistant authentifiés.
 
-La notification a toujours un contenu vide (`{}`). Elle sert uniquement à invalider le cache d'affichage ; elle ne contient ni `config_entry_id`, ni date, ni données ou identifiants de cave. Le frontend recharge ensuite les données via le service `ploc_cellar.get_inventory`. Aucun message n'est envoyé si la synchronisation échoue ou n'est pas validée et persistée.
+La notification a toujours un contenu vide (`{}`). Elle sert uniquement à invalider l'affichage : elle ne contient ni `config_entry_id`, ni date, ni données ou identifiants de cave. Le frontend recharge ensuite l'inventaire via `ploc_cellar.get_inventory`. Aucun message n'est envoyé si la synchronisation échoue ou n'est pas validée et persistée.
 
-`subscribeMessage()` fournit une fonction de désabonnement. Home Assistant l'exécute lors du désabonnement explicite ou de la fermeture de la connexion WebSocket. Le frontend protège également les abonnements asynchrones tardifs lors du changement de cave ou de la déconnexion. Aucun polling ni identifiant d'entité généré n'est nécessaire.
+`subscribeMessage()` fournit une fonction de désabonnement. Home Assistant l'exécute lors du désabonnement explicite ou de la fermeture de la connexion WebSocket. Le frontend protège aussi les abonnements asynchrones tardifs lors du changement de cave ou de la déconnexion. Aucun polling ni identifiant d'entité généré n'est nécessaire.
 
 ## Réponse
 
