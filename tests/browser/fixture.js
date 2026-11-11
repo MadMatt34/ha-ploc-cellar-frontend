@@ -110,7 +110,7 @@ const inventory = {
   ],
 };
 
-const syncListeners = new Set();
+const syncListeners = new Map();
 
 window.__plocFixture = {
   inventory,
@@ -118,8 +118,8 @@ window.__plocFixture = {
   calls: 0,
   imageFetches: 0,
   emitSync(configEntryId) {
-    for (const listener of syncListeners) {
-      listener({});
+    for (const [listener, subscribedEntryId] of syncListeners) {
+      if (subscribedEntryId === configEntryId) listener({});
     }
   },
 };
@@ -134,7 +134,7 @@ window.testHass = {
       if (message.config_entry_id !== "fixture-entry" && message.config_entry_id !== "second-entry") {
         throw new Error(`Unexpected config entry: ${message.config_entry_id}`);
       }
-      syncListeners.add(callback);
+      syncListeners.set(callback, message.config_entry_id);
       return () => syncListeners.delete(callback);
     },
   },
