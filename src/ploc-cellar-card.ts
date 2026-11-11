@@ -1,6 +1,5 @@
 import { LitElement, css, html, nothing } from "lit";
 import "./wine-typography";
-import "./numeric-typography";
 import { customElement, property, state } from "lit/decorators.js";
 import "./ploc-cellar-rack-card";
 import "./ploc-cellar-inventory-card";
@@ -65,7 +64,7 @@ export class PlocCellarCard extends LitElement {
     button[disabled] { opacity: .5; cursor: default; }
     .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 10px 0; }
     .metric { background: var(--secondary-background-color); border-radius: 10px; padding: 12px; min-width: 0; }
-    .value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .value { display: block; font-size: 1.4rem; }
     .label, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .section { margin-top: 10px; }
     .section-title { margin: 0 0 8px; font-size: .95rem; font-weight: 500; }
@@ -83,7 +82,7 @@ export class PlocCellarCard extends LitElement {
     .diagnostic-heading { display: flex; align-items: center; gap: 8px; }
     .diagnostic-icon { --mdc-icon-size: 21px; color: var(--secondary-text-color); flex: 0 0 auto; }
     .diagnostic.has-issues .diagnostic-icon { color: var(--error-color); }
-    .diagnostic-value { display: block; color: var(--primary-text-color); font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .diagnostic-value { display: block; color: var(--primary-text-color); font-size: 1.4rem; }
     .diagnostic.has-issues .diagnostic-value { color: var(--error-color); }
     .diagnostic-hint { display: block; align-self: flex-end; margin-top: auto; color: var(--secondary-text-color); font-size: .75rem; text-align: right; }
     .diagnostic-detail-list { display: grid; gap: 8px; max-height: min(60vh, 520px); overflow: auto; }
@@ -96,7 +95,7 @@ export class PlocCellarCard extends LitElement {
     .diagnostic-wine-metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .diagnostic-wine-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .diagnostic-wine-tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
-    .diagnostic-quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; color: var(--error-color); font-family: var(--ploc-numeric-font-family); font-size: 1.5rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .diagnostic-quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; color: var(--error-color); font-size: 1.5rem; }
     .diagnostic-quantity ha-icon { --mdc-icon-size: 25px; color: var(--error-color); }
     .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 10px; }
     .group { min-width: 0; border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; }
@@ -106,7 +105,7 @@ export class PlocCellarCard extends LitElement {
     .donut { position: relative; display: block; width: 100%; max-width: 150px; aspect-ratio: 1; justify-self: center; }
     .donut-chart { display: block; width: 100%; height: 100%; }
     .donut-center { position: absolute; inset: 17%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; background: var(--card-background-color, var(--ha-card-background, #fff)); pointer-events: none; }
-    .donut-total { color: var(--primary-text-color); font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .donut-total { color: var(--primary-text-color); font-size: 1.4rem; }
     .donut-caption { color: var(--secondary-text-color); font-size: .48rem; }
     .legend { display: grid; gap: 4px; min-width: 0; }
     .legend-item { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; column-gap: 7px; row-gap: 2px; font-size: .82rem; }
