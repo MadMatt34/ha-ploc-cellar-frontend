@@ -1,13 +1,9 @@
-export interface HomeAssistantEvent<T> {
-  data: T;
-}
-
 export interface HomeAssistant {
   language: string;
   connection: {
-    subscribeEvents<T>(
-      callback: (event: HomeAssistantEvent<T>) => void,
-      eventType: string,
+    subscribeMessage<T>(
+      callback: (message: T) => void,
+      message: Record<string, unknown>,
     ): Promise<() => void>;
   };
   callWS<T>(message: Record<string, unknown>): Promise<T>;
