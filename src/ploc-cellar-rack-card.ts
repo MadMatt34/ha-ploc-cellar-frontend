@@ -10,7 +10,6 @@ import type {
 import { translate, translatePicker, type TranslationKey } from "./translations";
 import { fetchInventory, InventorySyncSubscription } from "./inventory-client";
 import "./ploc-cellar-wine-detail";
-import "./numeric-typography";
 import { buildRackGridLayout, clampTooltipPosition } from "./rack-grid";
 
 @customElement("ploc-cellar-rack-card")
@@ -48,7 +47,7 @@ export class PlocCellarRackCard extends LitElement {
     .rack-occupancy { position: relative; box-sizing: border-box; width: 100%; height: 20px; margin: 0 0 8px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
     .rack-occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .rack-occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
-    .numeric-value { font-family: var(--ploc-numeric-font-family); font-weight: 400; font-variant-numeric: tabular-nums; }
+    .numeric-value { }
     .color-count { white-space: nowrap; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
