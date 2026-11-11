@@ -24,31 +24,27 @@ The cards call the Home Assistant `call_service` WebSocket command and request a
 
 The backend service also supports optional `search` and `color` filters. The cards currently request the inventory for the selected config entry and apply their presentation/filtering behavior in the frontend.
 
-## Successful synchronization event
+## Successful synchronization notification
 
-After a PLOUD synchronization has been fully validated, persisted and committed to the coordinator, the integration fires the Home Assistant event `ploc_cellar_sync_completed`. Its event data contains:
+After the new inventory has been fully validated, persisted and published, the backend emits an internal signal dedicated to that configuration entry. It no longer fires the global `ploc_cellar_sync_completed` event on the Home Assistant event bus.
+
+Each card subscribes through the `ploc_cellar/subscribe_sync` WebSocket command with its selected `config_entry_id`:
 
 ```ts
-{
-  config_entry_id: string;
-  last_sync: string;
-  trigger: "recurring" | "forced_incremental" | "forced_full";
-  sync_type: "full" | "incremental";
-  changes: {
-    wines: { added: string[]; updated: string[]; deleted: string[] };
-    racks: { added: string[]; updated: string[]; deleted: string[] };
-    rack_items: { added: string[]; updated: string[]; deleted: string[] };
-    orders: { added: string[]; updated: string[]; deleted: string[] };
-  };
-  change_counts: {
-    [collection: string]: { added: number; updated: number; deleted: number };
-  };
-}
+connection.subscribeMessage(
+  onSync,
+  {
+    type: "ploc_cellar/subscribe_sync",
+    config_entry_id: configEntryId,
+  },
+);
 ```
 
-`trigger` identifies the action that initiated synchronization. `sync_type` distinguishes a full snapshot from an incremental delta. `changes` lists the effective identifiers added, updated or deleted in each cellar collection; `change_counts` contains the corresponding totals. The cards currently use only `config_entry_id` and ignore the other event fields. `last_sync` is informational and is not used as a polling cursor.
+The backend verifies that the entry exists, belongs to Ploc Cellar and is loaded. The subscription attaches to an internal signal derived from that entry ID, so notifications from one cellar cannot reach subscribers for another. The command does not require administrator privileges and is available to authenticated Home Assistant users.
 
-The frontend subscribes to this event through the active Home Assistant WebSocket connection and refreshes only cards whose configured `config_entry_id` matches the event. The event is not fired for failed or uncommitted synchronizations. The frontend does not depend on the generated entity ID of the diagnostic last-sync sensor and does not poll.
+The notification payload is always empty (`{}`). It is only an invalidation hint; it contains no `config_entry_id`, timestamp, cellar data or object identifiers. The frontend then reloads inventory through `ploc_cellar.get_inventory`. No message is sent when synchronization fails or is not validated and persisted.
+
+`subscribeMessage()` provides an unsubscribe function. Home Assistant invokes it on explicit unsubscribe or WebSocket disconnection. The frontend also guards against late asynchronous subscription resolution when a card changes cellar or disconnects. No polling or generated entity ID is required.
 
 ## Response
 
