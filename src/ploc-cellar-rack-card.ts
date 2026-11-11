@@ -8,7 +8,7 @@ import type {
   Wine,
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
-import { fetchInventory, subscribeToInventorySync } from "./inventory-client";
+import { fetchInventory, InventorySyncSubscription } from "./inventory-client";
 import "./ploc-cellar-wine-detail";
 import "./numeric-typography";
 import { buildRackGridLayout, clampTooltipPosition } from "./rack-grid";
@@ -27,10 +27,7 @@ export class PlocCellarRackCard extends LitElement {
   @state() private selectedLocation?: { rackId: string; row: number; column: number };
   private requestGeneration = 0;
   private refreshPending = false;
-  private syncConnection?: HomeAssistant["connection"];
-  private syncEntryId?: string;
-  private syncUnsubscribe?: () => void;
-  private syncSubscriptionGeneration = 0;
+  private readonly syncSubscription = new InventorySyncSubscription();
 
   static styles = css`
     :host { display: block; }
@@ -72,6 +69,10 @@ export class PlocCellarRackCard extends LitElement {
     .bottle-marker { display: block; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: var(--bottle-color, var(--secondary-text-color)); border: 2px solid var(--divider-color); box-shadow: inset 0 1px 3px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 15%); box-sizing: border-box; }
     .legend, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .warning { color: var(--warning-color); padding: 8px 0; }
+    .loading { display: flex; align-items: center; gap: 8px; color: var(--secondary-text-color); padding: 8px 0; }
+    .loading::before { content: ""; width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid var(--divider-color); border-top-color: var(--primary-color); border-radius: 50%; animation: ploc-cellar-loading 0.8s linear infinite; }
+    @keyframes ploc-cellar-loading { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .loading::before { animation: none; } }
     .error { color: var(--error-color); padding: 8px 0; }
     .unplaced { border-top: 1px solid var(--divider-color); padding-top: 10px; margin-top: 10px; }
     .unplaced-item { padding: 5px 0; }
@@ -86,10 +87,19 @@ export class PlocCellarRackCard extends LitElement {
   }
 
   setConfig(config: PlocCellarCardConfig): void {
+    const configEntryChanged =
+      this.config?.config_entry_id !== config.config_entry_id;
     this.requestGeneration += 1;
     this.loading = false;
     this.refreshPending = false;
     this.config = config;
+    if (configEntryChanged) {
+      this.selectedRackId = undefined;
+      this.selectedWine = undefined;
+      this.selectedLocation = undefined;
+      this.activeTooltip = undefined;
+      this.tooltipPosition = undefined;
+    }
     this.inventory = undefined;
     this.error = undefined;
     if (this.config.config_entry_id) void this.refresh();
@@ -101,44 +111,17 @@ export class PlocCellarRackCard extends LitElement {
   }
 
   disconnectedCallback(): void {
-    this.syncSubscriptionGeneration += 1;
-    this.syncUnsubscribe?.();
-    this.syncUnsubscribe = undefined;
-    this.syncConnection = undefined;
-    this.syncEntryId = undefined;
+    this.syncSubscription.disconnect();
     super.disconnectedCallback();
   }
 
   private ensureSyncSubscription(): void {
-    const connection = this.hass?.connection;
-    const entryId = this.config?.config_entry_id;
-    if (connection === this.syncConnection && entryId === this.syncEntryId) return;
-
-    this.syncSubscriptionGeneration += 1;
-    this.syncUnsubscribe?.();
-    this.syncUnsubscribe = undefined;
-    this.syncConnection = connection;
-    this.syncEntryId = entryId;
-
-    if (!this.isConnected || !this.hass || !connection || !entryId) return;
-
-    const generation = this.syncSubscriptionGeneration;
-    void subscribeToInventorySync(this.hass, entryId, () => {
-      if (generation === this.syncSubscriptionGeneration) void this.refresh();
-    }).then((unsubscribe) => {
-      if (
-        generation === this.syncSubscriptionGeneration &&
-        this.isConnected &&
-        this.hass?.connection === connection &&
-        this.config?.config_entry_id === entryId
-      ) {
-        this.syncUnsubscribe = unsubscribe;
-      } else {
-        unsubscribe();
-      }
-    }).catch((error: unknown) => {
-      console.error("Unable to subscribe to Ploc Cellar synchronization events", error);
-    });
+    this.syncSubscription.update(
+      this.hass,
+      this.config?.config_entry_id,
+      this.isConnected,
+      () => void this.refresh(),
+    );
   }
 
   protected updated(): void {
@@ -165,8 +148,29 @@ export class PlocCellarRackCard extends LitElement {
       const inventory = await fetchInventory(hass, configEntryId);
       if (generation === this.requestGeneration) {
         this.inventory = inventory;
-        if (!this.selectedRackId || !this.inventory.racks.some((rack) => rack.id === this.selectedRackId)) {
-          this.selectedRackId = this.inventory.racks[0]?.id;
+        if (!this.selectedRackId || !inventory.racks.some((rack) => rack.id === this.selectedRackId)) {
+          this.selectedRackId = inventory.racks[0]?.id;
+        }
+        if (this.selectedWine) {
+          const updatedWine = inventory.wines.find(
+            (wine) => wine.id === this.selectedWine?.id,
+          );
+          if (!updatedWine) {
+            this.selectedWine = undefined;
+            this.selectedLocation = undefined;
+          } else {
+            this.selectedWine = updatedWine;
+            if (this.selectedLocation) {
+              const locationStillMatches = inventory.rack_items.some(
+                (item) =>
+                  item.rack_id === this.selectedLocation?.rackId &&
+                  item.row === this.selectedLocation?.row &&
+                  item.column === this.selectedLocation?.column &&
+                  item.wine_id === updatedWine.id,
+              );
+              if (!locationStillMatches) this.selectedLocation = undefined;
+            }
+          }
         }
       }
     } catch (error) {
@@ -313,10 +317,11 @@ export class PlocCellarRackCard extends LitElement {
     );
 
     return html`
-      <ha-card>
+      <ha-card aria-busy=${this.loading ? "true" : "false"}>
         <header>
           <h2>${this.config?.title ?? (t("rack_title"))}</h2>
         </header>
+        ${this.loading ? html`<div class="loading" role="status" aria-live="polite">${t("loading")}</div>` : nothing}
         ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
         ${!this.config?.config_entry_id ? html`<div class="muted">${t("select_config")}</div>` : nothing}
         ${data?.stale ? html`<div class="warning">${t("stale")}</div>` : nothing}

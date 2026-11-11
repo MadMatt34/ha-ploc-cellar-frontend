@@ -1,9 +1,8 @@
 name: Frontend CI
-# The compatibility branch pins Ubuntu 26.04 to validate the new runner image.
-
 on:
   push:
-    branches: [main, chore/ubuntu-26-04-ci-compatibility]
+    branches:
+      - main
   pull_request:
   workflow_dispatch:
 
@@ -40,6 +39,8 @@ jobs:
         run: npm test
       - name: Build standalone dashboard module
         run: npm run build
+      - name: Enforce production bundle size budget
+        run: npm run check:bundle-size
       - name: Prepare HACS distributable
         run: cp dist/ploc-cellar-card.js ploc-cellar-card.js
       - name: Verify distributables exist
@@ -50,7 +51,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           if ! git diff --quiet -- dist/ploc-cellar-card.js ploc-cellar-card.js; then
-            echo "::warning::The generated bundles differ from the committed files. The protected main-branch publish job regenerates and commits them after merge."
+            echo "::warning::The generated bundles differ from the committed files. The protected main-branch publish job regenerates and proposes them through a pull request."
           fi
 
   browser:
@@ -72,13 +73,27 @@ jobs:
         run: npm run test:e2e
 
   publish:
-    name: Update committed distributables
+    name: Propose updated distributables
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [build, browser]
     runs-on: ubuntu-26.04
     permissions:
-      contents: write
+      contents: read
     steps:
+      - name: Create narrowly scoped publication-app token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.BUNDLE_PUBLISH_APP_CLIENT_ID }}
+          private-key: ${{ secrets.BUNDLE_PUBLISH_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+      - name: Get publication app bot user ID
+        id: app-user
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: echo "id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up Node.js
@@ -90,12 +105,29 @@ jobs:
         run: npm ci
       - name: Build distributables
         run: npm run build && cp dist/ploc-cellar-card.js ploc-cellar-card.js
-      - name: Commit distributables when changed
+      - name: Create or update generated-bundles pull request
+        env:
+          BRANCH: automation/update-hacs-bundles
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          gh auth setup-git
+          git config user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
+          git config user.email "${{ steps.app-user.outputs.id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+          git switch --force-create "$BRANCH"
           git add dist/ploc-cellar-card.js ploc-cellar-card.js
-          if ! git diff --cached --quiet; then
-            git commit -m "Build Ploc Cellar Cards [skip ci]"
-            git push
+
+          if git diff --cached --quiet; then
+            echo "Generated distributables are already up to date."
+            exit 0
+          fi
+
+          git commit -m "Build Ploc Cellar Cards"
+          git push --force origin "HEAD:refs/heads/$BRANCH"
+
+          if ! gh pr view "$BRANCH" >/dev/null 2>&1; then
+            gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --title "Build Ploc Cellar Cards" \
+              --body "Automated update of the committed HACS distributables. The dedicated publication app may bypass only the review requirement; all required CI checks remain mandatory."
           fi

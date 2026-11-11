@@ -32,8 +32,14 @@ Après validation complète, persistance et validation du nouvel état par le co
 {
   config_entry_id: string;
   last_sync: string;
+  trigger: "recurring" | "forced_incremental" | "forced_full";
+  sync_type: "full" | "incremental";
+  changes: Record<string, { added: string[]; updated: string[]; deleted: string[] }>;
+  change_counts: Record<string, { added: number; updated: number; deleted: number }>;
 }
 ```
+
+`trigger` indique l'action à l'origine de la synchronisation. `sync_type` distingue un instantané complet d'un delta incrémental. `changes` liste les identifiants effectivement ajoutés, modifiés ou supprimés dans chaque collection de la cave ; `change_counts` fournit les totaux correspondants. Les cartes utilisent actuellement uniquement `config_entry_id` et ignorent les autres champs. `last_sync` est informatif et n'est pas utilisé comme curseur de polling.
 
 Le frontend s'abonne à cet événement via la connexion WebSocket Home Assistant active et actualise uniquement les cartes dont le `config_entry_id` configuré correspond à celui de l'événement. L'événement n'est pas déclenché lorsqu'une synchronisation échoue ou n'est pas validée. Le frontend ne dépend pas de l'identifiant généré de l'entité de diagnostic de dernière synchronisation et n'effectue aucun polling.
 
@@ -52,8 +58,8 @@ Principaux champs de la réponse :
 | `stock_reconstruction_complete` | Indique si un instantané complet des mouvements Orders est disponible. |
 | `total_bottles` | Nombre d'emplacements physiquement occupés. |
 | `total_stock_bottles` | Stock total reconstitué ; `null` tant que la reconstitution n'est pas complète. |
-| `stocked_wines` | Nombre de références de vins connues représentées dans l'inventaire. |
-| `wine_references` | Nombre de références de vins, ou `null` si indisponible. |
+| `stocked_wines` | Nombre de références de vins ayant au moins une bouteille physiquement affectée à un emplacement de casier. Ce compteur reste disponible avant la fin de la reconstitution du stock. |
+| `wine_references` | Nombre de références de vins dont le stock reconstitué est positif ; `null` tant que la reconstitution du stock n'est pas terminée. |
 | `total_positions`, `empty_positions`, `occupied_positions` | Totaux des emplacements des casiers. |
 | `unlocated_wines`, `unlocated_bottles` | Stock reconstitué non affecté à un emplacement ; `null` tant que la reconstitution n'est pas complète. |
 | `negative_movement_wines`, `negative_movement_bottles` | Diagnostics de soldes de mouvements négatifs ; `null` tant que la reconstitution n'est pas complète. |
@@ -123,7 +129,7 @@ L'indicateur `8192` est confirmé par l'application PLOUD comme la catégorie de
 
 La réponse `Wine` contient toujours le champ `image_url: string | null`.
 
-- Une valeur non nulle désigne une route locale Home Assistant vers l'image principale mise en cache, ou vers l'image de couverture si l'image principale n'est pas disponible.
+- Une valeur non nulle désigne une route locale Home Assistant vers l'image principale mise en cache, ou vers l'image de couverture si l'image principale n'est pas disponible. Le téléchargement du cache d'images est facultatif et dispose d'un budget total de 10 secondes par synchronisation : un lot lent ne retarde pas la publication de l'inventaire déjà enregistré. Les images non téléchargées dans ce délai seront réessayées lors d'une synchronisation ultérieure.
 - La route exige une authentification Home Assistant. Le consommateur doit récupérer l'image avec `hass.fetchWithAuth(image_url)` ; une requête d'image distante non authentifiée n'est pas prise en charge.
 - L'URL peut contenir un paramètre de version. Une URL modifiée indique que la version du document mis en cache a changé : l'image doit être téléchargée à nouveau, même si l'identifiant du document PLOUD est identique.
 - Le champ vaut `null` lorsqu'aucune image n'est disponible pour un vin, lorsque le document n'a pas encore été téléchargé ou lorsque le vin ne possède pas de référence d'image. La fiche vin reste utilisable sans image.

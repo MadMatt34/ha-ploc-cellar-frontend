@@ -9,7 +9,7 @@ import type {
   Wine,
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
-import { fetchInventory, subscribeToInventorySync } from "./inventory-client";
+import { fetchInventory, InventorySyncSubscription } from "./inventory-client";
 import { getMealTranslationKeys, type MealTranslationKey } from "./meals";
 import {
   ALL_FILTER_VALUES,
@@ -41,10 +41,7 @@ export class PlocCellarInventoryCard extends LitElement {
   @state() private selectedWine?: Wine;
   private requestGeneration = 0;
   private refreshPending = false;
-  private syncConnection?: HomeAssistant["connection"];
-  private syncEntryId?: string;
-  private syncUnsubscribe?: () => void;
-  private syncSubscriptionGeneration = 0;
+  private readonly syncSubscription = new InventorySyncSubscription();
 
   static styles = css`
     :host { display: block; }
@@ -80,9 +77,10 @@ export class PlocCellarInventoryCard extends LitElement {
     .metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
     .tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
-    .filters { margin: 10px 0; padding: 1px 10px 0px 10px}
+    .filters-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .filters { flex: 1 1 180px; min-width: 0; margin: 0; padding: 1px 10px 0px 10px; }
     .filters[open] { padding: 0 10px 10px 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
-    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { margin-left: auto; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
+    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { flex: 0 0 auto; margin: 0; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
     .filters[open] > summary { color: var(--primary-text-color); padding-bottom: 8px; border-bottom: 1px solid var(--divider-color); }
     .filters > summary::-webkit-details-marker { display: none; }
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
@@ -97,6 +95,10 @@ export class PlocCellarInventoryCard extends LitElement {
     .pagination-controls ha-icon { --mdc-icon-size: 20px; }
     .filters > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .warning { color: var(--warning-color); padding: 8px 0; }
+    .loading { display: flex; align-items: center; gap: 8px; color: var(--secondary-text-color); padding: 8px 0; }
+    .loading::before { content: ""; width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid var(--divider-color); border-top-color: var(--primary-color); border-radius: 50%; animation: ploc-cellar-loading 0.8s linear infinite; }
+    @keyframes ploc-cellar-loading { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .loading::before { animation: none; } }
     .error { color: var(--error-color); padding: 8px 0; }
     .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .actions { display: flex; gap: 8px; align-items: center; }
@@ -115,14 +117,23 @@ export class PlocCellarInventoryCard extends LitElement {
   }
 
   setConfig(config: PlocCellarCardConfig): void {
+    const pageSizeChanged = this.config?.page_size !== config.page_size;
+    const configEntryChanged = this.config?.config_entry_id !== config.config_entry_id;
     this.requestGeneration += 1;
     this.loading = false;
     this.refreshPending = false;
-    const pageSizeChanged = this.config?.page_size !== config.page_size;
-    const configEntryChanged = this.config?.config_entry_id !== config.config_entry_id;
     this.config = config;
     this.sort = config.default_sort ?? "name-asc";
     if (pageSizeChanged || configEntryChanged) this.currentPage = 1;
+    if (configEntryChanged) {
+      this.search = "";
+      this.color = ALL_FILTER_VALUES;
+      this.region = ALL_FILTER_VALUES;
+      this.appellation = ALL_FILTER_VALUES;
+      this.vintage = ALL_FILTER_VALUES;
+      this.meal = "";
+      this.selectedWine = undefined;
+    }
     this.inventory = undefined;
     this.error = undefined;
     if (config.config_entry_id) void this.refresh();
@@ -140,44 +151,17 @@ export class PlocCellarInventoryCard extends LitElement {
   }
 
   disconnectedCallback(): void {
-    this.syncSubscriptionGeneration += 1;
-    this.syncUnsubscribe?.();
-    this.syncUnsubscribe = undefined;
-    this.syncConnection = undefined;
-    this.syncEntryId = undefined;
+    this.syncSubscription.disconnect();
     super.disconnectedCallback();
   }
 
   private ensureSyncSubscription(): void {
-    const connection = this.hass?.connection;
-    const entryId = this.config?.config_entry_id;
-    if (connection === this.syncConnection && entryId === this.syncEntryId) return;
-
-    this.syncSubscriptionGeneration += 1;
-    this.syncUnsubscribe?.();
-    this.syncUnsubscribe = undefined;
-    this.syncConnection = connection;
-    this.syncEntryId = entryId;
-
-    if (!this.isConnected || !this.hass || !connection || !entryId) return;
-
-    const generation = this.syncSubscriptionGeneration;
-    void subscribeToInventorySync(this.hass, entryId, () => {
-      if (generation === this.syncSubscriptionGeneration) void this.refresh();
-    }).then((unsubscribe) => {
-      if (
-        generation === this.syncSubscriptionGeneration &&
-        this.isConnected &&
-        this.hass?.connection === connection &&
-        this.config?.config_entry_id === entryId
-      ) {
-        this.syncUnsubscribe = unsubscribe;
-      } else {
-        unsubscribe();
-      }
-    }).catch((error: unknown) => {
-      console.error("Unable to subscribe to Ploc Cellar synchronization events", error);
-    });
+    this.syncSubscription.update(
+      this.hass,
+      this.config?.config_entry_id,
+      this.isConnected,
+      () => void this.refresh(),
+    );
   }
 
   protected updated(): void {
@@ -201,7 +185,13 @@ export class PlocCellarInventoryCard extends LitElement {
     this.error = undefined;
     try {
       const inventory = await fetchInventory(hass, configEntryId);
-      if (generation === this.requestGeneration) this.inventory = inventory;
+      if (generation === this.requestGeneration) {
+        this.inventory = inventory;
+        if (this.selectedWine) {
+          this.selectedWine =
+            inventory.wines.find((wine) => wine.id === this.selectedWine?.id);
+        }
+      }
     } catch (error) {
       if (generation === this.requestGeneration) {
         this.error = error instanceof Error ? error.message : String(error);
@@ -395,11 +385,12 @@ export class PlocCellarInventoryCard extends LitElement {
     );
 
     return html`
-      <ha-card>
+      <ha-card aria-busy=${this.loading ? "true" : "false"}>
         <header>
           <h2>${this.config?.title ?? t("inventory_title")}</h2>
 
         </header>
+        ${this.loading ? html`<div class="loading" role="status" aria-live="polite">${t("loading")}</div>` : nothing}
         ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
         ${!this.config?.config_entry_id
           ? html`<div class="muted">${t("select_config")}</div>`
@@ -409,9 +400,10 @@ export class PlocCellarInventoryCard extends LitElement {
           <input class="search" type="search" aria-label=${t("search_wine")}
             placeholder=${t("search_placeholder")} .value=${this.search}
             @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; this.currentPage = 1; }} />
-          <details class="filters">
-            <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon>${activeFilters ? html`<button class="filters-clear" type="button" @click=${(event: Event) => { event.stopPropagation(); this.clearFilters(); }}>${t("clear_filters")}</button>` : nothing}</summary>
-            <div class="toolbar">
+          <div class="filters-row">
+            <details class="filters">
+              <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
+              <div class="toolbar">
               ${this.selectFilter("color", t("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", t("filter_region"), this.region, this.valuesFor("region"))}
               ${this.selectFilter("appellation", t("filter_appellation"), this.appellation, this.valuesFor("appellation"))}
@@ -429,8 +421,10 @@ export class PlocCellarInventoryCard extends LitElement {
                 <option value="vintage-asc">${t("sort_vintage_asc")}</option>
                 <option value="vintage-desc">${t("sort_vintage_desc")}</option>
               </select>
-            </label>
-          </details>
+              </label>
+            </details>
+            ${activeFilters ? html`<button class="filters-clear" type="button" @click=${() => this.clearFilters()}>${t("clear_filters")}</button>` : nothing}
+          </div>
           <div class="summary">
             <span>${t("inventory_results").replace("{count}", String(wines.length))}</span>
             <span>${t("inventory_bottle_total").replace("{count}", String(total))}</span>

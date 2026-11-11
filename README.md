@@ -14,6 +14,8 @@ Independent Home Assistant Lovelace frontend for the [Ploc Cellar integration](h
 
 ## 📚 Documentation
 
+Release compatibility and version policy: [Compatibility matrix and releases](docs/COMPATIBILITY_AND_RELEASES.md).
+
 - [Cards and capabilities](#ploc-cellar-cards)
 - [Installation](#installation)
 - [Development and CI](#development)
@@ -67,7 +69,7 @@ npm run test:e2e
 npm run build
 ```
 
-The production bundle is generated at `dist/ploc-cellar-card.js`, then copied to the repository root as `ploc-cellar-card.js`, the filename expected by HACS (`hacs.json`). Both files are versioned. Dependencies are bundled into the standalone JavaScript module. The frontend CI workflow runs the strict TypeScript check, unit tests and production build on pushes and pull requests. A separate Chromium job runs the browser interaction suite on every push and pull request; on `main`, it commits both generated bundles when they change.
+The production bundle is generated at `dist/ploc-cellar-card.js`, then copied to the repository root as `ploc-cellar-card.js`, the filename expected by HACS (`hacs.json`). Both files are versioned. Dependencies are bundled into the standalone JavaScript module. The frontend CI workflow runs the strict TypeScript check, unit tests and production build on pushes and pull requests. A separate Chromium job runs the browser interaction suite on every push and pull request; on `main`, it commits both generated bundles when they change. The CI build also enforces an 800,000-byte (uncompressed) production JavaScript bundle limit to catch unexpected growth.
 
 ## 🔗 Backend contract
 
@@ -133,3 +135,4 @@ This project is distributed under the [MIT License](LICENSE).
 Ploc Cellar Cards is an independent frontend for Home Assistant. It is not affiliated with, endorsed by or supported by PLOC or PLOUD.
 
 The overall Ploc Cellar project relies on PLOUD interfaces that are **not part of a public, documented API**. The backend's implementation was developed through independent technical research, including analysis of PLOUD-related repositories, comparison of application backup files, examination of the official mobile application's behavior and other observations and tests. The frontend itself communicates only with the Home Assistant backend and follows its documented local contract; it does not access PLOUD directly. This research is reverse-engineering work, not an official API specification, and the private interfaces used by the backend may change at any time and without notice. The owner of PLOC was contacted to discuss this work and the availability of an official interface, but no response had been received when this documentation was written.
+The backend integration communicates with PLOUD through private, undocumented interfaces. Their behavior was reconstructed through independent technical research and reverse engineering; they are not a public or supported API contract and may change without notice. PLOC was contacted about documenting or supporting this access; no response had been received when this notice was written. The cards themselves do not call PLOUD: they communicate only with the Home Assistant backend integration.

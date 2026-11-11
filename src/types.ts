@@ -107,7 +107,9 @@ export interface InventoryResponse {
   stock_reconstruction_complete: boolean;
   total_bottles: number;
   total_stock_bottles: number | null;
+  /** Wine references with at least one physically occupied rack position. */
   stocked_wines: number;
+  /** Wine references with positive reconstructed stock; null until complete. */
   wine_references: number | null;
   total_positions: number;
   empty_positions: number;

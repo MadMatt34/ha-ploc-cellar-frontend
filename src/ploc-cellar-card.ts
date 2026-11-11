@@ -15,7 +15,7 @@ import type {
   WineDiagnostic,
 } from "./types";
 import { translate, translatePicker, type TranslationKey } from "./translations";
-import { fetchInventory, subscribeToInventorySync } from "./inventory-client";
+import { fetchInventory, InventorySyncSubscription } from "./inventory-client";
 import "./donut-chart";
 
 interface DistributionItem {
@@ -54,10 +54,7 @@ export class PlocCellarCard extends LitElement {
   @state() private selectedWine?: Wine;
   private requestGeneration = 0;
   private refreshPending = false;
-  private syncConnection?: HomeAssistant["connection"];
-  private syncEntryId?: string;
-  private syncUnsubscribe?: () => void;
-  private syncSubscriptionGeneration = 0;
+  private readonly syncSubscription = new InventorySyncSubscription();
 
   static styles = css`
     :host { display: block; }
@@ -118,6 +115,12 @@ export class PlocCellarCard extends LitElement {
     .legend-value { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
     .legend-meta { grid-column: 2 / 4; margin-top: -2px; color: var(--secondary-text-color); font-size: .72rem; }
     .warning { color: var(--warning-color); padding: 8px 0; }
+    .sync-status { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+    .sync-warning { color: var(--warning-color); font-size: .85rem; }
+    .loading { display: flex; align-items: center; gap: 8px; color: var(--secondary-text-color); padding: 8px 0; }
+    .loading::before { content: ""; width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid var(--divider-color); border-top-color: var(--primary-color); border-radius: 50%; animation: ploc-cellar-loading 0.8s linear infinite; }
+    @keyframes ploc-cellar-loading { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .loading::before { animation: none; } }
     .error { color: var(--error-color); padding: 8px 0; }
     @media (max-width: 420px) {
       ha-card { padding: 12px; }
@@ -136,6 +139,8 @@ export class PlocCellarCard extends LitElement {
   }
 
   setConfig(config: PlocCellarCardConfig): void {
+    const configEntryChanged =
+      this.config?.config_entry_id !== config.config_entry_id;
     this.requestGeneration += 1;
     this.loading = false;
     this.refreshPending = false;
@@ -146,6 +151,10 @@ export class PlocCellarCard extends LitElement {
       show_statistics: config.show_statistics !== false,
       show_statistics_legends: config.show_statistics_legends !== false,
     };
+    if (configEntryChanged) {
+      this.activeDiagnostic = undefined;
+      this.selectedWine = undefined;
+    }
     this.inventory = undefined;
     this.error = undefined;
     if (config.config_entry_id) void this.refresh();
@@ -157,44 +166,17 @@ export class PlocCellarCard extends LitElement {
   }
 
   disconnectedCallback(): void {
-    this.syncSubscriptionGeneration += 1;
-    this.syncUnsubscribe?.();
-    this.syncUnsubscribe = undefined;
-    this.syncConnection = undefined;
-    this.syncEntryId = undefined;
+    this.syncSubscription.disconnect();
     super.disconnectedCallback();
   }
 
   private ensureSyncSubscription(): void {
-    const connection = this.hass?.connection;
-    const entryId = this.config?.config_entry_id;
-    if (connection === this.syncConnection && entryId === this.syncEntryId) return;
-
-    this.syncSubscriptionGeneration += 1;
-    this.syncUnsubscribe?.();
-    this.syncUnsubscribe = undefined;
-    this.syncConnection = connection;
-    this.syncEntryId = entryId;
-
-    if (!this.isConnected || !this.hass || !connection || !entryId) return;
-
-    const generation = this.syncSubscriptionGeneration;
-    void subscribeToInventorySync(this.hass, entryId, () => {
-      if (generation === this.syncSubscriptionGeneration) void this.refresh();
-    }).then((unsubscribe) => {
-      if (
-        generation === this.syncSubscriptionGeneration &&
-        this.isConnected &&
-        this.hass?.connection === connection &&
-        this.config?.config_entry_id === entryId
-      ) {
-        this.syncUnsubscribe = unsubscribe;
-      } else {
-        unsubscribe();
-      }
-    }).catch((error: unknown) => {
-      console.error("Unable to subscribe to Ploc Cellar synchronization events", error);
-    });
+    this.syncSubscription.update(
+      this.hass,
+      this.config?.config_entry_id,
+      this.isConnected,
+      () => void this.refresh(),
+    );
   }
 
   protected updated(): void {
@@ -218,7 +200,13 @@ export class PlocCellarCard extends LitElement {
     this.error = undefined;
     try {
       const inventory = await fetchInventory(hass, configEntryId);
-      if (generation === this.requestGeneration) this.inventory = inventory;
+      if (generation === this.requestGeneration) {
+        this.inventory = inventory;
+        if (this.selectedWine) {
+          this.selectedWine =
+            inventory.wines.find((wine) => wine.id === this.selectedWine?.id);
+        }
+      }
     } catch (error) {
       if (generation === this.requestGeneration) {
         this.error = error instanceof Error ? error.message : String(error);
@@ -467,27 +455,31 @@ export class PlocCellarCard extends LitElement {
       diagnostics.length > 0 ||
       data.positions_with_unknown_wine > 0
     ));
-    const wines = data?.wines ?? [];
-    const referenceCount = data?.wine_references ?? wines.length;
+    const referenceCount = data?.stock_reconstruction_complete
+      ? data.wine_references ?? 0
+      : data?.stocked_wines ?? 0;
+    const referenceLabel = data?.stock_reconstruction_complete
+      ? t("stocked_references")
+      : t("physical_wine_references");
 
     return html`
-      <ha-card>
+      <ha-card aria-busy=${this.loading ? "true" : "false"}>
         <header>
           <h2>${title}</h2>
         </header>
+        ${this.loading ? html`<div class="loading" role="status" aria-live="polite">${t("loading")}</div>` : nothing}
         ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
         ${!this.config?.config_entry_id
           ? html`<div class="muted">${t("select_config")}</div>`
           : nothing}
         ${data ? html`
-          ${data.stale ? html`<div class="warning">${t("stale")}</div>` : nothing}
           <div class="summary">
             ${this.metric(data.total_bottles, t("bottles_in_cellar"))}
             ${this.metric(
               data.total_stock_bottles ?? t("unknown_value"),
               t("reconstructed_stock"),
             )}
-            ${this.metric(referenceCount, t("stocked_references"))}
+            ${this.metric(referenceCount, referenceLabel)}
             ${this.metric(data.rack_count, t("racks"))}
           </div>
           ${showOccupancy ? html`
@@ -553,7 +545,10 @@ export class PlocCellarCard extends LitElement {
               </div>
             </details>
           ` : nothing}
-          <div class="muted section">${t("last_sync")}: ${this.formatSync(data.last_sync)}</div>
+          <div class="muted section sync-status">
+            <span>${t("last_sync")}: ${this.formatSync(data.last_sync)}</span>
+            ${data.stale ? html`<span class="sync-warning" role="status">${t("stale")}</span>` : nothing}
+          </div>
           ${this.renderDiagnosticDialog()}
           ${this.selectedWine ? html`
             <ploc-cellar-wine-detail
