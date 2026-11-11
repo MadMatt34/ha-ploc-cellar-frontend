@@ -31,3 +31,19 @@ test("both frontend READMEs link the compatibility and release policy", async ()
   assert.ok(policy.includes("| 0.8.0 development baseline | 0.1.0 development baseline |"));
   assert.ok(policy.includes("not a claim that corresponding GitHub Releases have been published"));
 });
+
+test("both backend contracts document the non-admin scoped sync command", async () => {
+  const [english, french, readmeEnglish, readmeFrench] = await Promise.all([
+    read("docs/BACKEND_CONTRACT.md"),
+    read("docs/CONTRAT_BACKEND.fr.md"),
+    read("README.md"),
+    read("README.fr.md"),
+  ]);
+
+  for (const document of [english, french, readmeEnglish, readmeFrench]) {
+    assert.ok(document.includes("ploc_cellar/subscribe_sync"));
+    assert.ok(document.includes("non-admin") || document.includes("non administrateurs"));
+  }
+  assert.ok(english.includes("empty (`{}).")) === false;
+  assert.ok(english.includes("empty (`{}).")) === false;
+});
