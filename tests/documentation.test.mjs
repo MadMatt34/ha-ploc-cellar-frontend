@@ -43,7 +43,7 @@ test("both backend contracts document the scoped non-admin sync command", async 
   for (const document of [english, french, readmeEnglish, readmeFrench]) {
     assert.ok(document.includes("ploc_cellar/subscribe_sync"));
   }
-  assert.ok(english.includes("non-admin"));
+  assert.ok(english.includes("does not require administrator privileges"));
   assert.ok(french.includes("ne requiert pas le rôle administrateur"));
   assert.ok(readmeEnglish.includes("Non-admin users"));
   assert.ok(readmeFrench.includes("utilisateurs non administrateurs"));
