@@ -74,7 +74,7 @@ test("removes failed requests so a later call can retry", async () => {
   assert.equal(calls, 2);
 });
 
-test("central subscription filters sync events and releases its listener", async () => {
+test("subscribes to the scoped sync command and releases its listener", async () => {
   let registeredMessage;
   let callback;
   let unsubscribeCount = 0;
@@ -82,9 +82,9 @@ test("central subscription filters sync events and releases its listener", async
   const subscribed = new Promise((resolve) => { resolveSubscribed = resolve; });
   const hass = {
     connection: {
-      subscribeEvents: async (listener, eventType) => {
+      subscribeMessage: async (listener, message) => {
         callback = listener;
-        registeredEvent = eventType;
+        registeredMessage = message;
         resolveSubscribed();
         return () => { unsubscribeCount += 1; };
       },
@@ -96,10 +96,11 @@ test("central subscription filters sync events and releases its listener", async
   subscription.update(hass, "entry-1", true, () => { syncCount += 1; });
   await subscribed;
 
-  assert.equal(registeredEvent, SYNC_COMPLETED_EVENT);
-  callback({ data: { config_entry_id: "entry-2" } });
-  assert.equal(syncCount, 0);
-  callback({ data: { config_entry_id: "entry-1" } });
+  assert.deepEqual(registeredMessage, {
+    type: SYNC_SUBSCRIPTION_COMMAND,
+    config_entry_id: "entry-1",
+  });
+  callback({});
   assert.equal(syncCount, 1);
 
   subscription.disconnect();
