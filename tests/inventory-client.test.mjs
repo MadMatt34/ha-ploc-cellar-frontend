@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { fetchInventory, InventorySyncSubscription, SYNC_COMPLETED_EVENT } from "../.test-dist/inventory-client.js";
+import { fetchInventory, InventorySyncSubscription, SYNC_SUBSCRIPTION_COMMAND } from "../.test-dist/inventory-client.js";
 
 function deferred() {
   let resolve;
@@ -74,17 +74,17 @@ test("removes failed requests so a later call can retry", async () => {
   assert.equal(calls, 2);
 });
 
-test("central subscription filters sync events and releases its listener", async () => {
-  let registeredEvent;
+test("subscribes to the scoped sync command and releases its listener", async () => {
+  let registeredMessage;
   let callback;
   let unsubscribeCount = 0;
   let resolveSubscribed;
   const subscribed = new Promise((resolve) => { resolveSubscribed = resolve; });
   const hass = {
     connection: {
-      subscribeEvents: async (listener, eventType) => {
+      subscribeMessage: async (listener, message) => {
         callback = listener;
-        registeredEvent = eventType;
+        registeredMessage = message;
         resolveSubscribed();
         return () => { unsubscribeCount += 1; };
       },
@@ -96,10 +96,11 @@ test("central subscription filters sync events and releases its listener", async
   subscription.update(hass, "entry-1", true, () => { syncCount += 1; });
   await subscribed;
 
-  assert.equal(registeredEvent, SYNC_COMPLETED_EVENT);
-  callback({ data: { config_entry_id: "entry-2" } });
-  assert.equal(syncCount, 0);
-  callback({ data: { config_entry_id: "entry-1" } });
+  assert.deepEqual(registeredMessage, {
+    type: SYNC_SUBSCRIPTION_COMMAND,
+    config_entry_id: "entry-1",
+  });
+  callback({});
   assert.equal(syncCount, 1);
 
   subscription.disconnect();
@@ -111,7 +112,7 @@ test("unsubscribes a listener that resolves after the card disconnects", async (
   let unsubscribeCount = 0;
   const hass = {
     connection: {
-      subscribeEvents: () => pending.promise,
+      subscribeMessage: () => pending.promise,
     },
   };
   const subscription = new InventorySyncSubscription();
@@ -131,7 +132,7 @@ test("retries a synchronization subscription after the first attempt rejects", a
   console.error = () => {};
   const hass = {
     connection: {
-      subscribeEvents: async () => {
+      subscribeMessage: async () => {
         attempts += 1;
         if (attempts === 1) throw new Error("temporary websocket failure");
         return () => { unsubscribeCount += 1; };

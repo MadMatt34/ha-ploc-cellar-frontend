@@ -81,7 +81,7 @@ Le champ nullable `Wine.meals` contient les indicateurs d'accords mets-vins PLOU
 
 ### 🔄 Actualisation automatique après synchronisation
 
-Après son initialisation, chaque carte écoute l'événement Home Assistant `ploc_cellar_sync_completed`. Elle ne s'actualise que si le champ `config_entry_id` de l'événement correspond à l'entrée sélectionnée dans cette carte. Le backend déclenche cet événement uniquement après validation et enregistrement de la synchronisation dans l'inventaire actif.
+Après son initialisation, chaque carte s'abonne à la commande WebSocket `ploc_cellar/subscribe_sync` pour l'entrée de configuration sélectionnée. Le backend réserve un signal interne à cette entrée et envoie une notification vide après chaque synchronisation réussie et enregistrée. Les utilisateurs non administrateurs peuvent donc actualiser les cartes sans s'abonner à un événement Home Assistant personnalisé. La carte relit ensuite l'inventaire avec `ploc_cellar.get_inventory` ; aucune donnée de cave n'est transmise dans la notification. L'événement public `ploc_cellar_sync_completed` reste émis pour préserver les automatisations des administrateurs, mais les cartes ne s'y abonnent plus.
 
 ## 🌐 Langues
 
