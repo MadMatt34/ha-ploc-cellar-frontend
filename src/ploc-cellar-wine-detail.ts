@@ -1,5 +1,4 @@
 import { LitElement, css, html, nothing, type PropertyValues } from "lit";
-import "./numeric-typography";
 
 import { customElement, property, state } from "lit/decorators.js";
 
@@ -54,7 +53,7 @@ export class PlocCellarWineDetail extends LitElement {
     .wine-vintage { margin: 5px 20px; font-family: var(--ploc-wine-font-family); font-size: 2.5rem; font-weight: 600; line-height: 1.2; }
     .wine-stock-line { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--secondary-text-color); font-size: 1rem; }
     .wine-stock-line ha-icon { --mdc-icon-size: 30px; flex: 0 0 auto; }
-    .wine-stock-count { font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-variant-numeric: tabular-nums; color: var(--primary-text-color); }
+    .wine-stock-count { font-size: 1.4rem; color: var(--primary-text-color); }
     .tag {
       padding: 4px 9px;
       border-radius: 999px;
@@ -104,8 +103,8 @@ export class PlocCellarWineDetail extends LitElement {
       border-radius: 9px;
       background: var(--secondary-background-color);
     }
-    .stock-value { display: block; font-family: var(--ploc-numeric-font-family); font-size: 1.4rem; font-weight: 400; font-variant-numeric: tabular-nums; }
-    .stock-details .characteristic-value { font-family: var(--ploc-numeric-font-family); font-variant-numeric: tabular-nums; }
+    .stock-value { display: block; font-size: 1.4rem; }
+    .stock-details .characteristic-value { }
     .stock-label { display: block; margin-top: 3px; color: var(--secondary-text-color); font-size: .8rem; }
     .locations { display: grid; gap: 9px; }
     .location { padding: 10px 12px; border: 1px solid var(--divider-color); border-radius: 9px; background: var(--secondary-background-color); }
