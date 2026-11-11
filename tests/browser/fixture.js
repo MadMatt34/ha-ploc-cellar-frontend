@@ -119,7 +119,7 @@ window.__plocFixture = {
   imageFetches: 0,
   emitSync(configEntryId) {
     for (const listener of syncListeners) {
-      listener({ data: { config_entry_id: configEntryId } });
+      listener({});
     }
   },
 };
@@ -127,9 +127,12 @@ window.__plocFixture = {
 window.testHass = {
   language: "en",
   connection: {
-    subscribeEvents: async (callback, eventType) => {
-      if (eventType !== "ploc_cellar_sync_completed") {
-        throw new Error(`Unexpected event subscription: ${eventType}`);
+    subscribeMessage: async (callback, message) => {
+      if (message.type !== "ploc_cellar/subscribe_sync") {
+        throw new Error(`Unexpected subscription command: ${message.type}`);
+      }
+      if (message.config_entry_id !== "fixture-entry" && message.config_entry_id !== "second-entry") {
+        throw new Error(`Unexpected config entry: ${message.config_entry_id}`);
       }
       syncListeners.add(callback);
       return () => syncListeners.delete(callback);
