@@ -44,6 +44,6 @@ test("both backend contracts document the non-admin scoped sync command", async 
     assert.ok(document.includes("ploc_cellar/subscribe_sync"));
     assert.ok(document.includes("non-admin") || document.includes("non administrateurs"));
   }
-  assert.ok(english.includes("empty (`{}).")) === false;
-  assert.ok(english.includes("empty (`{}).")) === false;
+  assert.ok(english.includes('empty (`{}`).'));
+  assert.ok(french.includes('vide (`{}`).'));
 });
