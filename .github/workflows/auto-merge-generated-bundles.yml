@@ -1,0 +1,65 @@
+name: Auto-merge generated bundles
+
+on:
+  workflow_run:
+    workflows:
+      - Frontend CI
+      - HACS validation
+    types:
+      - completed
+  pull_request_review:
+    types:
+      - submitted
+
+concurrency:
+  group: auto-merge-generated-bundles-${{ github.event.workflow_run.head_branch || github.event.pull_request.number }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  statuses: read
+
+jobs:
+  merge:
+    name: Merge generated-bundles PR when ready
+    if: >-
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'automation/update-hacs-bundles') ||
+      (github.event_name == 'pull_request_review' &&
+       github.event.pull_request.head.ref == 'automation/update-hacs-bundles' &&
+       github.event.review.state == 'approved')
+    runs-on: ubuntu-26.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Find generated-bundles pull request
+        id: pr
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request_review" ]; then
+            PR_NUMBER="$EVENT_PR_NUMBER"
+          else
+            PR_NUMBER="$(gh pr list --head "$HEAD_BRANCH" --state open --json number --jq '.[0].number // empty')"
+          fi
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No open generated-bundles pull request was found."
+            exit 0
+          fi
+
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for all pull-request checks
+        if: steps.pr.outputs.number != ''
+        run: gh pr checks "${{ steps.pr.outputs.number }}" --watch
+
+      - name: Merge pull request
+        if: steps.pr.outputs.number != ''
+        run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
