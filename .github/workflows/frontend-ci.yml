@@ -88,7 +88,7 @@ jobs:
           for attempt in $(seq 1 "$max_attempts"); do
             echo "::group::Playwright installation attempt $attempt/$max_attempts"
 
-            if timeout --foreground --signal=TERM --kill-after=30s "$attempt_timeout" \
+            if timeout --signal=TERM --kill-after=30s "$attempt_timeout" \
               npx playwright install --with-deps chromium; then
               echo "Playwright and Chromium dependencies installed successfully."
               echo "::endgroup::"
@@ -109,6 +109,7 @@ jobs:
 
           echo "::error::Playwright installation failed after ${max_attempts} attempts."
           exit 1
+
       - name: Run browser interaction tests
         run: npm run test:e2e
 
