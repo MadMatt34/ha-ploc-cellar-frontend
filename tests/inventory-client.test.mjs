@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { fetchInventory, InventorySyncSubscription, SYNC_COMPLETED_EVENT } from "../.test-dist/inventory-client.js";
+import { fetchInventory, InventorySyncSubscription, SYNC_SUBSCRIPTION_COMMAND } from "../.test-dist/inventory-client.js";
 
 function deferred() {
   let resolve;
@@ -75,7 +75,7 @@ test("removes failed requests so a later call can retry", async () => {
 });
 
 test("central subscription filters sync events and releases its listener", async () => {
-  let registeredEvent;
+  let registeredMessage;
   let callback;
   let unsubscribeCount = 0;
   let resolveSubscribed;
@@ -111,7 +111,7 @@ test("unsubscribes a listener that resolves after the card disconnects", async (
   let unsubscribeCount = 0;
   const hass = {
     connection: {
-      subscribeEvents: () => pending.promise,
+      subscribeMessage: () => pending.promise,
     },
   };
   const subscription = new InventorySyncSubscription();
@@ -131,7 +131,7 @@ test("retries a synchronization subscription after the first attempt rejects", a
   console.error = () => {};
   const hass = {
     connection: {
-      subscribeEvents: async () => {
+      subscribeMessage: async () => {
         attempts += 1;
         if (attempts === 1) throw new Error("temporary websocket failure");
         return () => { unsubscribeCount += 1; };
