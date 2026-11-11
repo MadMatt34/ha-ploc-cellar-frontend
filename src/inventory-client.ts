@@ -1,6 +1,6 @@
 import type { HomeAssistant, InventoryResponse } from "./types";
 
-export const SYNC_COMPLETED_EVENT = "ploc_cellar_sync_completed";
+export const SYNC_SUBSCRIPTION_COMMAND = "ploc_cellar/subscribe_sync";
 
 /**
  * Coalesce simultaneous inventory requests made by the three cards.
@@ -74,11 +74,12 @@ export class InventorySyncSubscription {
     if (!connected || !connection || !configEntryId) return;
 
     const generation = this.generation;
-    void connection.subscribeEvents<{ config_entry_id?: string }>(
-      (event) => {
-        if (event.data.config_entry_id === configEntryId) onSync();
+    void connection.subscribeMessage<Record<string, never>>(
+      () => onSync(),
+      {
+        type: SYNC_SUBSCRIPTION_COMMAND,
+        config_entry_id: configEntryId,
       },
-      SYNC_COMPLETED_EVENT,
     ).then((unsubscribe) => {
       if (
         generation === this.generation &&
@@ -91,7 +92,7 @@ export class InventorySyncSubscription {
         unsubscribe();
       }
     }).catch((error: unknown) => {
-      console.error("Unable to subscribe to Ploc Cellar synchronization events", error);
+      console.error("Unable to subscribe to Ploc Cellar synchronization updates", error);
       if (generation === this.generation) {
         // Permit the next hass/config update to retry the failed subscription.
         this.connection = undefined;
