@@ -931,7 +931,7 @@ function He(e) {
 	return I(typeof navigator > "u" ? "en" : navigator.language, e);
 }
 // src/inventory-client.ts
-var Ue = "ploc_cellar_sync_completed", We = /* @__PURE__ */ new WeakMap();
+var Ue = "ploc_cellar/subscribe_sync", We = /* @__PURE__ */ new WeakMap();
 function Ge(e, t) {
 	let n = We.get(e);
 	n || (n = /* @__PURE__ */ new Map(), We.set(e, n));
@@ -956,12 +956,13 @@ var Ke = class {
 		let i = e?.connection;
 		if (i === this.connection && t === this.configEntryId || (this.generation += 1, this.unsubscribe?.(), this.unsubscribe = void 0, this.connection = i, this.configEntryId = t, !n || !i || !t)) return;
 		let a = this.generation;
-		i.subscribeEvents((e) => {
-			e.data.config_entry_id === t && r();
-		}, Ue).then((e) => {
+		i.subscribeMessage(() => r(), {
+			type: Ue,
+			config_entry_id: t
+		}).then((e) => {
 			a === this.generation && n && this.connection === i && this.configEntryId === t ? this.unsubscribe = e : e();
 		}).catch((e) => {
-			console.error("Unable to subscribe to Ploc Cellar synchronization events", e), a === this.generation && (this.connection = void 0, this.configEntryId = void 0);
+			console.error("Unable to subscribe to Ploc Cellar synchronization updates", e), a === this.generation && (this.connection = void 0, this.configEntryId = void 0);
 		});
 	}
 	disconnect() {
