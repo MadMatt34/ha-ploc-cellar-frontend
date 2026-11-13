@@ -49,7 +49,7 @@ export class PlocCellarWineDetail extends LitElement {
     .identity { min-width: 0; }
     .identity-text { min-width: 0; }
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-left: 20px; }
     .wine-vintage { margin: 5px 20px; font-family: var(--ploc-wine-font-family); font-size: 2.5rem; font-weight: 600; line-height: 1.2; }
     .wine-stock-line { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--secondary-text-color); font-size: 1rem; }
     .wine-stock-line ha-icon { --mdc-icon-size: 30px; flex: 0 0 auto; }
@@ -84,8 +84,8 @@ export class PlocCellarWineDetail extends LitElement {
     .characteristic-label { color: var(--secondary-text-color); font-size: .9rem; }
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
     .characteristic-value.is-error { color: var(--error-color); }
-    .grapes-list { display: grid; gap: 2px; margin: 0 8% 0 0; }
-    .grape-row { display: grid; grid-template-columns: minmax(0px, 1fr) minmax(90px, 2fr); align-items: center; gap: 8px; }
+    .grapes-list { display: grid; gap: 2px; margin: 0 5% 0 0; }
+    .grape-row { display: grid; grid-template-columns: minmax(0px, 1.2fr) minmax(90px, 2fr); align-items: center; gap: 5px; }
     .grape-name { min-width: 0; overflow-wrap: anywhere; text-align: end; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .grape-percentage { flex: 0 0 42px; text-align: right; font-variant-numeric: tabular-nums; }

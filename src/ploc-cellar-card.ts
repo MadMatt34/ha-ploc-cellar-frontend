@@ -95,7 +95,7 @@ export class PlocCellarCard extends LitElement {
     .diagnostic-wine-metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .diagnostic-wine-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .diagnostic-wine-tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
-    .diagnostic-quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; color: var(--error-color); font-size: 1.5rem; }
+    .diagnostic-quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; color: var(--error-color); font-size: 1.4rem; }
     .diagnostic-quantity ha-icon { --mdc-icon-size: 25px; color: var(--error-color); }
     .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 10px; }
     .group { min-width: 0; border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; }
