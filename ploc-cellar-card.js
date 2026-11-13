@@ -837,7 +837,7 @@ var Be = {
 	unknown_value: "Inconnu",
 	stocked_references: "Références de vins en stock",
 	physical_wine_references: "Références de vins en cave",
-	rack_occupancy: "Occupation des casiers",
+	rack_occupancy: "Occupation casiers",
 	inventory_diagnostics: "Diagnostics du stock",
 	diagnostic_unlocated: "Bouteilles non localisées",
 	diagnostic_negative: "Solde de mouvements négatif",
@@ -1127,7 +1127,7 @@ var nt = class extends je {
     .identity { min-width: 0; }
     .identity-text { min-width: 0; }
     .subtitle { margin-top: 4px; color: var(--secondary-text-color); line-height: 1.45; }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-left: 20px; }
     .wine-vintage { margin: 5px 20px; font-family: var(--ploc-wine-font-family); font-size: 2.5rem; font-weight: 600; line-height: 1.2; }
     .wine-stock-line { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--secondary-text-color); font-size: 1rem; }
     .wine-stock-line ha-icon { --mdc-icon-size: 30px; flex: 0 0 auto; }
@@ -1162,8 +1162,8 @@ var nt = class extends je {
     .characteristic-label { color: var(--secondary-text-color); font-size: .9rem; }
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
     .characteristic-value.is-error { color: var(--error-color); }
-    .grapes-list { display: grid; gap: 2px; margin: 0 8% 0 0; }
-    .grape-row { display: grid; grid-template-columns: minmax(0px, 1fr) minmax(90px, 2fr); align-items: center; gap: 8px; }
+    .grapes-list { display: grid; gap: 2px; margin: 0 5% 0 0; }
+    .grape-row { display: grid; grid-template-columns: minmax(0px, 1.2fr) minmax(90px, 2fr); align-items: center; gap: 5px; }
     .grape-name { min-width: 0; overflow-wrap: anywhere; text-align: end; }
     .grape-composition { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .grape-percentage { flex: 0 0 42px; text-align: right; font-variant-numeric: tabular-nums; }
@@ -1571,13 +1571,13 @@ var ot = class extends je {
     .rack-occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .rack-occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
     .color-count { white-space: nowrap; }
-    .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
+    .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 35px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
     .slot.occupied[role="button"] { cursor: pointer; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 1px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: 10px; pointer-events: none; overflow-wrap: anywhere; }
     .wine-tooltip-name { margin: 0 0 4px; font-size: 1.12em; font-weight: 500; line-height: 1.2; }
-    .wine-tooltip-details { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 8px; margin: 0; }
+    .wine-tooltip-details { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 4px; margin: 0; }
     .wine-tooltip-details dt { color: var(--secondary-text-color); }
     .wine-tooltip-details dd { margin: 0; }
     .slot.missing { border-style: dashed; color: var(--secondary-text-color); background: transparent; }
@@ -1916,7 +1916,7 @@ var pt = class extends je {
     .wine:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
     .wine-name { font-family: var(--ploc-wine-font-family); font-size: 1.4rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
-    .quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; font-size: 1.5rem; }
+    .quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; font-size: 1.4rem; }
     .quantity ha-icon { --mdc-icon-size: 25px; color: var(--wine-color, var(--secondary-text-color)); }
     .quantity-column { position: static; display: flex; justify-content: flex-end; align-items: flex-start; flex: 0 0 auto; min-width: 0; max-width: 42%; }
     .wine-alert { position: absolute; right: 8px; bottom: 8px; display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--error-color); border-radius: 50%; background: var(--card-background-color, var(--ha-card-background, var(--primary-background-color))); color: var(--error-color); }
@@ -19639,7 +19639,7 @@ var HO = [
     .diagnostic-wine-metadata { color: var(--secondary-text-color); font-size: .85rem; margin-top: 5px; line-height: 1.45; }
     .diagnostic-wine-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .diagnostic-wine-tag { border-radius: 999px; background: var(--secondary-background-color); padding: 3px 8px; font-size: .75rem; }
-    .diagnostic-quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; color: var(--error-color); font-size: 1.5rem; }
+    .diagnostic-quantity { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; white-space: nowrap; color: var(--error-color); font-size: 1.4rem; }
     .diagnostic-quantity ha-icon { --mdc-icon-size: 25px; color: var(--error-color); }
     .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 10px; }
     .group { min-width: 0; border: 1px solid var(--divider-color); border-radius: 10px; padding: 12px; }
