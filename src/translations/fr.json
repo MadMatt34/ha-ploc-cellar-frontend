@@ -79,7 +79,7 @@
   "unknown_value": "Inconnu",
   "stocked_references": "Références de vins en stock",
   "physical_wine_references": "Références de vins en cave",
-  "rack_occupancy": "Occupation des casiers",
+  "rack_occupancy": "Occupation casiers",
   "inventory_diagnostics": "Diagnostics du stock",
   "diagnostic_unlocated": "Bouteilles non localisées",
   "diagnostic_negative": "Solde de mouvements négatif",
