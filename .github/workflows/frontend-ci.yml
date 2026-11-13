@@ -118,6 +118,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [build, browser]
     runs-on: ubuntu-26.04
+    timeout-minutes: 45
     permissions:
       contents: read
     steps:
@@ -129,6 +130,8 @@ jobs:
           private-key: ${{ secrets.BUNDLE_PUBLISH_APP_PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
+          permission-checks: read
+          permission-statuses: read
       - name: Get publication app bot user ID
         id: app-user
         env:
@@ -167,10 +170,34 @@ jobs:
           git commit -m "Build Ploc Cellar Cards"
           git push --force origin "HEAD:refs/heads/$BRANCH"
 
-          if ! gh pr view "$BRANCH" >/dev/null 2>&1; then
+          PR_NUMBER="$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')"
+          if [ -z "$PR_NUMBER" ]; then
             gh pr create \
               --base main \
               --head "$BRANCH" \
               --title "Build Ploc Cellar Cards" \
               --body "Automated update of the committed HACS distributables. The dedicated publication app may bypass only the review requirement; all required CI checks remain mandatory."
+            PR_NUMBER="$(gh pr view "$BRANCH" --json number --jq .number)"
           fi
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "::error::Unable to identify the generated-bundles pull request."
+            exit 1
+          fi
+
+          PR_DATA="$(gh pr view "$PR_NUMBER" --json baseRefName,headRefName,isDraft,files)"
+          echo "$PR_DATA" | jq -e '
+            .baseRefName == "main" and
+            .headRefName == "automation/update-hacs-bundles" and
+            .isDraft == false and
+            ([.files[].path] | sort) == ["dist/ploc-cellar-card.js", "ploc-cellar-card.js"]
+          ' >/dev/null || {
+            echo "::error::The pull request does not match the exact generated-bundle scope."
+            exit 1
+          }
+
+          echo "Waiting for all pull-request checks on #$PR_NUMBER..."
+          gh pr checks "$PR_NUMBER" --watch --interval 10
+
+          echo "All pull-request checks passed; merging #$PR_NUMBER."
+          gh pr merge "$PR_NUMBER" --squash --delete-branch
