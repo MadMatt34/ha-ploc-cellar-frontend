@@ -15,8 +15,8 @@ test("English and French backend contracts document the same critical inventory 
   ]);
 
   for (const field of ["stale", "last_sync", "stocked_wines", "wine_references"]) {
-    assert.ok(english.includes(`\`${field}\``), `English contract is missing ${field}`);
-    assert.ok(french.includes(`\`${field}\``), `French contract is missing ${field}`);
+    assert.ok(english.includes(`\`\${field}\`\`), `English contract is missing ${field}`);
+    assert.ok(french.includes(`\`\${field}\`\`), `French contract is missing ${field}`);
   }
 });
 
@@ -28,11 +28,12 @@ test("both frontend READMEs link the compatibility and release policy", async ()
   ]);
 
   assert.ok(english.includes("docs/COMPATIBILITY_AND_RELEASES.md"));
+  assert.ok(french.includes("docs/COMPATIBILITY_AND_RELEASES.md"));
   assert.ok(policy.includes("| 0.8.0 development baseline | 0.1.0 development baseline |"));
   assert.ok(policy.includes("not a claim that corresponding GitHub Releases have been published"));
 });
 
-test("both backend contracts document the scoped non-admin sync command", async () => {
+test("both contract documents own the synchronization protocol details", async () => {
   const [english, french, readmeEnglish, readmeFrench] = await Promise.all([
     read("docs/BACKEND_CONTRACT.md"),
     read("docs/CONTRAT_BACKEND.fr.md"),
@@ -40,16 +41,18 @@ test("both backend contracts document the scoped non-admin sync command", async 
     read("README.fr.md"),
   ]);
 
-  for (const document of [english, french, readmeEnglish, readmeFrench]) {
+  for (const document of [english, french]) {
     assert.ok(document.includes("ploc_cellar/subscribe_sync"));
     assert.ok(document.includes("ploc_cellar_sync_completed"));
+    assert.ok(document.includes("change_counts"));
   }
   assert.ok(english.includes("does not require administrator privileges"));
   assert.ok(french.includes("ne requiert pas le rôle administrateur"));
-  assert.ok(english.includes("change_counts"));
-  assert.ok(french.includes("change_counts"));
-  assert.ok(readmeEnglish.includes("Non-admin users"));
-  assert.ok(readmeFrench.includes("utilisateurs non administrateurs"));
-  assert.ok(english.includes('empty (`{}`).'));
-  assert.ok(french.includes('vide (`{}`).'));
+  assert.ok(english.includes("empty (`{}`)."));
+  assert.ok(french.includes("vide (`{}`)."));
+
+  assert.ok(readmeEnglish.includes("docs/BACKEND_CONTRACT.md"));
+  assert.ok(readmeFrench.includes("docs/CONTRAT_BACKEND.fr.md"));
+  assert.ok(!readmeEnglish.includes("ploc_cellar/subscribe_sync"));
+  assert.ok(!readmeFrench.includes("ploc_cellar/subscribe_sync"));
 });
