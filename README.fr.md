@@ -10,7 +10,7 @@ Frontend Lovelace indépendant pour Home Assistant, destiné à l'[intégration 
 [![HACS](https://img.shields.io/badge/HACS-Plugin%20de%20tableau%20de%20bord-blue)](https://www.hacs.xyz/)
 [![Frontend CI](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml)
 [![Validation HACS](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml)
-[![Licence : MIT](LICENSE)](LICENSE)
+![Licence : MIT](https://img.shields.io/badge/Licence-MIT-green.svg)
 
 ## Documentation
 
