@@ -1,5 +1,7 @@
 # Backend/frontend compatibility and release policy
 
+[Version française](COMPATIBILITY_AND_RELEASES.fr.md)
+
 This document is the compatibility reference for the two Ploc Cellar repositories.
 
 ## Current version baseline
