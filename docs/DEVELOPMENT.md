@@ -1,5 +1,7 @@
 # Frontend development and CI
 
+[Version française](DEVELOPMENT.fr.md)
+
 This document is for contributors. User installation instructions are in the root [README](../README.md) and [French README](../README.fr.md).
 
 ## Toolchain
