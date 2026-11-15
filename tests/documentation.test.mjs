@@ -15,8 +15,8 @@ test("English and French backend contracts document the same critical inventory 
   ]);
 
   for (const field of ["stale", "last_sync", "stocked_wines", "wine_references"]) {
-    assert.ok(english.includes(`\`\${field}\`\`), `English contract is missing ${field}`);
-    assert.ok(french.includes(`\`\${field}\`\`), `French contract is missing ${field}`);
+    assert.ok(english.includes("`" + field + "`"), "English contract is missing " + field);
+    assert.ok(french.includes("`" + field + "`"), "French contract is missing " + field);
   }
 });
 
