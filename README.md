@@ -10,7 +10,7 @@ Independent Home Assistant Lovelace frontend for the [Ploc Cellar integration](h
 [![HACS](https://img.shields.io/badge/HACS-Dashboard%20plugin-blue)](https://www.hacs.xyz/)
 [![Frontend CI](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml)
 [![HACS validation](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml)
-[![License: MIT](LICENSE)](LICENSE)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
 ## Documentation
 
