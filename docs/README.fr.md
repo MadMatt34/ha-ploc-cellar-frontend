@@ -6,7 +6,7 @@ Ce répertoire contient la documentation technique et de maintenance de Ploc Cel
 
 | Document | Contenu |
 |---|---|
-| [Contrat backend en français](CONTRAT_BACKEND.fr.md) | Requêtes WebSocket, sémantique des réponses, notifications de synchronisation, images et évolution coordonnée |
+| [Contrat backend en français](BACKEND_CONTRACT.fr.md) | Requêtes WebSocket, sémantique des réponses, notifications de synchronisation, images et évolution coordonnée |
 | [Backend contract in English](BACKEND_CONTRACT.md) | English version |
 | [Compatibilité et publications](COMPATIBILITY_AND_RELEASES.fr.md) | Couples backend/frontend pris en charge, versionnement et publication coordonnée |
 | [Compatibility and releases](COMPATIBILITY_AND_RELEASES.md) | English version |

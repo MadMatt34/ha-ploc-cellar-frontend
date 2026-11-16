@@ -8,7 +8,7 @@ This directory contains technical and maintenance documentation for Ploc Cellar 
 
 | Document | Scope |
 |---|---|
-| [Backend contract](BACKEND_CONTRACT.md) / [français](CONTRAT_BACKEND.fr.md) | WebSocket requests, response schema semantics, synchronization notifications, image handling and coordinated contract changes |
+| [Backend contract](BACKEND_CONTRACT.md) / [français](BACKEND_CONTRACT.fr.md) | WebSocket requests, response schema semantics, synchronization notifications, image handling and coordinated contract changes |
 | [Compatibility and releases](COMPATIBILITY_AND_RELEASES.md) / [français](COMPATIBILITY_AND_RELEASES.fr.md) | Supported backend/frontend pairs, versioning and coordinated publication |
 
 ## Development
