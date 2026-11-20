@@ -604,6 +604,58 @@ describe("Ploc Cellar browser interactions", () => {
       await context.close();
     }
   });
+  it("releases card subscriptions and wine image object URLs across repeated mount cycles", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      const cycles = 12;
+      await page.evaluate(() => {
+        window.__plocFixture.inventory.wines[0].image_url = "/fixture-image.jpg";
+      });
+      for (let cycle = 0; cycle < cycles; cycle += 1) {
+        await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
+        const inventoryCard = page.locator("ploc-cellar-inventory-card");
+        await inventoryCard.locator(".wine").first().waitFor();
+        if (cycle === 0) {
+          await inventoryCard.locator(".wine").first().click();
+          const detail = inventoryCard.locator("ploc-cellar-wine-detail");
+          await detail.waitFor();
+          await detail.locator("img.wine-image").waitFor();
+          await page.waitForFunction(() =>
+            document.querySelector("ploc-cellar-inventory-card")
+              ?.shadowRoot?.querySelector("ploc-cellar-wine-detail")
+              ?.shadowRoot?.querySelector("img.wine-image")?.src.startsWith("blob:"),
+          );
+        }
+        await page.evaluate(() => document.querySelector("#app").replaceChildren());
+        await page.waitForFunction(() => window.__plocFixture.activeSyncListeners === 0);
+      }
+
+      for (let cycle = 0; cycle < cycles; cycle += 1) {
+        await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+        await page.locator("ploc-cellar-card .summary").waitFor();
+        await page.evaluate(() => document.querySelector("#app").replaceChildren());
+        await page.waitForFunction(() => window.__plocFixture.activeSyncListeners === 0);
+      }
+
+      for (let cycle = 0; cycle < cycles; cycle += 1) {
+        await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));
+        await page.locator("ploc-cellar-rack-card .slot").first().waitFor();
+        await page.evaluate(() => document.querySelector("#app").replaceChildren());
+        await page.waitForFunction(() => window.__plocFixture.activeSyncListeners === 0);
+      }
+
+      assert.equal(await page.evaluate(() => window.__plocFixture.activeSyncListeners), 0);
+      assert.equal(
+        await page.evaluate(() => window.__objectUrlStats.revoked.length),
+        1,
+        "the wine detail object URL must be revoked when its card is disconnected",
+      );
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
 });
 
 
