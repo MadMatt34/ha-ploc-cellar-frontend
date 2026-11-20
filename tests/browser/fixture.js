@@ -117,6 +117,7 @@ window.__plocFixture = {
   fail: false,
   calls: 0,
   imageFetches: 0,
+  get activeSyncListeners() { return syncListeners.size; },
   emitSync(configEntryId) {
     for (const [listener, subscribedEntryId] of syncListeners) {
       if (subscribedEntryId === configEntryId) listener({});
