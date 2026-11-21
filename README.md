@@ -35,7 +35,6 @@ This repository contains three custom cards:
 - **Ploc Cellar rack** (`custom:ploc-cellar-rack-card`): rack selector and a position map based on the actual PLOUD row/column coordinates. Occupied positions are represented individually and use the wine color when available.
   The editor lets you hide the rack occupancy bar; it is shown by default and matches the width of the position map.
   On narrow cards (600 px or less), the rack map automatically switches to a compact touch-friendly grid: wine names and coordinate labels are hidden, bottle-color markers remain visible, and cells resize within a 44–64 px range. The actual PLOUD coordinates are unchanged; wide racks can scroll inside the map without making the card itself overflow.
-  On narrow cards (600 px or less), the rack map automatically switches to a compact touch-friendly grid: wine names and coordinate labels are hidden, bottle-color markers remain visible, and cells resize within a 44–64 px range. The actual PLOUD coordinates are unchanged; wide racks can scroll inside the map without making the card itself overflow.
 
  
 
