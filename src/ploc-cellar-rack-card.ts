@@ -65,7 +65,10 @@ export class PlocCellarRackCard extends LitElement {
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
     .slot.occupied[role="button"] { cursor: pointer; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
-    .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 1px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: 10px; pointer-events: none; overflow-wrap: anywhere; }\n    .wine-tooltip-close { display: none; }\n    .wine-tooltip.mobile-compact { padding-right: 28px; }\n    .wine-tooltip.mobile-compact .wine-tooltip-close { display: inline-flex; position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; align-items: center; justify-content: center; padding: 0; border: 0; border-radius: 50%; background: var(--secondary-background-color); color: var(--primary-text-color); font-size: 16px; line-height: 1; pointer-events: auto; cursor: pointer; }
+    .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 1px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: 10px; pointer-events: none; overflow-wrap: anywhere; }
+    .wine-tooltip-close { display: none; }
+    .wine-tooltip.mobile-compact { padding-right: 28px; }
+    .wine-tooltip.mobile-compact .wine-tooltip-close { display: inline-flex; position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; align-items: center; justify-content: center; padding: 0; border: 0; border-radius: 50%; background: var(--secondary-background-color); color: var(--primary-text-color); font-size: 16px; line-height: 1; pointer-events: auto; cursor: pointer; }
     .wine-tooltip-name { margin: 0 0 2px; font-size: 1.12em; font-weight: 500; line-height: 1.2; }
     .wine-tooltip-details { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1px 4px; margin: 0; line-height: 1.15; }
     .wine-tooltip-details dt { color: var(--secondary-text-color); }
@@ -267,10 +270,9 @@ export class PlocCellarRackCard extends LitElement {
     const target = event.currentTarget;
     if (!(target instanceof HTMLElement)) return;
     const rect = target.getBoundingClientRect();
-    const isPointer = "clientX" in event;
     this.tooltipPosition = {
-      left: isPointer ? event.clientX + 12 : rect.right + 8,
-      top: isPointer ? event.clientY + 12 : rect.top,
+      left: rect.right + 8,
+      top: rect.top,
     };
     this.activeTooltip = { wine, color: this.wineColor(wine) };
   }
@@ -442,7 +444,6 @@ export class PlocCellarRackCard extends LitElement {
                         }
                       } : nothing}
                       @pointerenter=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
-                      @pointermove=${occupied ? (event: PointerEvent) => this.moveWineTooltip(event) : nothing}
                       @pointerleave=${occupied ? () => this.hideWineTooltip() : nothing}
                       @focus=${occupied ? (event: FocusEvent) => this.showWineTooltip(event, wine) : nothing}
                       @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
@@ -474,10 +475,11 @@ export class PlocCellarRackCard extends LitElement {
           <div class="warning"><span>${rackItemsWithUnknownRack.length}</span> ${t("missing_rack")}</div>
         ` : nothing}
         ${this.activeTooltip ? html`
-          <div class="wine-tooltip"
+          <div class=${mobileCompact ? "wine-tooltip mobile-compact" : "wine-tooltip"}
             id="ploc-cellar-wine-tooltip"
             role="tooltip"
             style=${`left: 12px; top: 12px; --wine-tooltip-border-color: ${this.activeTooltip.color};`}>
+            ${mobileCompact ? html`<button class="wine-tooltip-close" type="button" aria-label=${t("tooltip_close")} @click=${(event: Event) => { event.stopPropagation(); this.hideWineTooltip(); }}>×</button>` : nothing}
             ${this.activeTooltip.wine ? html`
               <div class="wine-tooltip-name">${this.activeTooltip.wine.name}</div>
               <dl class="wine-tooltip-details">
