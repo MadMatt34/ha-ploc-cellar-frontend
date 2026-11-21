@@ -760,7 +760,17 @@ var Be = {
 	rack_mobile_grid: "Compact mobile rack position map",
 	tooltip_close: "Close wine tooltip",
 	editor_show_rack_header: "Show cellar header",
-	editor_show_diagnostics_expanded: "Expand diagnostics by default"
+	editor_show_diagnostics_expanded: "Expand diagnostics by default",
+	editor_section_general: "General",
+	editor_section_occupancy: "Rack occupancy",
+	editor_section_diagnostics: "Diagnostics",
+	editor_section_statistics: "Statistics",
+	editor_section_inventory: "Inventory display",
+	editor_section_rack_selection: "Rack selection",
+	editor_section_rack_header: "Cellar header",
+	editor_diagnostics_expanded_helper: "This option is available only when diagnostics are enabled.",
+	editor_statistics_legends_helper: "This option is available only when statistics are enabled.",
+	editor_rack_occupancy_helper: "This option is available only while the cellar header is shown."
 }, Ve = {
 	card_title: "Cave Ploc",
 	rack_title: "Rangement de la cave",
@@ -931,7 +941,17 @@ var Be = {
 	rack_mobile_grid: "Plan compact des emplacements du casier",
 	tooltip_close: "Fermer l’infobulle du vin",
 	editor_show_rack_header: "Afficher l’en-tête de la cave",
-	editor_show_diagnostics_expanded: "Déplier les diagnostics par défaut"
+	editor_show_diagnostics_expanded: "Déplier les diagnostics par défaut",
+	editor_section_general: "Général",
+	editor_section_occupancy: "Occupation des casiers",
+	editor_section_diagnostics: "Diagnostics",
+	editor_section_statistics: "Statistiques",
+	editor_section_inventory: "Affichage de l’inventaire",
+	editor_section_rack_selection: "Sélection du casier",
+	editor_section_rack_header: "En-tête de la cave",
+	editor_diagnostics_expanded_helper: "Cette option est disponible uniquement si les diagnostics sont activés.",
+	editor_statistics_legends_helper: "Cette option est disponible uniquement si les statistiques sont activées.",
+	editor_rack_occupancy_helper: "Cette option est disponible uniquement lorsque l’en-tête de la cave est affiché."
 };
 // src/translations.ts
 function I(e, t) {
@@ -2279,9 +2299,15 @@ var mt = class extends je {
 			show_statistics: "editor_show_statistics",
 			show_statistics_legends: "editor_show_statistics_legends"
 		}[e.name]), this.computeHelper = (e) => {
-			if (e.name === "config_entry_id") return I(this.hass?.language ?? "en", "editor_configuration_helper");
-			if (e.name === "title") return I(this.hass?.language ?? "en", "editor_title_helper");
-			if (e.name === "page_size") return I(this.hass?.language ?? "en", "editor_page_size_helper");
+			let t = {
+				config_entry_id: "editor_configuration_helper",
+				title: "editor_title_helper",
+				page_size: "editor_page_size_helper",
+				show_diagnostics_expanded: "editor_diagnostics_expanded_helper",
+				show_statistics_legends: "editor_statistics_legends_helper",
+				show_rack_occupancy: "editor_rack_occupancy_helper"
+			}[e.name];
+			return t ? I(this.hass?.language ?? "en", t) : void 0;
 		};
 	}
 	get isOverviewCard() {
@@ -2294,33 +2320,48 @@ var mt = class extends je {
 		return this.config?.type === "custom:ploc-cellar-rack-card";
 	}
 	get schema() {
-		let e = [{
+		let e = this.hass?.language ?? "en", t = (t, n) => ({
+			type: "expandable",
+			name: "",
+			title: I(e, t),
+			expanded: !0,
+			flatten: !0,
+			schema: n
+		}), n = [{
 			name: "config_entry_id",
 			required: !0,
 			selector: { config_entry: { integration: "ploc_cellar" } }
 		}];
-		return this.isOverviewCard ? (e.push({
+		return this.isOverviewCard ? n.push(t("editor_section_general", [{
 			name: "title",
 			selector: { text: {} }
-		}, {
+		}]), t("editor_section_occupancy", [{
 			name: "show_occupancy",
 			selector: { boolean: {} }
-		}, {
+		}]), t("editor_section_diagnostics", [{
 			name: "show_diagnostics",
 			selector: { boolean: {} }
-		}, ...this.config?.show_diagnostics === !1 ? [] : [{
+		}, {
 			name: "show_diagnostics_expanded",
+			visible: {
+				field: "show_diagnostics",
+				value: !0
+			},
 			selector: { boolean: {} }
-		}], {
+		}]), t("editor_section_statistics", [{
 			name: "show_statistics",
 			selector: { boolean: {} }
-		}), this.config?.show_statistics !== !1 && e.push({
+		}, {
 			name: "show_statistics_legends",
+			visible: {
+				field: "show_statistics",
+				value: !0
+			},
 			selector: { boolean: {} }
-		})) : this.isInventoryCard ? e.push({
+		}])) : this.isInventoryCard ? n.push(t("editor_section_general", [{
 			name: "title",
 			selector: { text: {} }
-		}, {
+		}]), t("editor_section_inventory", [{
 			name: "page_size",
 			selector: { number: {
 				min: 10,
@@ -2334,53 +2375,57 @@ var mt = class extends je {
 				mode: "dropdown",
 				options: [
 					{
-						label: I(this.hass?.language ?? "en", "sort_name_asc"),
+						label: I(e, "sort_name_asc"),
 						value: "name-asc"
 					},
 					{
-						label: I(this.hass?.language ?? "en", "sort_name_desc"),
+						label: I(e, "sort_name_desc"),
 						value: "name-desc"
 					},
 					{
-						label: I(this.hass?.language ?? "en", "sort_bottles_asc"),
+						label: I(e, "sort_bottles_asc"),
 						value: "bottles-asc"
 					},
 					{
-						label: I(this.hass?.language ?? "en", "sort_bottles_desc"),
+						label: I(e, "sort_bottles_desc"),
 						value: "bottles-desc"
 					},
 					{
-						label: I(this.hass?.language ?? "en", "sort_vintage_asc"),
+						label: I(e, "sort_vintage_asc"),
 						value: "vintage-asc"
 					},
 					{
-						label: I(this.hass?.language ?? "en", "sort_vintage_desc"),
+						label: I(e, "sort_vintage_desc"),
 						value: "vintage-desc"
 					}
 				]
 			} }
-		}) : this.isRackCard && e.push({
+		}])) : this.isRackCard && n.push(t("editor_section_general", [{
 			name: "title",
 			selector: { text: {} }
-		}, {
+		}]), t("editor_section_rack_selection", [{
 			name: "rack_picker_mode",
 			selector: { select: {
 				mode: "dropdown",
 				options: [{
-					label: I(this.hass?.language ?? "en", "editor_rack_picker_buttons"),
+					label: I(e, "editor_rack_picker_buttons"),
 					value: "buttons"
 				}, {
-					label: I(this.hass?.language ?? "en", "editor_rack_picker_dropdown"),
+					label: I(e, "editor_rack_picker_dropdown"),
 					value: "dropdown"
 				}]
 			} }
-		}, {
+		}]), t("editor_section_rack_header", [{
 			name: "show_rack_header",
 			selector: { boolean: {} }
-		}, ...this.config?.show_rack_header === !1 ? [] : [{
+		}, {
 			name: "show_rack_occupancy",
+			visible: {
+				field: "show_rack_header",
+				value: !0
+			},
 			selector: { boolean: {} }
-		}]), e;
+		}])), n;
 	}
 	setConfig(e) {
 		let t = { ...e };
@@ -2402,16 +2447,9 @@ var mt = class extends je {
 		}));
 	}
 	render() {
-		return N`
-      <ha-form
-        .hass=${this.hass}
-        .data=${this.config ?? {}}
-        .schema=${this.schema}
-        .computeLabel=${this.computeLabel}
-        .computeHelper=${this.computeHelper}
-        @value-changed=${this.valueChanged}
-      ></ha-form>
-    `;
+		return N`<ha-form .hass=${this.hass} .data=${this.config ?? {}} .schema=${this.schema}
+      .computeLabel=${this.computeLabel} .computeHelper=${this.computeHelper}
+      @value-changed=${this.valueChanged}></ha-form>`;
 	}
 };
 L([ze({ attribute: !1 })], mt.prototype, "hass", void 0), L([F()], mt.prototype, "config", void 0), mt = L([Ie("ploc-cellar-card-editor")], mt);
@@ -19669,7 +19707,7 @@ var HO = [
     .value { display: block; font-size: 1.4rem; }
     .label, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .section { margin-top: 10px; }
-    .section-title { margin: 0 0 8px; font-size: .95rem; font-weight: 500; }
+    .section-title { margin: 0; font-size: .95rem; font-weight: 500; }
     details.section > summary { display: list-item; cursor: pointer; }
     details.section > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .occupancy-bar { position: relative; height: 20px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
@@ -19677,7 +19715,7 @@ var HO = [
     .occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
     .diagnostics-section.has-issues { border: 1px solid var(--error-color); border-radius: 10px; padding: 10px; }
     .diagnostics-section.has-issues > summary { color: var(--error-color); }
-    .diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+    .diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 8px; }
     .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; background: transparent; font: inherit; }
     button.diagnostic { cursor: pointer; }
     button.diagnostic:hover { background: var(--secondary-background-color); }
