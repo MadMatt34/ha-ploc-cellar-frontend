@@ -391,13 +391,15 @@ export class PlocCellarRackCard extends LitElement {
                 </nav>
               `
             : nothing}
-          <div class="rack-summary">
-            <div class="rack-name">${rack?.name ?? ""}</div>
-            ${selectedRackColorCounts.length ? html`<div class="color-counts">${selectedRackColorCounts.map(({ color, count, markerColor }, index) => html`${index ? " · " : nothing}<span class="color-count"><span class="color-count-marker" style=${`--color-count-marker: ${markerColor};`} aria-hidden="true"></span>${color}: <span>${count}</span></span>`)}</div>` : nothing}
-          </div>
+          ${this.config?.show_rack_header === false ? nothing : html`
+            <div class="rack-summary">
+              <div class="rack-name">${rack?.name ?? ""}</div>
+              ${selectedRackColorCounts.length ? html`<div class="color-counts">${selectedRackColorCounts.map(({ color, count, markerColor }, index) => html`${index ? " · " : nothing}<span class="color-count"><span class="color-count-marker" style=${`--color-count-marker: ${markerColor};`} aria-hidden="true"></span>${color}: <span>${count}</span></span>`)}</div>` : nothing}
+            </div>
+          `}
           <div class="rack-visualization"
             style=${`width: ${mobileCompact || !items.length ? "100%" : `${gridLayout.columnCount * 104 - 6}px` };`}>
-            ${this.config?.show_rack_occupancy === false ? nothing : html`
+            ${this.config?.show_rack_header === false || this.config?.show_rack_occupancy === false ? nothing : html`
               <div class="rack-occupancy"
                 role="progressbar"
                 aria-label="${t("occupied")} / ${t("free")}"
