@@ -33,7 +33,7 @@ export class PlocCellarRackCard extends LitElement {
 
   static styles = css`
     :host { display: block; }
-    ha-card { padding: 16px; color: var(--primary-text-color); }
+    ha-card { display: block; padding: 16px; color: var(--primary-text-color); }
     header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     h2 { margin: 0; font-size: 1.2rem; font-weight: 500; }
     button { color: var(--primary-text-color); background: var(--secondary-background-color); border: 1px solid var(--divider-color); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
@@ -151,7 +151,7 @@ export class PlocCellarRackCard extends LitElement {
     this.cardResizeObserver?.disconnect();
     this.observedCard = card;
     this.cardResizeObserver = new ResizeObserver((entries) => {
-      const width = entries[0]?.contentRect.width ?? card.clientWidth;
+      const width = card.clientWidth || entries[0]?.contentRect.width || 0;
       if (width > 0 && width !== this.cardWidth) this.cardWidth = width;
     });
     this.cardResizeObserver.observe(card);
@@ -403,7 +403,7 @@ export class PlocCellarRackCard extends LitElement {
             `}
             ${items.length ? html`
               ${gridLayout.compact ? html`<div class="warning">${t("rack_grid_compacted")}</div>` : nothing}
-              <div class=${mobileCompact ? "grid-wrap mobile-compact" : "grid-wrap"}>
+              <div class=${mobileCompact ? "grid-wrap mobile-compact" : "grid-wrap"} role="group" aria-label=${mobileCompact ? t("rack_mobile_grid") : t("rack_grid")}>
                 <div class="rack-grid" style=${`grid-template-columns: repeat(${gridLayout.columnCount}, ${mobileSlotSize}px); grid-template-rows: repeat(${gridLayout.rowCount}, ${mobileSlotSize}px); gap: ${mobileCompact ? mobileGap : 6}px;`}>
                 ${items.map((item) => {
                   const position = gridPositionById.get(item.id);
