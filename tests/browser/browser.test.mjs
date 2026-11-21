@@ -370,6 +370,7 @@ describe("Ploc Cellar browser interactions", () => {
       await detail.waitFor();
       await detail.locator("ha-dialog").waitFor();
       assert.equal(await detail.locator(".location-coordinate.selected").count(), 1, "tap on compact slot must select the exact rack coordinate");
+      assert.equal(await card.locator(".wine-tooltip").count(), 0, "hover tooltip is suppressed on compact touch layouts");
       await detail.locator("ha-dialog").evaluate((dialog) => {
         dialog.dispatchEvent(new Event("closed", { bubbles: true }));
       });
