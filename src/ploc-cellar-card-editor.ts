@@ -120,7 +120,7 @@ export class PlocCellarCardEditor extends LitElement {
       nextConfig.show_statistics_legends = config.show_statistics_legends !== false;
     } else if (config.type === "custom:ploc-cellar-inventory-card") {
       nextConfig.default_sort = config.default_sort ?? "name-asc";
-      nextConfig.page_size = config.page_size ?? 40;
+      nextConfig.page_size = config.page_size ?? 10;
     } else if (config.type === "custom:ploc-cellar-rack-card") {
       nextConfig.rack_picker_mode = config.rack_picker_mode ?? "buttons";
       nextConfig.show_rack_occupancy = config.show_rack_occupancy !== false;
