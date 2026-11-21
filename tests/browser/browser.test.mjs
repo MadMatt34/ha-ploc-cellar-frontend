@@ -693,7 +693,7 @@ describe("Ploc Cellar browser interactions", () => {
         });
       });
       const schema = await page.locator("ploc-cellar-card-editor ha-form").evaluate((form) =>
-        form.schema.flatMap((field) => [field.name, ...(field.schema ? field.schema.flatMap((nested) => [nested.name, ...(nested.schema ? nested.schema.map((child) => child.name) : [])] : [])]),
+        (function names(schema) { return schema.flatMap((field) => [field.name, ...names(field.schema ?? [])]); })(form.schema),
       );
       assert.ok(schema.includes("config_entry_id"));
       assert.ok(schema.includes("rack_picker_mode"));
