@@ -26,8 +26,8 @@ async function waitForServer() {
   throw new Error("Vite did not become ready within 20 seconds");
 }
 
-async function openFixture() {
-  const context = await browser.newContext();
+async function openFixture(options = {}) {
+  const context = await browser.newContext(options);
   const page = await context.newPage();
   const pageErrors = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
@@ -326,7 +326,7 @@ describe("Ploc Cellar browser interactions", () => {
   });
 
   it("renders a compact, touch-friendly rack map on narrow screens and keeps bottle selection working", async () => {
-    const { context, page, pageErrors } = await openFixture();
+    const { context, page, pageErrors } = await openFixture({ hasTouch: true });
     try {
       await page.setViewportSize({ width: 375, height: 812 });
       await page.evaluate(() => {
@@ -366,12 +366,14 @@ describe("Ploc Cellar browser interactions", () => {
       await mkdir("test-results", { recursive: true });
       await page.screenshot({ path: "test-results/mobile-rack-grid.png", fullPage: true });
 
-      await slots.first().click();
+      const firstSlot = await slots.first().boundingBox();
+      assert.ok(firstSlot, "first rack slot must have a visible bounding box");
+      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
       const tooltip = card.locator(".wine-tooltip");
       await tooltip.waitFor();
       assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "first tap on mobile exposes wine tooltip details");
       assert.equal(await card.locator("ploc-cellar-wine-detail").count(), 0, "first tap should show tooltip instead of opening the detail dialog");
-      await slots.first().click();
+      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
       const detail = card.locator("ploc-cellar-wine-detail");
       await detail.waitFor();
       await detail.locator("ha-dialog").waitFor();
