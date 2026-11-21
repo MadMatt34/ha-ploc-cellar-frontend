@@ -1585,9 +1585,11 @@ var ot = class extends je {
     .rack-occupancy { position: relative; box-sizing: border-box; width: 100%; height: 20px; margin: 0 0 8px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
     .rack-occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .rack-occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
-    .color-count { white-space: nowrap; }
+    .color-count { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .color-count-marker { display: inline-block; width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; background: var(--color-count-marker, var(--secondary-text-color)); border: 1px solid var(--divider-color); box-sizing: border-box; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 35px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
+    .slot.tooltip-active { border: 2px solid var(--primary-color); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 28%, transparent), 0 0 8px color-mix(in srgb, var(--primary-color) 30%, transparent); }
     .slot.occupied[role="button"] { cursor: pointer; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 1px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: 10px; pointer-events: none; overflow-wrap: anywhere; }
@@ -1671,7 +1673,7 @@ var ot = class extends je {
 		}
 	}
 	selectRack(e) {
-		e.currentTarget instanceof HTMLSelectElement && (this.selectedRackId = e.currentTarget.value);
+		e.currentTarget instanceof HTMLSelectElement && (this.hideWineTooltip(), this.selectedRackId = e.currentTarget.value);
 	}
 	wineLabel(e, t) {
 		if (!e.wine_id) return "";
@@ -1691,16 +1693,17 @@ var ot = class extends je {
 		let i = [e.region, e.country].filter(Boolean).join(" / ");
 		return i && r.push([n("tooltip_region_country"), i]), r;
 	}
-	showWineTooltip(e, t) {
-		let n = e.currentTarget;
-		if (!(n instanceof HTMLElement)) return;
-		let r = n.getBoundingClientRect();
+	showWineTooltip(e, t, n) {
+		let r = e.currentTarget;
+		if (!(r instanceof HTMLElement)) return;
+		let i = r.getBoundingClientRect();
 		this.tooltipPosition = {
-			left: r.right + 8,
-			top: r.top
+			left: i.right + 8,
+			top: i.top
 		}, this.activeTooltip = {
 			wine: t,
-			color: this.wineColor(t)
+			color: this.wineColor(t),
+			rackItemId: n
 		};
 	}
 	applyTooltipPosition() {
@@ -1716,10 +1719,21 @@ var ot = class extends je {
 		let e = (e) => I(this.hass?.language ?? "en", e), t = this.inventory, n = t?.racks.find((e) => e.id === this.selectedRackId), r = (t?.rack_items ?? []).filter((e) => e.rack_id === this.selectedRackId), i = new Map((t?.wines ?? []).map((e) => [e.id, e])), a = r.reduce((e, t) => e + Number(!!t.wine_id), 0), o = r.length - a, s = r.length ? a / r.length * 100 : 0, c = r.filter((e) => Number.isSafeInteger(e.row) && Number.isSafeInteger(e.column)), l = /* @__PURE__ */ new Map();
 		for (let e of r) {
 			if (!e.wine_id) continue;
-			let t = i.get(e.wine_id)?.color?.trim();
-			t && l.set(t, (l.get(t) ?? 0) + 1);
+			let t = i.get(e.wine_id);
+			if (!t) continue;
+			let n = t.color?.trim();
+			if (!n) continue;
+			let r = l.get(n);
+			l.set(n, {
+				count: (r?.count ?? 0) + 1,
+				rgb: r?.rgb ?? t.color_rgb
+			});
 		}
-		let u = [...l.entries()].sort(([e], [t]) => e.localeCompare(t, this.hass?.language)), d = it(c.map((e) => ({
+		let u = [...l.entries()].sort(([e], [t]) => e.localeCompare(t, this.hass?.language)).map(([e, { count: t, rgb: n }]) => ({
+			color: e,
+			count: t,
+			markerColor: n && n.every((e) => Number.isFinite(e) && e >= 0 && e <= 255) ? `rgb(${n.map((e) => Math.round(e)).join(", ")})` : "var(--secondary-text-color)"
+		})), d = it(c.map((e) => ({
 			id: e.id,
 			row: e.row,
 			column: e.column
@@ -1750,14 +1764,14 @@ var ot = class extends je {
                   ${t.racks.map((e) => N`
                     <button aria-pressed=${e.id === this.selectedRackId}
                       @click=${() => {
-			this.selectedRackId = e.id;
+			this.hideWineTooltip(), this.selectedRackId = e.id;
 		}}>${e.name}</button>
                   `)}
                 </nav>
               ` : P}
           <div class="rack-summary">
             <div class="rack-name">${n?.name ?? ""}</div>
-            ${u.length ? N`<div class="color-counts">${u.map(([e, t], n) => N`${n ? " · " : P}<span class="color-count">${e}: <span>${t}</span></span>`)}</div>` : P}
+            ${u.length ? N`<div class="color-counts">${u.map(({ color: e, count: t, markerColor: n }, r) => N`${r ? " · " : P}<span class="color-count"><span class="color-count-marker" style=${`--color-count-marker: ${n};`} aria-hidden="true"></span>${e}: <span>${t}</span></span>`)}</div>` : P}
           </div>
           <div class="rack-visualization"
             style=${`width: ${p || !c.length ? "100%" : `${d.columnCount * 104 - 6}px`};`}>
@@ -1784,7 +1798,7 @@ var ot = class extends je {
 			if (!n) return P;
 			let r = !!t.wine_id, a = t.wine_id ? i.get(t.wine_id) : void 0, o = r ? this.wineLabel(t, i) : e("empty_position");
 			return N`
-                    <div class=${r ? "slot occupied" : "slot empty"}
+                    <div class=${r ? `slot occupied${this.activeTooltip?.rackItemId === t.id ? " tooltip-active" : ""}` : "slot empty"}
                       style=${`grid-row: ${n.row}; grid-column: ${n.column}; width: ${m}px; height: ${m}px; min-width: ${m}px; min-height: ${m}px;`}
                       aria-label=${r ? `${o}, ${e("row")} ${t.row + 1}, ${e("column")} ${t.column + 1}` : o}
                       aria-describedby=${r && this.activeTooltip?.wine === a ? "ploc-cellar-wine-tooltip" : P}
@@ -1796,7 +1810,7 @@ var ot = class extends je {
 			} : P}
                       @click=${a ? (e) => {
 				let n = `${t.rack_id}:${t.row}:${t.column}`;
-				p && this.pendingTouchTapLocation !== n ? (this.pendingTouchTapLocation = n, this.showWineTooltip(e, a)) : (this.pendingTouchTapLocation = void 0, this.hideWineTooltip(), this.selectedWine = a, this.selectedLocation = {
+				p && this.pendingTouchTapLocation !== n ? (this.pendingTouchTapLocation = n, this.showWineTooltip(e, a, t.id)) : (this.pendingTouchTapLocation = void 0, this.hideWineTooltip(), this.selectedWine = a, this.selectedLocation = {
 					rackId: t.rack_id,
 					row: t.row,
 					column: t.column
@@ -1809,11 +1823,11 @@ var ot = class extends je {
 					column: t.column
 				});
 			} : P}
-                      @pointerenter=${r ? (e) => this.showWineTooltip(e, a) : P}
+                      @pointerenter=${r ? (e) => this.showWineTooltip(e, a, t.id) : P}
                       @pointerleave=${r ? () => {
 				p || this.hideWineTooltip();
 			} : P}
-                      @focus=${r ? (e) => this.showWineTooltip(e, a) : P}
+                      @focus=${r ? (e) => this.showWineTooltip(e, a, t.id) : P}
                       @blur=${r ? () => this.hideWineTooltip() : P}>
                       ${r ? N`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(a)};`} aria-hidden="true"></span>` : P}
                       ${r ? N`<strong>${this.displayWineLabel(t, i)}</strong>` : N`<span class="empty-shelf" aria-hidden="true"></span>`}
