@@ -152,11 +152,17 @@ export class PlocCellarRackCard extends LitElement {
     this.observedCard = card;
     this.cardResizeObserver = new ResizeObserver((entries) => {
       const width = card.clientWidth || entries[0]?.contentRect.width || 0;
-      if (width > 0 && width !== this.cardWidth) this.cardWidth = width;
+      if (width > 0 && width !== this.cardWidth) {
+        this.cardWidth = width;
+        if (width <= 600) this.hideWineTooltip();
+      }
     });
     this.cardResizeObserver.observe(card);
     const initialWidth = card.clientWidth;
-    if (initialWidth > 0 && initialWidth !== this.cardWidth) this.cardWidth = initialWidth;
+    if (initialWidth > 0 && initialWidth !== this.cardWidth) {
+      this.cardWidth = initialWidth;
+      if (initialWidth <= 600) this.hideWineTooltip();
+    }
   }
 
   private async refresh(): Promise<void> {
@@ -470,7 +476,7 @@ export class PlocCellarRackCard extends LitElement {
         ${rackItemsWithUnknownRack.length ? html`
           <div class="warning"><span>${rackItemsWithUnknownRack.length}</span> ${t("missing_rack")}</div>
         ` : nothing}
-        ${this.activeTooltip ? html`
+        ${this.activeTooltip && !mobileCompact ? html`
           <div class="wine-tooltip"
             id="ploc-cellar-wine-tooltip"
             role="tooltip"
