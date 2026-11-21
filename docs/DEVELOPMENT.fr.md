@@ -10,21 +10,21 @@ Ce document s'adresse aux contributeurs. Les instructions d'installation destin�
 
 Installer les dépendances :
 
-```sh
+~~~sh
 npm ci
-```
+~~~
 
 ## Validation locale
 
 Exécuter les mêmes contrôles ciblés que pendant le développement :
 
-```sh
+~~~sh
 npm run check
 npm test
 npx playwright install chromium
 npm run test:e2e
 npm run build
-```
+~~~
 
 L'installation du navigateur Playwright est nécessaire une fois par environnement local. `npm run check` effectue la vérification TypeScript stricte ; `npm test` lance les tests unitaires ; `npm run test:e2e` lance les tests d'interaction navigateur.
 
@@ -48,7 +48,7 @@ La validation HACS est effectuée par le workflow de validation du dépôt. Les 
 - `tests/browser/` contient les tests d'interaction navigateur et leur fixture.
 - `tests/documentation.test.mjs` vérifie certains invariants documentaires.
 
-Lorsqu'un comportement visible par l'utilisateur change, mettre à jour les tests unitaires/navigateur concernés et les deux README linguistiques. Lorsqu'une réponse backend ou le protocole de notification change, suivre la procédure coordonnée de [BACKEND_CONTRACT.md](BACKEND_CONTRACT.md) et mettre à jour la politique de compatibilité si une paire de versions prises en charge change.
+Les tests de régression du cycle de vie montent puis déconnectent plusieurs fois les trois cartes, vérifient la libération des abonnements de synchronisation et la révocation des URL Blob des fiches vin. Lorsqu'un comportement visible par l'utilisateur change, mettre à jour les tests unitaires/navigateur concernés et les deux README linguistiques. Lorsqu'une réponse backend ou le protocole de notification change, suivre la procédure coordonnée de [BACKEND_CONTRACT.md](BACKEND_CONTRACT.md) et mettre à jour la politique de compatibilité si une paire de versions prises en charge change.
 
 ## Limites de validation
 
