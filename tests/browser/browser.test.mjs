@@ -181,6 +181,27 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
+  it("shows color markers beside the color counts in the rack header", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));
+      const card = page.locator("ploc-cellar-rack-card");
+      await card.locator(".rack-name").getByText("Cave principale").waitFor();
+      const counts = card.locator(".color-count");
+      await assert.equal(await counts.count(), 2);
+      const red = counts.filter({ hasText: "Rouge" });
+      const white = counts.filter({ hasText: "Blanc" });
+      assert.equal(await red.locator(".color-count-marker").count(), 1);
+      assert.equal(await white.locator(".color-count-marker").count(), 1);
+      assert.equal(await red.locator(".color-count-marker").getAttribute("aria-hidden"), "true");
+      assert.match(await red.locator(".color-count-marker").getAttribute("style"), /rgb\(150, 20, 30\)/);
+      assert.match(await white.locator(".color-count-marker").getAttribute("style"), /rgb\(230, 220, 170\)/);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
   it("shows stale inventory state beside the last successful synchronization", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
@@ -466,12 +487,16 @@ describe("Ploc Cellar browser interactions", () => {
       await slot.focus();
       const tooltip = card.locator(".wine-tooltip");
       await tooltip.waitFor({ state: "visible" });
+      assert.ok(await slot.evaluate((element) => element.classList.contains("tooltip-active")), "slot associated with active tooltip should be highlighted");
       const initial = await tooltip.boundingBox();
       assert.ok(initial, "desktop wine tooltip should have a visible bounding box");
       await page.mouse.move(bounds.x + 5, bounds.y + 5);
       await page.mouse.move(bounds.x + bounds.width - 5, bounds.y + bounds.height - 5);
       const moved = await tooltip.boundingBox();
       assert.deepEqual({ x: moved.x, y: moved.y }, { x: initial.x, y: initial.y }, "tooltip should stay anchored to the hovered rack slot when the pointer moves within it");
+      await slot.blur();
+      await tooltip.waitFor({ state: "hidden" });
+      assert.ok(!(await slot.evaluate((element) => element.classList.contains("tooltip-active"))), "slot highlight should clear when tooltip closes");
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();

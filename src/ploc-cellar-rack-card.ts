@@ -20,7 +20,7 @@ export class PlocCellarRackCard extends LitElement {
   @state() private selectedRackId?: string;
   @state() private loading = false;
   @state() private error?: string;
-  @state() private activeTooltip?: { wine?: Wine; color: string };
+  @state() private activeTooltip?: { wine?: Wine; color: string; rackItemId: string };
   private tooltipPosition?: { left: number; top: number };
   private pendingTouchTapLocation?: string;
   @state() private selectedWine?: Wine;
@@ -60,9 +60,11 @@ export class PlocCellarRackCard extends LitElement {
     .rack-occupancy { position: relative; box-sizing: border-box; width: 100%; height: 20px; margin: 0 0 8px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
     .rack-occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .rack-occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
-    .color-count { white-space: nowrap; }
+    .color-count { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .color-count-marker { display: inline-block; width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; background: var(--color-count-marker, var(--secondary-text-color)); border: 1px solid var(--divider-color); box-sizing: border-box; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 35px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
+    .slot.tooltip-active { border: 2px solid var(--primary-color); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 28%, transparent), 0 0 8px color-mix(in srgb, var(--primary-color) 30%, transparent); }
     .slot.occupied[role="button"] { cursor: pointer; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 1px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: 10px; pointer-events: none; overflow-wrap: anywhere; }
@@ -227,6 +229,7 @@ export class PlocCellarRackCard extends LitElement {
 
   private selectRack(event: Event): void {
     if (event.currentTarget instanceof HTMLSelectElement) {
+      this.hideWineTooltip();
       this.selectedRackId = event.currentTarget.value;
     }
   }
@@ -266,7 +269,7 @@ export class PlocCellarRackCard extends LitElement {
     return fields;
   }
 
-  private showWineTooltip(event: PointerEvent | FocusEvent, wine?: Wine): void {
+  private showWineTooltip(event: PointerEvent | FocusEvent, wine: Wine | undefined, rackItemId: string): void {
     const target = event.currentTarget;
     if (!(target instanceof HTMLElement)) return;
     const rect = target.getBoundingClientRect();
@@ -274,7 +277,7 @@ export class PlocCellarRackCard extends LitElement {
       left: rect.right + 8,
       top: rect.top,
     };
-    this.activeTooltip = { wine, color: this.wineColor(wine) };
+    this.activeTooltip = { wine, color: this.wineColor(wine), rackItemId };
   }
 
   private applyTooltipPosition(): void {
@@ -314,14 +317,27 @@ export class PlocCellarRackCard extends LitElement {
     const items = selectedItems.filter(
       (item) => Number.isSafeInteger(item.row) && Number.isSafeInteger(item.column),
     );
-    const colorCounts = new Map<string, number>();
+    const colorCounts = new Map<string, { count: number; rgb: Wine["color_rgb"] }>();
     for (const item of selectedItems) {
       if (!item.wine_id) continue;
-      const color = winesById.get(item.wine_id)?.color?.trim();
-      if (color) colorCounts.set(color, (colorCounts.get(color) ?? 0) + 1);
+      const wine = winesById.get(item.wine_id);
+      if (!wine) continue;
+      const color = wine.color?.trim();
+      if (!color) continue;
+      const existing = colorCounts.get(color);
+      colorCounts.set(color, {
+        count: (existing?.count ?? 0) + 1,
+        rgb: existing?.rgb ?? wine.color_rgb,
+      });
     }
     const selectedRackColorCounts = [...colorCounts.entries()]
-      .sort(([left], [right]) => left.localeCompare(right, this.hass?.language));
+      .sort(([left], [right]) => left.localeCompare(right, this.hass?.language))
+      .map(([color, { count, rgb }]) => {
+        const markerColor = rgb && rgb.every((channel) => Number.isFinite(channel) && channel >= 0 && channel <= 255)
+          ? `rgb(${rgb.map((channel) => Math.round(channel)).join(", ")})`
+          : "var(--secondary-text-color)";
+        return { color, count, markerColor };
+      });
     const gridLayout = buildRackGridLayout(
       items.map((item) => ({
         id: item.id,
@@ -370,14 +386,14 @@ export class PlocCellarRackCard extends LitElement {
                 <nav class="rack-picker" aria-label=${t("rack_selection")}>
                   ${data.racks.map((item) => html`
                     <button aria-pressed=${item.id === this.selectedRackId}
-                      @click=${() => { this.selectedRackId = item.id; }}>${item.name}</button>
+                      @click=${() => { this.hideWineTooltip(); this.selectedRackId = item.id; }}>${item.name}</button>
                   `)}
                 </nav>
               `
             : nothing}
           <div class="rack-summary">
             <div class="rack-name">${rack?.name ?? ""}</div>
-            ${selectedRackColorCounts.length ? html`<div class="color-counts">${selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: <span>${count}</span></span>`)}</div>` : nothing}
+            ${selectedRackColorCounts.length ? html`<div class="color-counts">${selectedRackColorCounts.map(({ color, count, markerColor }, index) => html`${index ? " · " : nothing}<span class="color-count"><span class="color-count-marker" style=${`--color-count-marker: ${markerColor};`} aria-hidden="true"></span>${color}: <span>${count}</span></span>`)}</div>` : nothing}
           </div>
           <div class="rack-visualization"
             style=${`width: ${mobileCompact || !items.length ? "100%" : `${gridLayout.columnCount * 104 - 6}px` };`}>
@@ -406,7 +422,7 @@ export class PlocCellarRackCard extends LitElement {
                   const wine = item.wine_id ? winesById.get(item.wine_id) : undefined;
                   const label = occupied ? this.wineLabel(item, winesById) : t("empty_position");
                   return html`
-                    <div class=${occupied ? "slot occupied" : "slot empty"}
+                    <div class=${occupied ? `slot occupied${this.activeTooltip?.rackItemId === item.id ? " tooltip-active" : ""}` : "slot empty"}
                       style=${`grid-row: ${position.row}; grid-column: ${position.column}; width: ${mobileSlotSize}px; height: ${mobileSlotSize}px; min-width: ${mobileSlotSize}px; min-height: ${mobileSlotSize}px;`}
                       aria-label=${occupied ? `${label}, ${t("row")} ${(item.row as number) + 1}, ${t("column")} ${(item.column as number) + 1}` : label}
                       aria-describedby=${occupied && this.activeTooltip?.wine === wine ? "ploc-cellar-wine-tooltip" : nothing}
@@ -421,7 +437,7 @@ export class PlocCellarRackCard extends LitElement {
                         const touchLocation = `${item.rack_id}:${item.row}:${item.column}`;
                         if (mobileCompact && this.pendingTouchTapLocation !== touchLocation) {
                           this.pendingTouchTapLocation = touchLocation;
-                          this.showWineTooltip(event as unknown as PointerEvent, wine);
+                          this.showWineTooltip(event as unknown as PointerEvent, wine, item.id);
                           return;
                         }
                         this.pendingTouchTapLocation = undefined;
@@ -444,9 +460,9 @@ export class PlocCellarRackCard extends LitElement {
                           };
                         }
                       } : nothing}
-                      @pointerenter=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
+                      @pointerenter=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine, item.id) : nothing}
                       @pointerleave=${occupied ? () => { if (!mobileCompact) this.hideWineTooltip(); } : nothing}
-                      @focus=${occupied ? (event: FocusEvent) => this.showWineTooltip(event, wine) : nothing}
+                      @focus=${occupied ? (event: FocusEvent) => this.showWineTooltip(event, wine, item.id) : nothing}
                       @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
                       ${occupied ? html`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(wine)};`} aria-hidden="true"></span>` : nothing}
                       ${occupied ? html`<strong>${this.displayWineLabel(item, winesById)}</strong>` : html`<span class="empty-shelf" aria-hidden="true"></span>`}
