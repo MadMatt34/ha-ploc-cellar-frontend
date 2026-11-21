@@ -166,5 +166,5 @@
   "wine_detail_tasting": "Tasting and composition",
   "rack_grid": "Rack position map",
   "rack_mobile_grid": "Compact mobile rack position map",
-  "tooltip_close": "Close wine tooltip",\n  "tooltip_close": "Close wine tooltip"
+  "tooltip_close": "Close wine tooltip",  "tooltip_close": "Close wine tooltip"
 }
