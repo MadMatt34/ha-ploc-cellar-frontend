@@ -352,6 +352,9 @@ describe("Ploc Cellar browser interactions", () => {
       assert.equal(dimensions.width, 44, `compact mobile slots must have a fixed 44px size: ${JSON.stringify(dimensions)}`);
       assert.equal(dimensions.width, dimensions.height, "compact rack positions must remain square");
       assert.equal(await slots.first().locator("strong").evaluate((label) => getComputedStyle(label).display), "none");
+      const emptySlot = slots.nth(2);
+      assert.equal(await emptySlot.locator(".empty-shelf").evaluate((icon) => getComputedStyle(icon).display), "block", "empty mobile rack slots must retain the half-circle graphic");
+      assert.equal(await emptySlot.locator(".empty-shelf").evaluate((icon) => getComputedStyle(icon, "::after").borderTopWidth), "0px", "empty mobile slots must retain the half-circle shape");
       assert.match(await slots.first().getAttribute("aria-label"), /row 1.*col 1/i, "accessible label retains original coordinates in compact mode");
       const scrollMetrics = await compactGrid.evaluate((wrapper) => ({
         clientWidth: wrapper.clientWidth,
