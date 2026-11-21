@@ -194,8 +194,8 @@ describe("Ploc Cellar browser interactions", () => {
       assert.equal(await red.locator(".color-count-marker").count(), 1);
       assert.equal(await white.locator(".color-count-marker").count(), 1);
       assert.equal(await red.locator(".color-count-marker").getAttribute("aria-hidden"), "true");
-      assert.match(await red.locator(".color-count-marker").getAttribute("style"), /rgb\\(150, 20, 30\\)/);
-      assert.match(await white.locator(".color-count-marker").getAttribute("style"), /rgb\\(230, 220, 170\\)/);
+      assert.match(await red.locator(".color-count-marker").getAttribute("style"), /rgb\(150, 20, 30\)/);
+      assert.match(await white.locator(".color-count-marker").getAttribute("style"), /rgb\(230, 220, 170\)/);
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();
