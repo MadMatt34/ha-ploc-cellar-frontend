@@ -129,7 +129,7 @@ describe("Ploc Cellar browser interactions", () => {
       });
       const overviewCard = page.locator("ploc-cellar-card");
       const diagnosticsSummary = overviewCard.locator("details.diagnostics-section > summary");
-      await diagnosticsSummary.waitFor();
+      await diagnosticsSummary.waitFor({ state: "attached" });
       await diagnosticsSummary.click();
       await overviewCard.locator(".diagnostic").filter({ hasText: "Unlocated bottles" }).click();
       await overviewCard.locator("ha-dialog").waitFor();
@@ -218,7 +218,7 @@ describe("Ploc Cellar browser interactions", () => {
       await card.evaluate((element) => { element.style.setProperty("--error-color", "rgb(220, 0, 0)"); });
       const section = card.locator("details.diagnostics-section");
       await section.waitFor();
-      await section.locator(".has-issues").waitFor();
+      await section.locator(".has-issues").waitFor({ state: "attached" });
       assert.equal(await section.getAttribute("open"), null);
       assert.equal(await section.evaluate((element) => element.classList.contains("has-issues")), true);
       assert.equal(
@@ -726,7 +726,6 @@ describe("Ploc Cellar browser interactions", () => {
         wine.negative_movement_bottles = 1;
         return window.mountPlocCard("ploc-cellar-inventory-card", {});
       });
-      await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
       await page.evaluate(() => {
         window.__plocFixture.inventory.wine_diagnostics = [{
           id: "wine-a",
@@ -744,10 +743,11 @@ describe("Ploc Cellar browser interactions", () => {
           wine: window.__plocFixture.inventory.wines[0],
         }];
       });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
       const mainCard = page.locator("ploc-cellar-card");
       const mainDiagnostics = mainCard.locator(".diagnostic-value");
       const mainDiagnosticsSummary = mainCard.locator("details.diagnostics-section > summary");
-      await mainDiagnosticsSummary.waitFor();
+      await mainDiagnosticsSummary.waitFor({ state: "attached" });
       await mainDiagnosticsSummary.click();
       await mainDiagnostics.first().waitFor();
       assert.equal(await mainDiagnostics.first().evaluate((element) => getComputedStyle(element).color), "rgb(200, 0, 0)");
