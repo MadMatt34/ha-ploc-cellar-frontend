@@ -50,7 +50,7 @@ HACS validation is handled by the repository's validation workflow. The exact wo
 - `tests/browser/` contains browser interaction tests and their fixture.
 - `tests/documentation.test.mjs` checks selected documentation invariants.
 
-When changing a user-visible behavior, update the relevant unit/browser tests and both language README files. When changing the backend response or notification protocol, follow the coordinated procedure in [BACKEND_CONTRACT.md](BACKEND_CONTRACT.md) and update the compatibility policy if a supported version pair changes.
+Browser lifecycle regression tests repeatedly mount and disconnect all three cards, verify that synchronization listeners are released, and confirm that wine-detail Blob URLs are revoked. When changing a user-visible behavior, update the relevant unit/browser tests and both language README files. When changing the backend response or notification protocol, follow the coordinated procedure in [BACKEND_CONTRACT.md](BACKEND_CONTRACT.md) and update the compatibility policy if a supported version pair changes.
 
 ## Validation limits
 
