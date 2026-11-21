@@ -248,6 +248,28 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
+  it("uses ten inventory references per page by default", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => {
+        const template = window.__plocFixture.inventory.wines[0];
+        window.__plocFixture.inventory.wines = Array.from({ length: 25 }, (_, index) => ({
+          ...template,
+          id: `default-page-${index + 1}`,
+          name: `Default wine ${String(index + 1).padStart(2, "0")}`,
+        }));
+      });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
+      const card = page.locator("ploc-cellar-inventory-card");
+      await card.locator(".wine").first().waitFor();
+      assert.equal(await card.locator(".wine").count(), 10);
+      assert.equal(await card.locator(".pagination").innerText(), "1–10 of 25\\nPage 1 of 3");
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
   it("paginates inventory results and resets to the first page after filtering", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
