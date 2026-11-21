@@ -158,9 +158,9 @@ window.mountPlocCard = async (tag, config) => {
   const host = document.querySelector("#app");
   host.replaceChildren();
   const card = document.createElement(tag);
+  host.append(card);
   card.hass = window.testHass;
   card.setConfig({ config_entry_id: "fixture-entry", ...config });
-  host.append(card);
   await card.updateComplete;
   return card;
 };
