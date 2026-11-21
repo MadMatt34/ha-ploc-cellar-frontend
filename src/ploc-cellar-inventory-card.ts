@@ -79,7 +79,8 @@ export class PlocCellarInventoryCard extends LitElement {
     .filters-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
     .filters { flex: 1 1 180px; min-width: 0; margin: 0; padding: 1px 10px 0px 10px; }
     .filters[open] { padding: 0 10px 10px 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
-    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { flex: 0 0 auto; margin-left: auto; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
+    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }
+    .filters-clear { flex: 0 0 auto; margin-left: auto; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
     .filters[open] > summary { color: var(--primary-text-color); padding-bottom: 8px; border-bottom: 1px solid var(--divider-color); }
     .filters > summary::-webkit-details-marker { display: none; }
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
