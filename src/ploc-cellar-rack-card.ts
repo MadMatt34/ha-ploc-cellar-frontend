@@ -154,14 +154,12 @@ export class PlocCellarRackCard extends LitElement {
       const width = card.clientWidth || entries[0]?.contentRect.width || 0;
       if (width > 0 && width !== this.cardWidth) {
         this.cardWidth = width;
-        this.hideWineTooltip();
       }
     });
     this.cardResizeObserver.observe(card);
     const initialWidth = card.clientWidth;
     if (initialWidth > 0 && initialWidth !== this.cardWidth) {
       this.cardWidth = initialWidth;
-      this.hideWineTooltip();
     }
   }
 
@@ -425,7 +423,12 @@ export class PlocCellarRackCard extends LitElement {
                       role=${wine ? "button" : occupied ? "img" : nothing}
                       aria-haspopup=${wine ? "dialog" : nothing}
                       tabindex=${occupied ? "0" : nothing}
-                      @click=${wine ? () => {
+                      @click=${wine ? (event: MouseEvent) => {
+                        if (mobileCompact && this.activeTooltip?.wine !== wine) {
+                          this.showWineTooltip(event as unknown as PointerEvent, wine);
+                          return;
+                        }
+                        this.hideWineTooltip();
                         this.selectedWine = wine;
                         this.selectedLocation = {
                           rackId: item.rack_id,
@@ -476,7 +479,7 @@ export class PlocCellarRackCard extends LitElement {
         ${rackItemsWithUnknownRack.length ? html`
           <div class="warning"><span>${rackItemsWithUnknownRack.length}</span> ${t("missing_rack")}</div>
         ` : nothing}
-        ${this.activeTooltip && !mobileCompact ? html`
+        ${this.activeTooltip ? html`
           <div class="wine-tooltip"
             id="ploc-cellar-wine-tooltip"
             role="tooltip"
