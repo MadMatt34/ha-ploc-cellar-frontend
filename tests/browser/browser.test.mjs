@@ -352,7 +352,7 @@ describe("Ploc Cellar browser interactions", () => {
       await card.locator(".slot.occupied").first().click();
       let detail = card.locator("ploc-cellar-wine-detail");
       await detail.waitFor();
-      const locationsSection = detail.locator("details").filter({ has: detail.locator("summary", { hasText: "Locations" }) });
+      const locationsSection = detail.locator('details:has(summary ha-icon[icon="mdi:map-marker-multiple-outline"])');
       await locationsSection.waitFor();
       assert.equal(await locationsSection.getAttribute("open"), "", "positions section opens when selected bottle coordinates are known");
       assert.equal(await detail.locator("details[open]").count(), 1, "only the positions section should be open from the rack view");
