@@ -18,7 +18,7 @@ These values are a **development baseline**, not a claim that corresponding GitH
 The current development branches are validated against the same declared inventory contract:
 - Backend response shape and semantics: `tests/test_service_contract.py`.
 - Frontend mirrored shape: `src/backend-inventory-contract.ts` and `src/types.ts`.
-- Human-readable contract: `docs/BACKEND_CONTRACT.md` and `docs/CONTRAT_BACKEND.fr.md`.
+- Human-readable contract: `docs/BACKEND_CONTRACT.md` and `docs/BACKEND_CONTRACT.fr.md`.
 
 These checks establish structural agreement. They do not replace an end-to-end test with both versions installed in a running Home Assistant instance.
 
