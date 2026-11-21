@@ -338,6 +338,10 @@ describe("Ploc Cellar browser interactions", () => {
           row: Math.floor(index / 8),
           column: index % 8,
         }));
+        inventory.wines.find((wine) => wine.id === "wine-a").locations = [
+          { rack: "Cave principale", rack_id: "rack-a", row: 0, column: 0 },
+          { rack: "Cave principale", rack_id: "rack-a", row: 0, column: 1 },
+        ];
       });
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));
       const card = page.locator("ploc-cellar-rack-card");
