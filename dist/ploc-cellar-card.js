@@ -1381,7 +1381,7 @@ var nt = class extends je {
 	renderMeals(e) {
 		let t = Ze(e.meals);
 		return t.length ? N`
-      <details class="detail-section" open>
+      <details class="detail-section">
         <summary class="section-summary"><ha-icon icon="mdi:silverware-variant" aria-hidden="true"></ha-icon>${this.t("wine_detail_meals")}</summary>
         <div class="section-body"><div class="meal-tiles">
           ${t.map((e) => N`<div class="meal-tile"><ha-icon icon=${Xe(e)} aria-hidden="true"></ha-icon><span>${this.t(e)}</span></div>`)}
@@ -1452,7 +1452,7 @@ var nt = class extends je {
               ` : P}
             </div>
           </div>
-          <details class="detail-section" open>
+          <details class="detail-section">
             <summary class="section-summary"><ha-icon icon="mdi:clipboard-list-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_characteristics")}</summary>
             <div class="section-body">
             <div class="section-subtitle">${this.t("wine_detail_origin")}</div>
@@ -1481,7 +1481,7 @@ var nt = class extends je {
               <div class="section-body"><div class="comment">${e.comment}</div></div>
             </details>
           ` : P}
-          <details class="detail-section" open>
+          <details class="detail-section" ?open=${!!this.selectedLocation}>
             <summary class="section-summary"><ha-icon icon="mdi:map-marker-multiple-outline" aria-hidden="true"></ha-icon>${this.t("locations")}</summary>
             <div class="section-body">${this.renderLocations(e)}</div>
           </details>
