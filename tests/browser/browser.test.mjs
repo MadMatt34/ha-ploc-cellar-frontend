@@ -123,6 +123,7 @@ describe("Ploc Cellar browser interactions", () => {
     const { context, page, pageErrors } = await openFixture();
     try {
       await page.evaluate(() => {
+        window.__plocFixture.inventory.stock_reconstruction_complete = true;
         window.__plocFixture.inventory.unlocated_bottles = 1;
         return window.mountPlocCard("ploc-cellar-card", {});
       });
@@ -207,6 +208,7 @@ describe("Ploc Cellar browser interactions", () => {
     const { context, page, pageErrors } = await openFixture();
     try {
       await page.evaluate(() => {
+        window.__plocFixture.inventory.stock_reconstruction_complete = true;
         window.__plocFixture.inventory.unlocated_bottles = 2;
       });
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
@@ -710,6 +712,7 @@ describe("Ploc Cellar browser interactions", () => {
     try {
       await page.evaluate(() => {
         document.documentElement.style.setProperty("--error-color", "rgb(200, 0, 0)");
+        window.__plocFixture.inventory.stock_reconstruction_complete = true;
         window.__plocFixture.inventory.unlocated_bottles = 2;
         window.__plocFixture.inventory.negative_movement_bottles = 1;
         window.__plocFixture.inventory.physical_surplus_bottles = 0;
@@ -740,6 +743,7 @@ describe("Ploc Cellar browser interactions", () => {
       });
       const mainCard = page.locator("ploc-cellar-card");
       const mainDiagnostics = mainCard.locator(".diagnostic-value");
+      await mainCard.locator("details.diagnostics-section > summary").click();
       await mainDiagnostics.first().waitFor();
       assert.equal(await mainDiagnostics.first().evaluate((element) => getComputedStyle(element).color), "rgb(200, 0, 0)");
       await mainCard.locator(".diagnostic").filter({ hasText: "Unlocated bottles" }).click();
