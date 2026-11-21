@@ -154,14 +154,14 @@ export class PlocCellarRackCard extends LitElement {
       const width = card.clientWidth || entries[0]?.contentRect.width || 0;
       if (width > 0 && width !== this.cardWidth) {
         this.cardWidth = width;
-        if (width <= 600) this.hideWineTooltip();
+        this.hideWineTooltip();
       }
     });
     this.cardResizeObserver.observe(card);
     const initialWidth = card.clientWidth;
     if (initialWidth > 0 && initialWidth !== this.cardWidth) {
       this.cardWidth = initialWidth;
-      if (initialWidth <= 600) this.hideWineTooltip();
+      this.hideWineTooltip();
     }
   }
 
