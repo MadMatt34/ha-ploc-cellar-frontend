@@ -52,7 +52,7 @@ test("both contract documents own the synchronization protocol details", async (
   assert.ok(french.includes("vide (`{}`)."));
 
   assert.ok(readmeEnglish.includes("docs/BACKEND_CONTRACT.md"));
-  assert.ok(readmeFrench.includes("docs/CONTRAT_BACKEND.fr.md"));
+  assert.ok(readmeFrench.includes("docs/BACKEND_CONTRACT.fr.md"));
   assert.ok(!readmeEnglish.includes("ploc_cellar/subscribe_sync"));
   assert.ok(!readmeFrench.includes("ploc_cellar/subscribe_sync"));
 });
