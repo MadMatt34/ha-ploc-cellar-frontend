@@ -22,7 +22,7 @@ export class PlocCellarRackCard extends LitElement {
   @state() private error?: string;
   @state() private activeTooltip?: { wine?: Wine; color: string };
   private tooltipPosition?: { left: number; top: number };
-  private pendingTouchTapWineId?: string;
+  private pendingTouchTapLocation?: string;
   @state() private selectedWine?: Wine;
   @state() private selectedLocation?: { rackId: string; row: number; column: number };
   @state() private cardWidth = 0;
@@ -48,9 +48,10 @@ export class PlocCellarRackCard extends LitElement {
     .grid-wrap.mobile-compact .rack-grid { gap: 4px; }
     .grid-wrap.mobile-compact .slot { border-radius: 8px; padding: 2px; gap: 0; }
     .grid-wrap.mobile-compact .slot strong,
-    .grid-wrap.mobile-compact .slot small,
-    .grid-wrap.mobile-compact .empty-shelf { display: none; }
+    .grid-wrap.mobile-compact .slot small { display: none; }
     .grid-wrap.mobile-compact .slot .bottle-marker { width: 26px; height: 26px; flex-basis: 26px; margin: auto; }
+    .grid-wrap.mobile-compact .slot .empty-shelf { width: 24px; height: 24px; flex-basis: 24px; margin: auto; }
+    .grid-wrap.mobile-compact .slot .empty-shelf::after { height: 12px; border-radius: 0 0 12px 12px; }
     .grid-wrap.mobile-compact .slot.missing { font-size: .75rem; align-items: center; justify-content: center; }
     .grid-wrap.mobile-compact .slot.missing strong { display: block; min-height: 0; max-height: none; }
     .rack-summary { color: var(--secondary-text-color); font-size: .85rem; line-height: 1.2; text-align: center; }
@@ -343,9 +344,7 @@ export class PlocCellarRackCard extends LitElement {
     );
     const mobileCompact = this.cardWidth > 0 && this.cardWidth <= 600;
     const mobileGap = 4;
-    const mobileSlotSize = mobileCompact
-      ? Math.max(44, Math.min(64, Math.floor((this.cardWidth - 32 - mobileGap * (gridLayout.columnCount - 1)) / Math.max(1, gridLayout.columnCount))))
-      : 98;
+    const mobileSlotSize = mobileCompact ? 44 : 98;
     const unplaced = selectedItems.filter(
       (item) => !Number.isSafeInteger(item.row) || !Number.isSafeInteger(item.column),
     );
@@ -426,15 +425,16 @@ export class PlocCellarRackCard extends LitElement {
                       tabindex=${occupied ? "0" : nothing}
                       @pointerdown=${wine ? (event: PointerEvent) => {
                         if (event.pointerType === "touch") return;
-                        this.pendingTouchTapWineId = undefined;
+                        this.pendingTouchTapLocation = undefined;
                       } : nothing}
                       @click=${wine ? (event: MouseEvent) => {
-                        if (mobileCompact && this.pendingTouchTapWineId !== wine.id) {
-                          this.pendingTouchTapWineId = wine.id;
+                        const touchLocation = `${item.rack_id}:${item.row}:${item.column}`;
+                        if (mobileCompact && this.pendingTouchTapLocation !== touchLocation) {
+                          this.pendingTouchTapLocation = touchLocation;
                           this.showWineTooltip(event as unknown as PointerEvent, wine);
                           return;
                         }
-                        this.pendingTouchTapWineId = undefined;
+                        this.pendingTouchTapLocation = undefined;
                         this.hideWineTooltip();
                         this.selectedWine = wine;
                         this.selectedLocation = {
