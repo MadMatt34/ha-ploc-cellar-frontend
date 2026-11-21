@@ -344,7 +344,7 @@ export class PlocCellarWineDetail extends LitElement {
     const mealKeys = getMealTranslationKeys(wine.meals);
     if (!mealKeys.length) return nothing;
     return html`
-      <details class="detail-section" open>
+      <details class="detail-section">
         <summary class="section-summary"><ha-icon icon="mdi:silverware-variant" aria-hidden="true"></ha-icon>${this.t("wine_detail_meals")}</summary>
         <div class="section-body"><div class="meal-tiles">
           ${mealKeys.map((key) => html`<div class="meal-tile"><ha-icon icon=${getMealIcon(key)} aria-hidden="true"></ha-icon><span>${this.t(key)}</span></div>`)}
@@ -433,7 +433,7 @@ export class PlocCellarWineDetail extends LitElement {
               ` : nothing}
             </div>
           </div>
-          <details class="detail-section" open>
+          <details class="detail-section">
             <summary class="section-summary"><ha-icon icon="mdi:clipboard-list-outline" aria-hidden="true"></ha-icon>${this.t("wine_detail_characteristics")}</summary>
             <div class="section-body">
             <div class="section-subtitle">${this.t("wine_detail_origin")}</div>
@@ -462,7 +462,7 @@ export class PlocCellarWineDetail extends LitElement {
               <div class="section-body"><div class="comment">${wine.comment}</div></div>
             </details>
           ` : nothing}
-          <details class="detail-section" open>
+          <details class="detail-section" ?open=${Boolean(this.selectedLocation)}>
             <summary class="section-summary"><ha-icon icon="mdi:map-marker-multiple-outline" aria-hidden="true"></ha-icon>${this.t("locations")}</summary>
             <div class="section-body">${this.renderLocations(wine)}</div>
           </details>

@@ -329,6 +329,7 @@ describe("Ploc Cellar browser interactions", () => {
       const detail = card.locator("ploc-cellar-wine-detail");
       await detail.waitFor();
       await detail.locator("ha-dialog").waitFor();
+      assert.equal(await detail.locator("details[open]").count(), 0, "all detail sections must be collapsed when opened from inventory");
       await detail.locator("ha-dialog").evaluate((dialog) => {
         dialog.dispatchEvent(new Event("closed", { bubbles: true }));
       });
@@ -351,6 +352,10 @@ describe("Ploc Cellar browser interactions", () => {
       await card.locator(".slot.occupied").first().click();
       let detail = card.locator("ploc-cellar-wine-detail");
       await detail.waitFor();
+      const locationsSection = detail.locator('details:has(summary ha-icon[icon="mdi:map-marker-multiple-outline"])');
+      await locationsSection.waitFor();
+      assert.equal(await locationsSection.getAttribute("open"), "", "positions section opens when selected bottle coordinates are known");
+      assert.equal(await detail.locator("details[open]").count(), 1, "only the positions section should be open from the rack view");
       const selected = detail.locator(".location-coordinate.selected");
       await selected.waitFor();
       assert.match(await selected.innerText(), /row\s*1.*col\s*1/i);
