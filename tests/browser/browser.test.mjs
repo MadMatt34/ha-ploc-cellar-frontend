@@ -26,6 +26,16 @@ async function waitForServer() {
   throw new Error("Vite did not become ready within 20 seconds");
 }
 
+
+function findSchemaField(schema, name) {
+  for (const field of schema ?? []) {
+    if (field.name === name) return field;
+    const nested = findSchemaField(field.schema, name);
+    if (nested) return nested;
+  }
+  return undefined;
+}
+
 async function openFixture(options = {}) {
   const context = await browser.newContext(options);
   const page = await context.newPage();
@@ -389,7 +399,7 @@ describe("Ploc Cellar browser interactions", () => {
         document.body.append(element);
         await element.updateComplete;
         const form = element.shadowRoot.querySelector("ha-form");
-        const field = form.schema.find((item) => item.name === "page_size");
+        const field = findSchemaField(form.schema, "page_size");
         return { value: form.data.page_size, selector: field.selector.number };
       });
       assert.equal(editor.value, 10);
@@ -683,7 +693,7 @@ describe("Ploc Cellar browser interactions", () => {
         });
       });
       const schema = await page.locator("ploc-cellar-card-editor ha-form").evaluate((form) =>
-        form.schema.map((field) => field.name),
+        form.schema.flatMap((field) => [field.name, ...(field.schema ? field.schema.flatMap((nested) => [nested.name, ...(nested.schema ? nested.schema.map((child) => child.name) : [])] : [])]),
       );
       assert.ok(schema.includes("config_entry_id"));
       assert.ok(schema.includes("rack_picker_mode"));
