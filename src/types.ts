@@ -21,6 +21,7 @@ export interface PlocCellarCardConfig {
   show_rack_occupancy?: boolean;
   show_occupancy?: boolean;
   show_diagnostics?: boolean;
+  show_diagnostics_expanded?: boolean;
   show_statistics?: boolean;
   show_statistics_legends?: boolean;
 }
