@@ -1571,9 +1571,10 @@ var ot = class extends je {
     .grid-wrap.mobile-compact .rack-grid { gap: 4px; }
     .grid-wrap.mobile-compact .slot { border-radius: 8px; padding: 2px; gap: 0; }
     .grid-wrap.mobile-compact .slot strong,
-    .grid-wrap.mobile-compact .slot small,
-    .grid-wrap.mobile-compact .empty-shelf { display: none; }
+    .grid-wrap.mobile-compact .slot small { display: none; }
     .grid-wrap.mobile-compact .slot .bottle-marker { width: 26px; height: 26px; flex-basis: 26px; margin: auto; }
+    .grid-wrap.mobile-compact .slot .empty-shelf { width: 24px; height: 24px; flex-basis: 24px; margin: auto; }
+    .grid-wrap.mobile-compact .slot .empty-shelf::after { height: 12px; border-radius: 0 0 12px 12px; }
     .grid-wrap.mobile-compact .slot.missing { font-size: .75rem; align-items: center; justify-content: center; }
     .grid-wrap.mobile-compact .slot.missing strong { display: block; min-height: 0; max-height: none; }
     .rack-summary { color: var(--secondary-text-color); font-size: .85rem; line-height: 1.2; text-align: center; }
@@ -1723,7 +1724,7 @@ var ot = class extends je {
 			id: e.id,
 			row: e.row,
 			column: e.column
-		}))), f = new Map(d.positions.map((e) => [e.id, e])), p = this.cardWidth > 0 && this.cardWidth <= 600, m = p ? Math.max(44, Math.min(64, Math.floor((this.cardWidth - 32 - 4 * (d.columnCount - 1)) / Math.max(1, d.columnCount)))) : 98, h = r.filter((e) => !Number.isSafeInteger(e.row) || !Number.isSafeInteger(e.column)), g = (t?.rack_items ?? []).filter((e) => !t?.racks.some((t) => t.id === e.rack_id));
+		}))), f = new Map(d.positions.map((e) => [e.id, e])), p = this.cardWidth > 0 && this.cardWidth <= 600, m = p ? 44 : 98, h = r.filter((e) => !Number.isSafeInteger(e.row) || !Number.isSafeInteger(e.column)), g = (t?.rack_items ?? []).filter((e) => !t?.racks.some((t) => t.id === e.rack_id));
 		return N`
       <ha-card aria-busy=${this.loading ? "true" : "false"}>
         <header>
@@ -1792,10 +1793,11 @@ var ot = class extends je {
                       aria-haspopup=${a ? "dialog" : P}
                       tabindex=${r ? "0" : P}
                       @pointerdown=${a ? (e) => {
-				e.pointerType !== "touch" && (this.pendingTouchTapWineId = void 0);
+				e.pointerType !== "touch" && (this.pendingTouchTapLocation = void 0);
 			} : P}
                       @click=${a ? (e) => {
-				p && this.pendingTouchTapWineId !== a.id ? (this.pendingTouchTapWineId = a.id, this.showWineTooltip(e, a)) : (this.pendingTouchTapWineId = void 0, this.hideWineTooltip(), this.selectedWine = a, this.selectedLocation = {
+				let n = `${t.rack_id}:${t.row}:${t.column}`;
+				p && this.pendingTouchTapLocation !== n ? (this.pendingTouchTapLocation = n, this.showWineTooltip(e, a)) : (this.pendingTouchTapLocation = void 0, this.hideWineTooltip(), this.selectedWine = a, this.selectedLocation = {
 					rackId: t.rack_id,
 					row: t.row,
 					column: t.column
