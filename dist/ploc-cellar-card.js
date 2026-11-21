@@ -1997,7 +1997,8 @@ var pt = class extends je {
     .filters-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
     .filters { flex: 1 1 180px; min-width: 0; margin: 0; padding: 1px 10px 0px 10px; }
     .filters[open] { padding: 0 10px 10px 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
-    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { flex: 0 0 auto; margin: 0; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
+    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }
+    .filters-clear { flex: 0 0 auto; margin-left: auto; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
     .filters[open] > summary { color: var(--primary-text-color); padding-bottom: 8px; border-bottom: 1px solid var(--divider-color); }
     .filters > summary::-webkit-details-marker { display: none; }
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
@@ -2199,7 +2200,9 @@ var pt = class extends je {
 		}} />
           <div class="filters-row">
             <details class="filters">
-              <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
+              <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${e("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon>${c ? N`<button class="filters-clear" type="button" @click=${(e) => {
+			e.preventDefault(), e.stopPropagation(), this.clearFilters();
+		}}>${e("clear_filters")}</button>` : P}</summary>
               <div class="toolbar">
               ${this.selectFilter("color", e("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", e("filter_region"), this.region, this.valuesFor("region"))}
@@ -2222,7 +2225,6 @@ var pt = class extends je {
               </select>
               </label>
             </details>
-            ${c ? N`<button class="filters-clear" type="button" @click=${() => this.clearFilters()}>${e("clear_filters")}</button>` : P}
           </div>
           <div class="summary">
             <span>${e("inventory_results").replace("{count}", String(t.length))}</span>
