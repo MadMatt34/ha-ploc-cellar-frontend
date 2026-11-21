@@ -334,10 +334,14 @@ describe("Ploc Cellar browser interactions", () => {
         inventory.rack_items = Array.from({ length: 24 }, (_, index) => ({
           id: `mobile-slot-${index}`,
           rack_id: "rack-a",
-          wine_id: index === 0 ? "wine-a" : index === 1 ? "wine-b" : null,
+          wine_id: index === 0 || index === 1 ? "wine-a" : null,
           row: Math.floor(index / 8),
           column: index % 8,
         }));
+        inventory.wines.find((wine) => wine.id === "wine-a").locations = [
+          { rack: "Cave principale", rack_id: "rack-a", row: 0, column: 0 },
+          { rack: "Cave principale", rack_id: "rack-a", row: 0, column: 1 },
+        ];
       });
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));
       const card = page.locator("ploc-cellar-rack-card");
@@ -349,9 +353,12 @@ describe("Ploc Cellar browser interactions", () => {
         const style = getComputedStyle(slot);
         return { width: slot.getBoundingClientRect().width, height: slot.getBoundingClientRect().height, labelDisplay: style.display };
       });
-      assert.ok(dimensions.width >= 44 && dimensions.width <= 64, `unexpected compact slot width: ${JSON.stringify(dimensions)}`);
+      assert.equal(dimensions.width, 44, `compact mobile slots must have a fixed 44px size: ${JSON.stringify(dimensions)}`);
       assert.equal(dimensions.width, dimensions.height, "compact rack positions must remain square");
       assert.equal(await slots.first().locator("strong").evaluate((label) => getComputedStyle(label).display), "none");
+      const emptySlot = slots.nth(2);
+      assert.equal(await emptySlot.locator(".empty-shelf").evaluate((icon) => getComputedStyle(icon).display), "block", "empty mobile rack slots must retain the half-circle graphic");
+      assert.equal(await emptySlot.locator(".empty-shelf").evaluate((icon) => getComputedStyle(icon, "::after").borderTopWidth), "0px", "empty mobile slots must retain the half-circle shape");
       assert.match(await slots.first().getAttribute("aria-label"), /row 1.*col 1/i, "accessible label retains original coordinates in compact mode");
       const scrollMetrics = await compactGrid.evaluate((wrapper) => ({
         clientWidth: wrapper.clientWidth,
@@ -373,7 +380,13 @@ describe("Ploc Cellar browser interactions", () => {
       await tooltip.waitFor();
       assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "first tap on mobile exposes wine tooltip details");
       assert.equal(await card.locator("ploc-cellar-wine-detail").count(), 0, "first tap should show tooltip instead of opening the detail dialog");
-      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
+
+      const secondSlot = await slots.nth(1).boundingBox();
+      assert.ok(secondSlot, "second rack slot must have a visible bounding box");
+      await page.touchscreen.tap(secondSlot.x + secondSlot.width / 2, secondSlot.y + secondSlot.height / 2);
+      await tooltip.waitFor();
+      assert.equal(await card.locator("ploc-cellar-wine-detail").count(), 0, "tapping another slot containing the same wine must only show the tooltip");
+      await page.touchscreen.tap(secondSlot.x + secondSlot.width / 2, secondSlot.y + secondSlot.height / 2);
       const detail = card.locator("ploc-cellar-wine-detail");
       await detail.waitFor();
       await detail.locator("ha-dialog").waitFor();
@@ -383,6 +396,16 @@ describe("Ploc Cellar browser interactions", () => {
         dialog.dispatchEvent(new Event("closed", { bubbles: true }));
       });
       await detail.waitFor({ state: "detached" });
+
+      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
+      await tooltip.waitFor();
+      assert.equal(await card.locator("ploc-cellar-wine-detail").count(), 0, "switching to another slot of the same wine resets the double-tap state");
+      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
+      await card.locator("ploc-cellar-wine-detail ha-dialog").waitFor();
+      await card.locator("ploc-cellar-wine-detail ha-dialog").evaluate((dialog) => {
+        dialog.dispatchEvent(new Event("closed", { bubbles: true }));
+      });
+      await card.locator("ploc-cellar-wine-detail").waitFor({ state: "detached" });
       await page.setViewportSize({ width: 1024, height: 768 });
       await card.locator(".grid-wrap:not(.mobile-compact)").waitFor();
       assert.equal(await slots.first().evaluate((slot) => slot.getBoundingClientRect().width), 98, "desktop cell size must be restored after widening");
