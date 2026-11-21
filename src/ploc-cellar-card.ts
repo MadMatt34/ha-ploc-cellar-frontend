@@ -73,6 +73,8 @@ export class PlocCellarCard extends LitElement {
     .occupancy-bar { position: relative; height: 20px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
     .occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
+    .diagnostics-section.has-issues { border: 1px solid var(--error-color); border-radius: 10px; padding: 10px; }
+    .diagnostics-section.has-issues > summary { color: var(--error-color); }
     .diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
     .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; background: transparent; font: inherit; }
     button.diagnostic { cursor: pointer; }
@@ -501,7 +503,7 @@ export class PlocCellarCard extends LitElement {
             </section>
           ` : nothing}
           ${showDiagnostics && hasDiagnostics ? html`
-            <details class="section" open>
+            <details class="section diagnostics-section ${diagnostics.some((item) => item.value > 0) ? "has-issues" : ""}>
               <summary class="section-title">${t("inventory_diagnostics")}</summary>
               ${!data.stock_reconstruction_complete
                 ? html`<div class="warning">${t("reconstruction_incomplete")}</div>`
