@@ -352,6 +352,7 @@ describe("Ploc Cellar browser interactions", () => {
       assert.ok(dimensions.width >= 44 && dimensions.width <= 64, `unexpected compact slot width: ${JSON.stringify(dimensions)}`);
       assert.equal(dimensions.width, dimensions.height, "compact rack positions must remain square");
       assert.equal(await slots.first().locator("strong").evaluate((label) => getComputedStyle(label).display), "none");
+      assert.match(await slots.first().getAttribute("aria-label"), /row 1.*column 1/i, "accessible label retains original coordinates in compact mode");
       const scrollMetrics = await compactGrid.evaluate((wrapper) => ({
         clientWidth: wrapper.clientWidth,
         scrollWidth: wrapper.scrollWidth,
@@ -379,6 +380,10 @@ describe("Ploc Cellar browser interactions", () => {
       await card.locator(".grid-wrap:not(.mobile-compact)").waitFor();
       assert.equal(await slots.first().evaluate((slot) => slot.getBoundingClientRect().width), 98, "desktop cell size must be restored after widening");
       assert.notEqual(await slots.first().locator("strong").evaluate((label) => getComputedStyle(label).display), "none");
+      const observerCounts = await page.evaluate(() => ({ observed: window.__resizeObserverStats.observed, disconnected: window.__resizeObserverStats.disconnected }));
+      await page.evaluate(() => document.querySelector("#app").replaceChildren());
+      await page.waitForFunction((before) => window.__resizeObserverStats.disconnected > before, observerCounts.disconnected);
+      assert.ok(observerCounts.observed > observerCounts.disconnected, "rack card should own a resize observer before disconnect");
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();
