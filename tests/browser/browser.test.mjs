@@ -214,7 +214,7 @@ describe("Ploc Cellar browser interactions", () => {
       await section.waitFor();
       assert.equal(await section.getAttribute("open"), null);
       assert.equal(await section.evaluate((element) => element.classList.contains("has-issues")), true);
-      assert.equal(await section.evaluate((element) => getComputedStyle(element).borderTopColor), "rgb(255, 0, 0)");
+      assert.equal(\n        await section.evaluate((element) => getComputedStyle(element).borderTopColor),\n        await section.evaluate((element) => getComputedStyle(element).getPropertyValue("--error-color").trim()),\n      );
       await section.locator("summary").click();
       assert.equal(await section.getAttribute("open"), "");
       assert.equal(await section.evaluate((element) => element.classList.contains("has-issues")), true);
