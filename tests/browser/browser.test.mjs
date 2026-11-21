@@ -449,7 +449,29 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
-  it("keeps desktop wine tooltips anchored to the rack slot instead of following the pointer", async () => {\n    const { context, page, pageErrors } = await openFixture();\n    try {\n      await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));\n      const card = page.locator("ploc-cellar-rack-card");\n      const slot = card.locator(".slot.occupied").first();\n      await slot.waitFor();\n      const bounds = await slot.boundingBox();\n      assert.ok(bounds);\n      await page.mouse.move(bounds.x + 10, bounds.y + 10);\n      const tooltip = card.locator(".wine-tooltip");\n      await tooltip.waitFor();\n      const initial = await tooltip.boundingBox();\n      await page.mouse.move(bounds.x + bounds.width - 5, bounds.y + bounds.height - 5);\n      const moved = await tooltip.boundingBox();\n      assert.deepEqual({ x: moved.x, y: moved.y }, { x: initial.x, y: initial.y }, "tooltip should stay anchored to the hovered rack slot when the pointer moves within it");\n      assert.deepEqual(pageErrors, []);\n    } finally {\n      await context.close();\n    }\n  });\n\n  it("keeps desktop wine tooltips anchored to the rack slot", async () => {\n    const { context, page, pageErrors } = await openFixture();\n    try {\n      await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));\n      const card = page.locator("ploc-cellar-rack-card");\n      const slot = card.locator(".slot.occupied").first();\n      await slot.waitFor();\n      const bounds = await slot.boundingBox();\n      assert.ok(bounds);\n      await page.mouse.move(bounds.x + 10, bounds.y + 10);\n      const tooltip = card.locator(".wine-tooltip");\n      await tooltip.waitFor();\n      const initial = await tooltip.boundingBox();\n      await page.mouse.move(bounds.x + bounds.width - 5, bounds.y + bounds.height - 5);\n      const moved = await tooltip.boundingBox();\n      assert.deepEqual({ x: moved.x, y: moved.y }, { x: initial.x, y: initial.y }, "tooltip remains slot-anchored during pointer movement");\n      assert.deepEqual(pageErrors, []);\n    } finally {\n      await context.close();\n    }\n  });\n\n  it("opens rack wines with mouse and keyboard and highlights the exact coordinate", async () => {
+  it("keeps desktop wine tooltips anchored to the rack slot instead of following the pointer", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));
+      const card = page.locator("ploc-cellar-rack-card");
+      const slot = card.locator(".slot.occupied").first();
+      await slot.waitFor();
+      const bounds = await slot.boundingBox();
+      assert.ok(bounds);
+      await page.mouse.move(bounds.x + 10, bounds.y + 10);
+      const tooltip = card.locator(".wine-tooltip");
+      await tooltip.waitFor();
+      const initial = await tooltip.boundingBox();
+      await page.mouse.move(bounds.x + bounds.width - 5, bounds.y + bounds.height - 5);
+      const moved = await tooltip.boundingBox();
+      assert.deepEqual({ x: moved.x, y: moved.y }, { x: initial.x, y: initial.y }, "tooltip should stay anchored to the hovered rack slot when the pointer moves within it");
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it("keeps desktop wine tooltips anchored to the rack slot", async () => {\n    const { context, page, pageErrors } = await openFixture();\n    try {\n      await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));\n      const card = page.locator("ploc-cellar-rack-card");\n      const slot = card.locator(".slot.occupied").first();\n      await slot.waitFor();\n      const bounds = await slot.boundingBox();\n      assert.ok(bounds);\n      await page.mouse.move(bounds.x + 10, bounds.y + 10);\n      const tooltip = card.locator(".wine-tooltip");\n      await tooltip.waitFor();\n      const initial = await tooltip.boundingBox();\n      await page.mouse.move(bounds.x + bounds.width - 5, bounds.y + bounds.height - 5);\n      const moved = await tooltip.boundingBox();\n      assert.deepEqual({ x: moved.x, y: moved.y }, { x: initial.x, y: initial.y }, "tooltip remains slot-anchored during pointer movement");\n      assert.deepEqual(pageErrors, []);\n    } finally {\n      await context.close();\n    }\n  });\n\n  it("opens rack wines with mouse and keyboard and highlights the exact coordinate", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {
