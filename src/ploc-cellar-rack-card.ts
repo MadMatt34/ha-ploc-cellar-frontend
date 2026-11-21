@@ -297,6 +297,7 @@ export class PlocCellarRackCard extends LitElement {
   private hideWineTooltip(): void {
     this.activeTooltip = undefined;
     this.tooltipPosition = undefined;
+    this.pendingTouchTapLocation = undefined;
   }
   protected render() {
     const t = (key: TranslationKey): string =>
