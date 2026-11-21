@@ -162,6 +162,25 @@ window.mountPlocCard = async (tag, config) => {
   card.hass = window.testHass;
   card.setConfig({ config_entry_id: "fixture-entry", ...config });
   await card.updateComplete;
+  await new Promise((resolve, reject) => {
+    const deadline = Date.now() + 5_000;
+    const checkInventory = () => {
+      if (card.inventory) {
+        card.updateComplete.then(resolve, reject);
+        return;
+      }
+      if (card.error) {
+        reject(new Error(card.error));
+        return;
+      }
+      if (Date.now() >= deadline) {
+        reject(new Error(`Timed out waiting for inventory on ${tag}`));
+        return;
+      }
+      requestAnimationFrame(checkInventory);
+    };
+    checkInventory();
+  });
   return card;
 };
 
