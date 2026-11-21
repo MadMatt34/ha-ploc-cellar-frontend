@@ -39,16 +39,21 @@ async function openFixture() {
       window.__objectUrlStats.revoked.push(url);
       originalRevokeObjectURL(url);
     };
+    const NativeResizeObserver = window.ResizeObserver;
     window.ResizeObserver = class {
       constructor(callback) {
-        this.callback = callback;
+        this.observer = new NativeResizeObserver(callback);
       }
-      observe() {
+      observe(element) {
         window.__resizeObserverStats.observed += 1;
+        this.observer.observe(element);
       }
-      unobserve() {}
+      unobserve(element) {
+        this.observer.unobserve(element);
+      }
       disconnect() {
         window.__resizeObserverStats.disconnected += 1;
+        this.observer.disconnect();
       }
     };
   });
@@ -351,7 +356,7 @@ describe("Ploc Cellar browser interactions", () => {
         clientWidth: wrapper.clientWidth,
         scrollWidth: wrapper.scrollWidth,
       }));
-      assert.ok(scrollMetrics.scrollWidth >= scrollMetrics.clientWidth, "compact grid should stay inside its scrollable wrapper");
+      assert.ok(scrollMetrics.scrollWidth > scrollMetrics.clientWidth, "wide rack should scroll inside its compact grid wrapper");
       const cardDimensions = await card.evaluate((element) => {
         const surface = element.shadowRoot.querySelector("ha-card");
         return { width: surface.clientWidth, scrollWidth: surface.scrollWidth };
@@ -365,6 +370,14 @@ describe("Ploc Cellar browser interactions", () => {
       await detail.waitFor();
       await detail.locator("ha-dialog").waitFor();
       assert.equal(await detail.locator(".location-coordinate.selected").count(), 1, "tap on compact slot must select the exact rack coordinate");
+      await detail.locator("ha-dialog").evaluate((dialog) => {
+        dialog.dispatchEvent(new Event("closed", { bubbles: true }));
+      });
+      await detail.waitFor({ state: "detached" });
+      await page.setViewportSize({ width: 1024, height: 768 });
+      await card.locator(".grid-wrap:not(.mobile-compact)").waitFor();
+      assert.equal(await slots.first().evaluate((slot) => slot.getBoundingClientRect().width), 98, "desktop cell size must be restored after widening");
+      assert.notEqual(await slots.first().locator("strong").evaluate((label) => getComputedStyle(label).display), "none");
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();
