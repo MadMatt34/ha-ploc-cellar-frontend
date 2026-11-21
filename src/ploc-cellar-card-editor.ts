@@ -14,6 +14,7 @@ type EditorField =
   | "show_rack_occupancy"
   | "show_occupancy"
   | "show_diagnostics"
+  | "show_diagnostics_expanded"
   | "show_statistics"
   | "show_statistics_legends";
 
@@ -48,6 +49,9 @@ export class PlocCellarCardEditor extends LitElement {
         { name: "title", selector: { text: {} } },
         { name: "show_occupancy", selector: { boolean: {} } },
         { name: "show_diagnostics", selector: { boolean: {} } },
+        ...(this.config?.show_diagnostics !== false
+          ? [{ name: "show_diagnostics_expanded", selector: { boolean: {} } }]
+          : []),
         { name: "show_statistics", selector: { boolean: {} } },
       );
 
@@ -120,6 +124,7 @@ export class PlocCellarCardEditor extends LitElement {
     if (this.isOverviewType(config.type)) {
       nextConfig.show_occupancy = config.show_occupancy !== false;
       nextConfig.show_diagnostics = config.show_diagnostics !== false;
+      nextConfig.show_diagnostics_expanded = config.show_diagnostics_expanded === true;
       nextConfig.show_statistics = config.show_statistics !== false;
       nextConfig.show_statistics_legends = config.show_statistics_legends !== false;
     } else if (config.type === "custom:ploc-cellar-inventory-card") {
@@ -149,6 +154,7 @@ export class PlocCellarCardEditor extends LitElement {
       show_rack_occupancy: "editor_show_rack_occupancy",
       show_occupancy: "editor_show_occupancy",
       show_diagnostics: "editor_show_diagnostics",
+      show_diagnostics_expanded: "editor_show_diagnostics_expanded",
       show_statistics: "editor_show_statistics",
       show_statistics_legends: "editor_show_statistics_legends",
     };
