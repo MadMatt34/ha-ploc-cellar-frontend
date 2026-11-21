@@ -16,7 +16,7 @@ Ces valeurs constituent une **base de développement** ; elles ne signifient pas
 Les branches de développement actuelles sont validées contre le même contrat d'inventaire déclaré :
 - Structure et sémantique de la réponse backend : `tests/test_service_contract.py`.
 - Structure miroir frontend : `src/backend-inventory-contract.ts` et `src/types.ts`.
-- Contrat lisible : `docs/BACKEND_CONTRACT.md` et `docs/CONTRAT_BACKEND.fr.md`.
+- Contrat lisible : `docs/BACKEND_CONTRACT.md` et `docs/BACKEND_CONTRACT.fr.md`.
 
 Ces contrôles établissent une cohérence structurelle. Ils ne remplacent pas un test de bout en bout avec les deux versions installées dans une instance Home Assistant active.
 
