@@ -378,7 +378,7 @@ describe("Ploc Cellar browser interactions", () => {
       await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
       const tooltip = card.locator(".wine-tooltip");
       await tooltip.waitFor();
-      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "first tap on mobile exposes wine tooltip details");
+      const closeTooltip = tooltip.locator(".wine-tooltip-close");\n      await closeTooltip.waitFor();\n      assert.equal(await closeTooltip.getAttribute("aria-label"), "Close wine tooltip");\n      await closeTooltip.click();\n      await tooltip.waitFor({ state: "detached" });\n      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);\n      await tooltip.waitFor();\n      await tooltip.locator(".wine-tooltip-close").click();\n      await tooltip.waitFor({ state: "detached" });\n      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "first tap on mobile exposes wine tooltip details");
       assert.equal(await card.locator("ploc-cellar-wine-detail").count(), 0, "first tap should show tooltip instead of opening the detail dialog");
 
       const secondSlot = await slots.nth(1).boundingBox();
@@ -441,7 +441,7 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
-  it("opens rack wines with mouse and keyboard and highlights the exact coordinate", async () => {
+  it("keeps desktop wine tooltips anchored to the rack slot instead of following the pointer", async () => {\n    const { context, page, pageErrors } = await openFixture();\n    try {\n      await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));\n      const card = page.locator("ploc-cellar-rack-card");\n      const slot = card.locator(".slot.occupied").first();\n      await slot.waitFor();\n      const bounds = await slot.boundingBox();\n      assert.ok(bounds);\n      await page.mouse.move(bounds.x + 10, bounds.y + 10);\n      const tooltip = card.locator(".wine-tooltip");\n      await tooltip.waitFor();\n      const initial = await tooltip.boundingBox();\n      await page.mouse.move(bounds.x + bounds.width - 5, bounds.y + bounds.height - 5);\n      const moved = await tooltip.boundingBox();\n      assert.deepEqual({ x: moved.x, y: moved.y }, { x: initial.x, y: initial.y }, "tooltip should stay anchored to the hovered rack slot when the pointer moves within it");\n      assert.deepEqual(pageErrors, []);\n    } finally {\n      await context.close();\n    }\n  });\n\n  it("opens rack wines with mouse and keyboard and highlights the exact coordinate", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {
