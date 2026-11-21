@@ -755,7 +755,9 @@ var Be = {
 	sort_vintage_asc: "Vintage ascending",
 	sort_vintage_desc: "Vintage descending",
 	wine_detail_origin: "Origin and identification",
-	wine_detail_tasting: "Tasting and composition"
+	wine_detail_tasting: "Tasting and composition",
+	rack_grid: "Rack position map",
+	rack_mobile_grid: "Compact mobile rack position map"
 }, Ve = {
 	card_title: "Cave Ploc",
 	rack_title: "Rangement de la cave",
@@ -921,7 +923,9 @@ var Be = {
 	sort_vintage_asc: "Millésime ascendant",
 	sort_vintage_desc: "Millésime descendant",
 	wine_detail_origin: "Origine et identification",
-	wine_detail_tasting: "Dégustation et composition"
+	wine_detail_tasting: "Dégustation et composition",
+	rack_grid: "Plan des emplacements du casier",
+	rack_mobile_grid: "Plan compact des emplacements du casier"
 };
 // src/translations.ts
 function I(e, t) {
@@ -1548,12 +1552,12 @@ function at(e, t, n, r, i, a, o = 12) {
 // src/ploc-cellar-rack-card.ts
 var ot = class extends je {
 	constructor(...e) {
-		super(...e), this.loading = !1, this.requestGeneration = 0, this.refreshPending = !1, this.syncSubscription = new Ke();
+		super(...e), this.loading = !1, this.cardWidth = 0, this.requestGeneration = 0, this.refreshPending = !1, this.syncSubscription = new Ke();
 	}
 	static {
 		this.styles = c`
     :host { display: block; }
-    ha-card { padding: 16px; color: var(--primary-text-color); }
+    ha-card { display: block; padding: 16px; color: var(--primary-text-color); }
     header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     h2 { margin: 0; font-size: 1.2rem; font-weight: 500; }
     button { color: var(--primary-text-color); background: var(--secondary-background-color); border: 1px solid var(--divider-color); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
@@ -1564,6 +1568,14 @@ var ot = class extends je {
     .rack-visualization { width: max-content; max-width: 100%; margin: 4px auto 0; }
     .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; width: 100%; box-sizing: border-box; padding: 0; }
     .rack-grid { display: grid; flex: 0 0 auto; gap: 6px; width: max-content; min-width: min-content; }
+    .grid-wrap.mobile-compact .rack-grid { gap: 4px; }
+    .grid-wrap.mobile-compact .slot { border-radius: 8px; padding: 2px; gap: 0; }
+    .grid-wrap.mobile-compact .slot strong,
+    .grid-wrap.mobile-compact .slot small,
+    .grid-wrap.mobile-compact .empty-shelf { display: none; }
+    .grid-wrap.mobile-compact .slot .bottle-marker { width: 26px; height: 26px; flex-basis: 26px; margin: auto; }
+    .grid-wrap.mobile-compact .slot.missing { font-size: .75rem; align-items: center; justify-content: center; }
+    .grid-wrap.mobile-compact .slot.missing strong { display: block; min-height: 0; max-height: none; }
     .rack-summary { color: var(--secondary-text-color); font-size: .85rem; line-height: 1.2; text-align: center; }
     .rack-name { color: var(--primary-text-color); font-size: 1rem; font-weight: 500; }
     .color-counts { color: var(--secondary-text-color); text-align: center; }
@@ -1613,13 +1625,23 @@ var ot = class extends je {
 		super.connectedCallback(), this.requestUpdate();
 	}
 	disconnectedCallback() {
-		this.syncSubscription.disconnect(), super.disconnectedCallback();
+		this.syncSubscription.disconnect(), this.cardResizeObserver?.disconnect(), this.cardResizeObserver = void 0, this.observedCard = void 0, super.disconnectedCallback();
 	}
 	ensureSyncSubscription() {
 		this.syncSubscription.update(this.hass, this.config?.config_entry_id, this.isConnected, () => void this.refresh());
 	}
 	updated() {
-		this.ensureSyncSubscription(), this.hass && this.config && !this.inventory && !this.loading && !this.error && this.refresh(), this.activeTooltip && this.applyTooltipPosition();
+		this.ensureSyncSubscription(), this.observeCardWidth(), this.hass && this.config && !this.inventory && !this.loading && !this.error && this.refresh(), this.activeTooltip && this.applyTooltipPosition();
+	}
+	observeCardWidth() {
+		let e = this.renderRoot.querySelector("ha-card");
+		if (!e || this.observedCard === e) return;
+		this.cardResizeObserver?.disconnect(), this.observedCard = e, this.cardResizeObserver = new ResizeObserver((t) => {
+			let n = e.clientWidth || t[0]?.contentRect.width || 0;
+			n > 0 && n !== this.cardWidth && (this.cardWidth = n);
+		}), this.cardResizeObserver.observe(e);
+		let t = e.clientWidth;
+		t > 0 && t !== this.cardWidth && (this.cardWidth = t);
 	}
 	async refresh() {
 		let e = this.hass, t = this.config;
@@ -1701,7 +1723,7 @@ var ot = class extends je {
 			id: e.id,
 			row: e.row,
 			column: e.column
-		}))), f = new Map(d.positions.map((e) => [e.id, e])), p = r.filter((e) => !Number.isSafeInteger(e.row) || !Number.isSafeInteger(e.column)), m = (t?.rack_items ?? []).filter((e) => !t?.racks.some((t) => t.id === e.rack_id));
+		}))), f = new Map(d.positions.map((e) => [e.id, e])), p = this.cardWidth > 0 && this.cardWidth <= 600, m = p ? Math.max(44, Math.min(64, Math.floor((this.cardWidth - 32 - 4 * (d.columnCount - 1)) / Math.max(1, d.columnCount)))) : 98, h = r.filter((e) => !Number.isSafeInteger(e.row) || !Number.isSafeInteger(e.column)), g = (t?.rack_items ?? []).filter((e) => !t?.racks.some((t) => t.id === e.rack_id));
 		return N`
       <ha-card aria-busy=${this.loading ? "true" : "false"}>
         <header>
@@ -1738,7 +1760,7 @@ var ot = class extends je {
             ${u.length ? N`<div class="color-counts">${u.map(([e, t], n) => N`${n ? " · " : P}<span class="color-count">${e}: <span>${t}</span></span>`)}</div>` : P}
           </div>
           <div class="rack-visualization"
-            style=${`width: ${c.length ? `${d.columnCount * 104 - 6}px` : "100%"};`}>
+            style=${`width: ${p || !c.length ? "100%" : `${d.columnCount * 104 - 6}px`};`}>
             ${this.config?.show_rack_occupancy === !1 ? P : N`
               <div class="rack-occupancy"
                 role="progressbar"
@@ -1755,26 +1777,29 @@ var ot = class extends je {
             `}
             ${c.length ? N`
               ${d.compact ? N`<div class="warning">${e("rack_grid_compacted")}</div>` : P}
-              <div class="grid-wrap">
-                <div class="rack-grid" style=${`grid-template-columns: repeat(${d.columnCount}, 98px); grid-template-rows: repeat(${d.rowCount}, 98px);`}>
+              <div class=${p ? "grid-wrap mobile-compact" : "grid-wrap"} role="group" aria-label=${e(p ? "rack_mobile_grid" : "rack_grid")}>
+                <div class="rack-grid" style=${`grid-template-columns: repeat(${d.columnCount}, ${m}px); grid-template-rows: repeat(${d.rowCount}, ${m}px); gap: ${p ? 4 : 6}px;`}>
                 ${c.map((t) => {
 			let n = f.get(t.id);
 			if (!n) return P;
 			let r = !!t.wine_id, a = t.wine_id ? i.get(t.wine_id) : void 0, o = r ? this.wineLabel(t, i) : e("empty_position");
 			return N`
                     <div class=${r ? "slot occupied" : "slot empty"}
-                      style=${`grid-row: ${n.row}; grid-column: ${n.column};`}
-                      aria-label=${o}
+                      style=${`grid-row: ${n.row}; grid-column: ${n.column}; width: ${m}px; height: ${m}px; min-width: ${m}px; min-height: ${m}px;`}
+                      aria-label=${r ? `${o}, ${e("row")} ${t.row + 1}, ${e("column")} ${t.column + 1}` : o}
                       aria-describedby=${r && this.activeTooltip?.wine === a ? "ploc-cellar-wine-tooltip" : P}
                       role=${a ? "button" : r ? "img" : P}
                       aria-haspopup=${a ? "dialog" : P}
                       tabindex=${r ? "0" : P}
-                      @click=${a ? () => {
-				this.selectedWine = a, this.selectedLocation = {
+                      @pointerdown=${a ? (e) => {
+				e.pointerType !== "touch" && (this.pendingTouchTapWineId = void 0);
+			} : P}
+                      @click=${a ? (e) => {
+				p && this.pendingTouchTapWineId !== a.id ? (this.pendingTouchTapWineId = a.id, this.showWineTooltip(e, a)) : (this.pendingTouchTapWineId = void 0, this.hideWineTooltip(), this.selectedWine = a, this.selectedLocation = {
 					rackId: t.rack_id,
 					row: t.row,
 					column: t.column
-				};
+				});
 			} : P}
                       @keydown=${a ? (e) => {
 				(e.key === "Enter" || e.key === " ") && (e.preventDefault(), this.selectedWine = a, this.selectedLocation = {
@@ -1796,7 +1821,7 @@ var ot = class extends je {
 		})}
                 ${d.missingCoordinates.map((t) => N`
                   <div class="slot missing"
-                    style=${`grid-row: ${t.row}; grid-column: ${t.column};`}>
+                    style=${`grid-row: ${t.row}; grid-column: ${t.column}; width: ${m}px; height: ${m}px; min-width: ${m}px; min-height: ${m}px;`}>
                     <strong>—</strong>
                     <small>${e("not_mapped")}</small>
                   </div>
@@ -1805,15 +1830,15 @@ var ot = class extends je {
               </div>
             ` : N`<div class="warning">${e("no_coordinates")}</div>`}
           </div>
-          ${p.length ? N`
+          ${h.length ? N`
             <div class="unplaced">
               <strong>${e("positions_without_coordinates")}</strong>
-              ${p.map((t) => N`<div class="unplaced-item">${this.wineLabel(t, i) || e("empty_position")}</div>`)}
+              ${h.map((t) => N`<div class="unplaced-item">${this.wineLabel(t, i) || e("empty_position")}</div>`)}
             </div>
           ` : P}
         ` : N`<p class="muted">${e("no_racks")}</p>`}
-        ${m.length ? N`
-          <div class="warning"><span>${m.length}</span> ${e("missing_rack")}</div>
+        ${g.length ? N`
+          <div class="warning"><span>${g.length}</span> ${e("missing_rack")}</div>
         ` : P}
         ${this.activeTooltip ? N`
           <div class="wine-tooltip"
@@ -1854,7 +1879,7 @@ var ot = class extends je {
 		};
 	}
 };
-L([ze({ attribute: !1 })], ot.prototype, "hass", void 0), L([F()], ot.prototype, "config", void 0), L([F()], ot.prototype, "inventory", void 0), L([F()], ot.prototype, "selectedRackId", void 0), L([F()], ot.prototype, "loading", void 0), L([F()], ot.prototype, "error", void 0), L([F()], ot.prototype, "activeTooltip", void 0), L([F()], ot.prototype, "selectedWine", void 0), L([F()], ot.prototype, "selectedLocation", void 0), ot = L([Ie("ploc-cellar-rack-card")], ot), window.customCards ??= [], window.customCards.push({
+L([ze({ attribute: !1 })], ot.prototype, "hass", void 0), L([F()], ot.prototype, "config", void 0), L([F()], ot.prototype, "inventory", void 0), L([F()], ot.prototype, "selectedRackId", void 0), L([F()], ot.prototype, "loading", void 0), L([F()], ot.prototype, "error", void 0), L([F()], ot.prototype, "activeTooltip", void 0), L([F()], ot.prototype, "selectedWine", void 0), L([F()], ot.prototype, "selectedLocation", void 0), L([F()], ot.prototype, "cardWidth", void 0), ot = L([Ie("ploc-cellar-rack-card")], ot), window.customCards ??= [], window.customCards.push({
 	type: "ploc-cellar-rack-card",
 	name: He("picker_rack_name"),
 	description: He("picker_rack_description")
