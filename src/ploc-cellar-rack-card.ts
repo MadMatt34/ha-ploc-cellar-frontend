@@ -228,7 +228,7 @@ export class PlocCellarRackCard extends LitElement {
 
   private selectRack(event: Event): void {
     if (event.currentTarget instanceof HTMLSelectElement) {
-      this.selectedRackId = event.currentTarget.value;
+      this.hideWineTooltip();\n      this.selectedRackId = event.currentTarget.value;
     }
   }
 
@@ -383,7 +383,7 @@ export class PlocCellarRackCard extends LitElement {
                 <nav class="rack-picker" aria-label=${t("rack_selection")}>
                   ${data.racks.map((item) => html`
                     <button aria-pressed=${item.id === this.selectedRackId}
-                      @click=${() => { this.selectedRackId = item.id; }}>${item.name}</button>
+                      @click=${() => { this.hideWineTooltip(); this.selectedRackId = item.id; }}>${item.name}</button>
                   `)}
                 </nav>
               `
