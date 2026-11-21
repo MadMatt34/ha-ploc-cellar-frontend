@@ -67,7 +67,7 @@ export class PlocCellarCard extends LitElement {
     .value { display: block; font-size: 1.4rem; }
     .label, .muted { color: var(--secondary-text-color); font-size: .85rem; }
     .section { margin-top: 10px; }
-    .section-title { margin: 0 0 8px; font-size: .95rem; font-weight: 500; }
+    .section-title { margin: 0; font-size: .95rem; font-weight: 500; }
     details.section > summary { display: list-item; cursor: pointer; }
     details.section > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 4px; border-radius: 2px; }
     .occupancy-bar { position: relative; height: 20px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
@@ -75,7 +75,7 @@ export class PlocCellarCard extends LitElement {
     .occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
     .diagnostics-section.has-issues { border: 1px solid var(--error-color); border-radius: 10px; padding: 10px; }
     .diagnostics-section.has-issues > summary { color: var(--error-color); }
-    .diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+    .diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 8px; }
     .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; background: transparent; font: inherit; }
     button.diagnostic { cursor: pointer; }
     button.diagnostic:hover { background: var(--secondary-background-color); }

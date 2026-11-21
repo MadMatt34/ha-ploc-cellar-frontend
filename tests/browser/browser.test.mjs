@@ -389,7 +389,15 @@ describe("Ploc Cellar browser interactions", () => {
         document.body.append(element);
         await element.updateComplete;
         const form = element.shadowRoot.querySelector("ha-form");
-        const field = form.schema.find((item) => item.name === "page_size");
+        const findField = (schema, name) => {
+          for (const field of schema ?? []) {
+            if (field.name === name) return field;
+            const nested = findField(field.schema, name);
+            if (nested) return nested;
+          }
+          return undefined;
+        };
+        const field = findField(form.schema, "page_size");
         return { value: form.data.page_size, selector: field.selector.number };
       });
       assert.equal(editor.value, 10);
@@ -683,7 +691,7 @@ describe("Ploc Cellar browser interactions", () => {
         });
       });
       const schema = await page.locator("ploc-cellar-card-editor ha-form").evaluate((form) =>
-        form.schema.map((field) => field.name),
+        (function names(schema) { return schema.flatMap((field) => [field.name, ...names(field.schema ?? [])]); })(form.schema),
       );
       assert.ok(schema.includes("config_entry_id"));
       assert.ok(schema.includes("rack_picker_mode"));

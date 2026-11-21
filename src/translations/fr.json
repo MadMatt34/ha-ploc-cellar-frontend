@@ -168,5 +168,15 @@
   "rack_mobile_grid": "Plan compact des emplacements du casier",
   "tooltip_close": "Fermer l’infobulle du vin",
   "editor_show_rack_header": "Afficher l’en-tête de la cave",
-  "editor_show_diagnostics_expanded": "Déplier les diagnostics par défaut"
+  "editor_show_diagnostics_expanded": "Déplier les diagnostics par défaut",
+  "editor_section_general": "Général",
+  "editor_section_occupancy": "Occupation des casiers",
+  "editor_section_diagnostics": "Diagnostics",
+  "editor_section_statistics": "Statistiques",
+  "editor_section_inventory": "Affichage de l’inventaire",
+  "editor_section_rack_selection": "Sélection du casier",
+  "editor_section_rack_header": "En-tête de la cave",
+  "editor_diagnostics_expanded_helper": "Cette option est disponible uniquement si les diagnostics sont activés.",
+  "editor_statistics_legends_helper": "Cette option est disponible uniquement si les statistiques sont activées.",
+  "editor_rack_occupancy_helper": "Cette option est disponible uniquement lorsque l’en-tête de la cave est affiché."
 }
