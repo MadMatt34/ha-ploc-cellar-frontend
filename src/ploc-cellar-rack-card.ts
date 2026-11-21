@@ -319,7 +319,8 @@ export class PlocCellarRackCard extends LitElement {
     for (const item of selectedItems) {
       if (!item.wine_id) continue;
       const wine = winesById.get(item.wine_id);
-      const color = wine?.color?.trim();
+      if (!wine) continue;
+      const color = wine.color?.trim();
       if (!color) continue;
       const existing = colorCounts.get(color);
       colorCounts.set(color, {
