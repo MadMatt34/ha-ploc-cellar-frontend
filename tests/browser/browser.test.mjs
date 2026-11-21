@@ -202,6 +202,28 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
+  it("collapses diagnostics by default and marks positive counters in red", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => {
+        window.__plocFixture.inventory.unlocated_bottles = 2;
+      });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+      const card = page.locator("ploc-cellar-card");
+      const section = card.locator("details.diagnostics-section");
+      await section.waitFor();
+      assert.equal(await section.getAttribute("open"), null);
+      assert.equal(await section.evaluate((element) => element.classList.contains("has-issues")), true);
+      assert.equal(await section.evaluate((element) => getComputedStyle(element).borderTopColor), "rgb(255, 0, 0)");
+      await section.locator("summary").click();
+      assert.equal(await section.getAttribute("open"), "");
+      assert.equal(await section.evaluate((element) => element.classList.contains("has-issues")), true);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
   it("shows stale inventory state beside the last successful synchronization", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
