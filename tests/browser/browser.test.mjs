@@ -452,8 +452,10 @@ describe("Ploc Cellar browser interactions", () => {
   it("keeps desktop wine tooltips anchored to the rack slot instead of following the pointer", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
+      await page.setViewportSize({ width: 1280, height: 900 });
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));
       const card = page.locator("ploc-cellar-rack-card");
+      await card.locator(".grid-wrap:not(.mobile-compact)").waitFor();
       const slot = card.locator(".slot.occupied").first();
       await slot.waitFor();
       const bounds = await slot.boundingBox();
