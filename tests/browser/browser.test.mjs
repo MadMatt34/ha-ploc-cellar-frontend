@@ -369,7 +369,7 @@ describe("Ploc Cellar browser interactions", () => {
       await slots.first().click();
       const tooltip = card.locator(".wine-tooltip");
       await tooltip.waitFor();
-      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /wine/i, "first tap on mobile exposes wine tooltip details");
+      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "first tap on mobile exposes wine tooltip details");
       assert.equal(await card.locator("ploc-cellar-wine-detail").count(), 0, "first tap should show tooltip instead of opening the detail dialog");
       await slots.first().click();
       const detail = card.locator("ploc-cellar-wine-detail");
