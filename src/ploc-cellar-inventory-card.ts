@@ -139,8 +139,8 @@ export class PlocCellarInventoryCard extends LitElement {
   }
 
   private get pageSize(): number {
-    const configured = this.config?.page_size ?? 40;
-    if (!Number.isFinite(configured)) return 40;
+    const configured = this.config?.page_size ?? 10;
+    if (!Number.isFinite(configured)) return 10;
     return Math.min(200, Math.max(10, Math.round(configured / 10) * 10));
   }
 
