@@ -79,7 +79,7 @@ export class PlocCellarInventoryCard extends LitElement {
     .filters-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
     .filters { flex: 1 1 180px; min-width: 0; margin: 0; padding: 1px 10px 0px 10px; }
     .filters[open] { padding: 0 10px 10px 10px; border: 1px solid var(--outline-color, var(--divider-color)); border-radius: 10px; background: var(--secondary-background-color); }
-    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { flex: 0 0 auto; margin: 0; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
+    .filters > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; padding: 4px 0; list-style: none; }\n    .filters-clear { flex: 0 0 auto; margin-left: auto; padding: 5px 8px; font-size: .8rem; white-space: nowrap; }
     .filters[open] > summary { color: var(--primary-text-color); padding-bottom: 8px; border-bottom: 1px solid var(--divider-color); }
     .filters > summary::-webkit-details-marker { display: none; }
     .filters-icon { --mdc-icon-size: 18px; color: var(--secondary-text-color); }
@@ -401,7 +401,7 @@ export class PlocCellarInventoryCard extends LitElement {
             @input=${(event: Event) => { this.search = (event.target as HTMLInputElement).value; this.currentPage = 1; }} />
           <div class="filters-row">
             <details class="filters">
-              <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span><ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
+              <summary><ha-icon class="filters-icon" icon="mdi:filter-variant" aria-hidden="true"></ha-icon><span>${t("inventory_filters")}</span>${activeFilters ? html`<button class="filters-clear" type="button" @click=${(event: Event) => { event.preventDefault(); event.stopPropagation(); this.clearFilters(); }}>${t("clear_filters")}</button>` : nothing}<ha-icon class="filters-chevron" icon="mdi:chevron-right" aria-hidden="true"></ha-icon></summary>
               <div class="toolbar">
               ${this.selectFilter("color", t("filter_color"), this.color, this.valuesFor("color"))}
               ${this.selectFilter("region", t("filter_region"), this.region, this.valuesFor("region"))}
@@ -422,7 +422,6 @@ export class PlocCellarInventoryCard extends LitElement {
               </select>
               </label>
             </details>
-            ${activeFilters ? html`<button class="filters-clear" type="button" @click=${() => this.clearFilters()}>${t("clear_filters")}</button>` : nothing}
           </div>
           <div class="summary">
             <span>${t("inventory_results").replace("{count}", String(wines.length))}</span>
