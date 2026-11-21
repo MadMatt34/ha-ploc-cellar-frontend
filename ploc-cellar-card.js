@@ -757,7 +757,8 @@ var Be = {
 	wine_detail_origin: "Origin and identification",
 	wine_detail_tasting: "Tasting and composition",
 	rack_grid: "Rack position map",
-	rack_mobile_grid: "Compact mobile rack position map"
+	rack_mobile_grid: "Compact mobile rack position map",
+	tooltip_close: "Close wine tooltip"
 }, Ve = {
 	card_title: "Cave Ploc",
 	rack_title: "Rangement de la cave",
@@ -925,7 +926,8 @@ var Be = {
 	wine_detail_origin: "Origine et identification",
 	wine_detail_tasting: "Dégustation et composition",
 	rack_grid: "Plan des emplacements du casier",
-	rack_mobile_grid: "Plan compact des emplacements du casier"
+	rack_mobile_grid: "Plan compact des emplacements du casier",
+	tooltip_close: "Fermer l’infobulle du vin"
 };
 // src/translations.ts
 function I(e, t) {
@@ -1589,6 +1591,9 @@ var ot = class extends je {
     .slot.occupied[role="button"] { cursor: pointer; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 1px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: 10px; pointer-events: none; overflow-wrap: anywhere; }
+    .wine-tooltip-close { display: none; }
+    .wine-tooltip.mobile-compact { padding-right: 28px; }
+    .wine-tooltip.mobile-compact .wine-tooltip-close { display: inline-flex; position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; align-items: center; justify-content: center; padding: 0; border: 0; border-radius: 50%; background: var(--secondary-background-color); color: var(--primary-text-color); font-size: 16px; line-height: 1; pointer-events: auto; cursor: pointer; }
     .wine-tooltip-name { margin: 0 0 2px; font-size: 1.12em; font-weight: 500; line-height: 1.2; }
     .wine-tooltip-details { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1px 4px; margin: 0; line-height: 1.15; }
     .wine-tooltip-details dt { color: var(--secondary-text-color); }
@@ -1689,20 +1694,14 @@ var ot = class extends je {
 	showWineTooltip(e, t) {
 		let n = e.currentTarget;
 		if (!(n instanceof HTMLElement)) return;
-		let r = n.getBoundingClientRect(), i = "clientX" in e;
+		let r = n.getBoundingClientRect();
 		this.tooltipPosition = {
-			left: i ? e.clientX + 12 : r.right + 8,
-			top: i ? e.clientY + 12 : r.top
+			left: r.right + 8,
+			top: r.top
 		}, this.activeTooltip = {
 			wine: t,
 			color: this.wineColor(t)
 		};
-	}
-	moveWineTooltip(e) {
-		this.activeTooltip && (this.tooltipPosition = {
-			left: e.clientX + 12,
-			top: e.clientY + 12
-		}, this.applyTooltipPosition());
 	}
 	applyTooltipPosition() {
 		let e = this.renderRoot.querySelector(".wine-tooltip"), t = this.tooltipPosition;
@@ -1711,7 +1710,7 @@ var ot = class extends je {
 		e.style.left = `${n.left}px`, e.style.top = `${n.top}px`;
 	}
 	hideWineTooltip() {
-		this.activeTooltip = void 0, this.tooltipPosition = void 0;
+		this.activeTooltip = void 0, this.tooltipPosition = void 0, this.pendingTouchTapLocation = void 0;
 	}
 	render() {
 		let e = (e) => I(this.hass?.language ?? "en", e), t = this.inventory, n = t?.racks.find((e) => e.id === this.selectedRackId), r = (t?.rack_items ?? []).filter((e) => e.rack_id === this.selectedRackId), i = new Map((t?.wines ?? []).map((e) => [e.id, e])), a = r.reduce((e, t) => e + Number(!!t.wine_id), 0), o = r.length - a, s = r.length ? a / r.length * 100 : 0, c = r.filter((e) => Number.isSafeInteger(e.row) && Number.isSafeInteger(e.column)), l = /* @__PURE__ */ new Map();
@@ -1811,8 +1810,9 @@ var ot = class extends je {
 				});
 			} : P}
                       @pointerenter=${r ? (e) => this.showWineTooltip(e, a) : P}
-                      @pointermove=${r ? (e) => this.moveWineTooltip(e) : P}
-                      @pointerleave=${r ? () => this.hideWineTooltip() : P}
+                      @pointerleave=${r ? () => {
+				p || this.hideWineTooltip();
+			} : P}
                       @focus=${r ? (e) => this.showWineTooltip(e, a) : P}
                       @blur=${r ? () => this.hideWineTooltip() : P}>
                       ${r ? N`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(a)};`} aria-hidden="true"></span>` : P}
@@ -1843,10 +1843,13 @@ var ot = class extends je {
           <div class="warning"><span>${g.length}</span> ${e("missing_rack")}</div>
         ` : P}
         ${this.activeTooltip ? N`
-          <div class="wine-tooltip"
+          <div class=${p ? "wine-tooltip mobile-compact" : "wine-tooltip"}
             id="ploc-cellar-wine-tooltip"
             role="tooltip"
             style=${`left: 12px; top: 12px; --wine-tooltip-border-color: ${this.activeTooltip.color};`}>
+            ${p ? N`<button class="wine-tooltip-close" type="button" aria-label=${e("tooltip_close")} @click=${(e) => {
+			e.stopPropagation(), this.hideWineTooltip();
+		}}>×</button>` : P}
             ${this.activeTooltip.wine ? N`
               <div class="wine-tooltip-name">${this.activeTooltip.wine.name}</div>
               <dl class="wine-tooltip-details">
