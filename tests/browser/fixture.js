@@ -158,11 +158,31 @@ window.mountPlocCard = async (tag, config) => {
   const host = document.querySelector("#app");
   host.replaceChildren();
   const card = document.createElement(tag);
+  host.append(card);
   card.hass = window.testHass;
   card.setConfig({ config_entry_id: "fixture-entry", ...config });
-  host.append(card);
   await card.updateComplete;
   return card;
 };
+
+window.waitForInventory = (card, timeoutMs = 5_000) => new Promise((resolve, reject) => {
+  const deadline = Date.now() + timeoutMs;
+  const checkInventory = () => {
+    if (card.inventory) {
+      card.updateComplete.then(() => resolve(card), reject);
+      return;
+    }
+    if (card.error) {
+      reject(new Error(card.error));
+      return;
+    }
+    if (Date.now() >= deadline) {
+      reject(new Error(`Timed out waiting for inventory on ${card.tagName.toLowerCase()}`));
+      return;
+    }
+    requestAnimationFrame(checkInventory);
+  };
+  checkInventory();
+});
 
 window.__plocFixtureReady = true;

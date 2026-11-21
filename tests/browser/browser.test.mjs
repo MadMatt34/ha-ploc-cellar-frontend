@@ -77,6 +77,21 @@ after(async () => {
   server?.kill("SIGTERM");
 });
 
+async function waitForDiagnosticsSummary(card, page) {
+  try {
+    await card.locator("details.diagnostics-section > summary").waitFor({ state: "attached", timeout: 5_000 });
+  } catch (error) {
+    const state = await card.evaluate((element) => ({
+      config: element.config,
+      inventory: element.inventory,
+      error: element.error,
+      loading: element.loading,
+      shadowRoot: element.shadowRoot?.innerHTML,
+    }));
+    throw new Error(`Diagnostics summary missing. Runtime state: ${JSON.stringify(state)}. Original error: ${error}`);
+  }
+}
+
 describe("Ploc Cellar browser interactions", () => {
   it("filters unknown values, searches wines and sorts the visible results", async () => {
     const { context, page, pageErrors } = await openFixture();
@@ -123,10 +138,16 @@ describe("Ploc Cellar browser interactions", () => {
     const { context, page, pageErrors } = await openFixture();
     try {
       await page.evaluate(() => {
+        window.__plocFixture.inventory.stock_reconstruction_complete = true;
         window.__plocFixture.inventory.unlocated_bottles = 1;
         return window.mountPlocCard("ploc-cellar-card", {});
       });
+      await page.evaluate(() => window.waitForInventory(document.querySelector("ploc-cellar-card")));
       const overviewCard = page.locator("ploc-cellar-card");
+      await overviewCard.locator(".summary").waitFor();
+      const diagnosticsSummary = overviewCard.locator("details.diagnostics-section > summary");
+      await waitForDiagnosticsSummary(overviewCard, page);
+      await diagnosticsSummary.click();
       await overviewCard.locator(".diagnostic").filter({ hasText: "Unlocated bottles" }).click();
       await overviewCard.locator("ha-dialog").waitFor();
       await overviewCard.evaluate((element) => {
@@ -202,6 +223,40 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
+  it("collapses diagnostics by default and marks positive counters in red", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => {
+        window.__plocFixture.inventory.stock_reconstruction_complete = true;
+        window.__plocFixture.inventory.unlocated_bottles = 2;
+      });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+      await page.evaluate(() => window.waitForInventory(document.querySelector("ploc-cellar-card")));
+      const card = page.locator("ploc-cellar-card");
+      await card.evaluate((element) => { element.style.setProperty("--error-color", "rgb(220, 0, 0)"); });
+      await card.locator(".summary").waitFor();
+      const section = card.locator("details.diagnostics-section");
+      await waitForDiagnosticsSummary(card, page);
+      await page.waitForFunction(() => {
+        const section = document.querySelector("ploc-cellar-card")
+          ?.shadowRoot?.querySelector("details.diagnostics-section");
+        return section?.classList.contains("has-issues") === true;
+      });
+      assert.equal(await section.getAttribute("open"), null);
+      assert.equal(await section.evaluate((element) => element.classList.contains("has-issues")), true);
+      assert.equal(
+        await section.evaluate((element) => getComputedStyle(element).borderTopColor),
+        "rgb(220, 0, 0)",
+      );
+      await section.locator("summary").click();
+      assert.equal(await section.getAttribute("open"), "");
+      assert.equal(await section.evaluate((element) => element.classList.contains("has-issues")), true);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
   it("shows stale inventory state beside the last successful synchronization", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
@@ -242,6 +297,28 @@ describe("Ploc Cellar browser interactions", () => {
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
       await card.locator(".metric").nth(2).waitFor();
       assert.match(await card.locator(".metric").nth(2).innerText(), /1\s*Wine references in stock/);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it("uses ten inventory references per page by default", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => {
+        const template = window.__plocFixture.inventory.wines[0];
+        window.__plocFixture.inventory.wines = Array.from({ length: 25 }, (_, index) => ({
+          ...template,
+          id: `default-page-${index + 1}`,
+          name: `Default wine ${String(index + 1).padStart(2, "0")}`,
+        }));
+      });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
+      const card = page.locator("ploc-cellar-inventory-card");
+      await card.locator(".wine").first().waitFor();
+      assert.equal(await card.locator(".wine").count(), 10);
+      assert.equal(await card.locator(".pagination").innerText(), "1–10 of 25\nPage 1 of 3");
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();
@@ -289,8 +366,8 @@ describe("Ploc Cellar browser interactions", () => {
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
       const defaultPageCard = page.locator("ploc-cellar-inventory-card");
       await defaultPageCard.locator(".wine").first().waitFor();
-      assert.equal(await defaultPageCard.locator(".wine").count(), 40);
-      assert.equal(await defaultPageCard.locator(".pagination").innerText(), "1–40 of 45\nPage 1 of 2");
+      assert.equal(await defaultPageCard.locator(".wine").count(), 10);
+      assert.equal(await defaultPageCard.locator(".pagination").innerText(), "1–10 of 45\nPage 1 of 5");
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", { page_size: 200 }));
       const maxPageCard = page.locator("ploc-cellar-inventory-card");
       await maxPageCard.locator(".wine").first().waitFor();
@@ -302,7 +379,7 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
-  it("exposes a 10-to-200 page-size editor setting with a default of 40", async () => {
+  it("exposes a 10-to-200 page-size editor setting with a default of 10", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
       const editor = await page.evaluate(async () => {
@@ -315,7 +392,7 @@ describe("Ploc Cellar browser interactions", () => {
         const field = form.schema.find((item) => item.name === "page_size");
         return { value: form.data.page_size, selector: field.selector.number };
       });
-      assert.equal(editor.value, 40);
+      assert.equal(editor.value, 10);
       assert.deepEqual(editor.selector, { min: 10, max: 200, step: 10, mode: "box" });
       assert.deepEqual(pageErrors, []);
     } finally {
@@ -661,6 +738,7 @@ describe("Ploc Cellar browser interactions", () => {
     try {
       await page.evaluate(() => {
         document.documentElement.style.setProperty("--error-color", "rgb(200, 0, 0)");
+        window.__plocFixture.inventory.stock_reconstruction_complete = true;
         window.__plocFixture.inventory.unlocated_bottles = 2;
         window.__plocFixture.inventory.negative_movement_bottles = 1;
         window.__plocFixture.inventory.physical_surplus_bottles = 0;
@@ -669,10 +747,6 @@ describe("Ploc Cellar browser interactions", () => {
         wine.effective_stock = 4;
         wine.unlocated_bottles = 2;
         wine.negative_movement_bottles = 1;
-        return window.mountPlocCard("ploc-cellar-inventory-card", {});
-      });
-      await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
-      await page.evaluate(() => {
         window.__plocFixture.inventory.wine_diagnostics = [{
           id: "wine-a",
           name: "Château A",
@@ -686,11 +760,21 @@ describe("Ploc Cellar browser interactions", () => {
           unlocated_bottles: 2,
           negative_movement_bottles: 1,
           physical_surplus_bottles: 0,
-          wine: window.__plocFixture.inventory.wines[0],
+          wine,
         }];
       });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
+      await page.evaluate(() => window.waitForInventory(document.querySelector("ploc-cellar-inventory-card")));
+      const inventoryCard = page.locator("ploc-cellar-inventory-card");
+      await inventoryCard.locator(".wine").first().waitFor();
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+      await page.evaluate(() => window.waitForInventory(document.querySelector("ploc-cellar-card")));
       const mainCard = page.locator("ploc-cellar-card");
+      await mainCard.locator(".summary").waitFor();
       const mainDiagnostics = mainCard.locator(".diagnostic-value");
+      const mainDiagnosticsSummary = mainCard.locator("details.diagnostics-section > summary");
+      await waitForDiagnosticsSummary(mainCard, page);
+      await mainDiagnosticsSummary.click();
       await mainDiagnostics.first().waitFor();
       assert.equal(await mainDiagnostics.first().evaluate((element) => getComputedStyle(element).color), "rgb(200, 0, 0)");
       await mainCard.locator(".diagnostic").filter({ hasText: "Unlocated bottles" }).click();
