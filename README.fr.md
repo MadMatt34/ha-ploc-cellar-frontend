@@ -15,6 +15,7 @@ Frontend Lovelace indépendant pour Home Assistant, destiné à l'[intégration 
 ## Documentation
 
 - [Index de la documentation](docs/README.fr.md) / [English](docs/README.md)
+- [Contrat backend](docs/BACKEND_CONTRACT.fr.md) / [English](docs/BACKEND_CONTRACT.md)
 - [Compatibilité backend/frontend et politique de publication](docs/COMPATIBILITY_AND_RELEASES.fr.md) / [English](docs/COMPATIBILITY_AND_RELEASES.md)
 
 ## Cartes
