@@ -128,7 +128,9 @@ describe("Ploc Cellar browser interactions", () => {
         return window.mountPlocCard("ploc-cellar-card", {});
       });
       const overviewCard = page.locator("ploc-cellar-card");
-      await overviewCard.locator("details.diagnostics-section > summary").click();
+      const diagnosticsSummary = overviewCard.locator("details.diagnostics-section > summary");
+      await diagnosticsSummary.waitFor();
+      await diagnosticsSummary.click();
       await overviewCard.locator(".diagnostic").filter({ hasText: "Unlocated bottles" }).click();
       await overviewCard.locator("ha-dialog").waitFor();
       await overviewCard.evaluate((element) => {
@@ -216,6 +218,7 @@ describe("Ploc Cellar browser interactions", () => {
       await card.evaluate((element) => { element.style.setProperty("--error-color", "rgb(220, 0, 0)"); });
       const section = card.locator("details.diagnostics-section");
       await section.waitFor();
+      await section.locator(".has-issues").waitFor();
       assert.equal(await section.getAttribute("open"), null);
       assert.equal(await section.evaluate((element) => element.classList.contains("has-issues")), true);
       assert.equal(
@@ -743,7 +746,9 @@ describe("Ploc Cellar browser interactions", () => {
       });
       const mainCard = page.locator("ploc-cellar-card");
       const mainDiagnostics = mainCard.locator(".diagnostic-value");
-      await mainCard.locator("details.diagnostics-section > summary").click();
+      const mainDiagnosticsSummary = mainCard.locator("details.diagnostics-section > summary");
+      await mainDiagnosticsSummary.waitFor();
+      await mainDiagnosticsSummary.click();
       await mainDiagnostics.first().waitFor();
       assert.equal(await mainDiagnostics.first().evaluate((element) => getComputedStyle(element).color), "rgb(200, 0, 0)");
       await mainCard.locator(".diagnostic").filter({ hasText: "Unlocated bottles" }).click();
