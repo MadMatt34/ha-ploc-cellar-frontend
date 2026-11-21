@@ -181,6 +181,27 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
+  it("shows color markers beside the color counts in the rack header", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));
+      const card = page.locator("ploc-cellar-rack-card");
+      await card.locator(".rack-name").getByText("Cave principale").waitFor();
+      const counts = card.locator(".color-count");
+      await assert.equal(await counts.count(), 2);
+      const red = counts.filter({ hasText: "Rouge" });
+      const white = counts.filter({ hasText: "Blanc" });
+      assert.equal(await red.locator(".color-count-marker").count(), 1);
+      assert.equal(await white.locator(".color-count-marker").count(), 1);
+      assert.equal(await red.locator(".color-count-marker").getAttribute("aria-hidden"), "true");
+      assert.match(await red.locator(".color-count-marker").getAttribute("style"), /rgb\\(150, 20, 30\\)/);
+      assert.match(await white.locator(".color-count-marker").getAttribute("style"), /rgb\\(230, 220, 170\\)/);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
   it("shows stale inventory state beside the last successful synchronization", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
