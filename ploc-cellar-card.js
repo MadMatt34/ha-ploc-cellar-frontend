@@ -656,7 +656,7 @@ var Be = {
 	editor_title_helper: "Optional. Leave empty to use the default title.",
 	editor_default_sort: "Default sort order",
 	editor_page_size: "Wine references per page",
-	editor_page_size_helper: "From 10 to 200 references, in steps of 10. Default: 40.",
+	editor_page_size_helper: "From 10 to 200 references, in steps of 10. Default: 10.",
 	statistics_title: "Cellar statistics",
 	statistics_bottles: "Bottles in stock",
 	statistics_references: "wine references",
@@ -825,7 +825,7 @@ var Be = {
 	editor_title_helper: "Facultatif. Laissez vide pour utiliser le titre par défaut.",
 	editor_default_sort: "Tri par défaut",
 	editor_page_size: "Nombre de références par page",
-	editor_page_size_helper: "De 10 à 200 références, par pas de 10. Valeur par défaut : 40.",
+	editor_page_size_helper: "De 10 à 200 références, par pas de 10. Valeur par défaut : 10.",
 	statistics_title: "Statistiques de la cave",
 	statistics_bottles: "Bouteilles en stock",
 	statistics_references: "références de vin",
@@ -2010,8 +2010,8 @@ var pt = class extends je {
 		this.requestGeneration += 1, this.loading = !1, this.refreshPending = !1, this.config = e, this.sort = e.default_sort ?? "name-asc", (t || n) && (this.currentPage = 1), n && (this.search = "", this.color = st, this.region = st, this.appellation = st, this.vintage = st, this.meal = "", this.selectedWine = void 0), this.inventory = void 0, this.error = void 0, e.config_entry_id && this.refresh();
 	}
 	get pageSize() {
-		let e = this.config?.page_size ?? 40;
-		return Number.isFinite(e) ? Math.min(200, Math.max(10, Math.round(e / 10) * 10)) : 40;
+		let e = this.config?.page_size ?? 10;
+		return Number.isFinite(e) ? Math.min(200, Math.max(10, Math.round(e / 10) * 10)) : 10;
 	}
 	connectedCallback() {
 		super.connectedCallback(), this.requestUpdate();
@@ -2370,7 +2370,7 @@ var mt = class extends je {
 	}
 	setConfig(e) {
 		let t = { ...e };
-		this.isOverviewType(e.type) ? (t.show_occupancy = e.show_occupancy !== !1, t.show_diagnostics = e.show_diagnostics !== !1, t.show_statistics = e.show_statistics !== !1, t.show_statistics_legends = e.show_statistics_legends !== !1) : e.type === "custom:ploc-cellar-inventory-card" ? (t.default_sort = e.default_sort ?? "name-asc", t.page_size = e.page_size ?? 40) : e.type === "custom:ploc-cellar-rack-card" && (t.rack_picker_mode = e.rack_picker_mode ?? "buttons", t.show_rack_occupancy = e.show_rack_occupancy !== !1), this.config = t;
+		this.isOverviewType(e.type) ? (t.show_occupancy = e.show_occupancy !== !1, t.show_diagnostics = e.show_diagnostics !== !1, t.show_statistics = e.show_statistics !== !1, t.show_statistics_legends = e.show_statistics_legends !== !1) : e.type === "custom:ploc-cellar-inventory-card" ? (t.default_sort = e.default_sort ?? "name-asc", t.page_size = e.page_size ?? 10) : e.type === "custom:ploc-cellar-rack-card" && (t.rack_picker_mode = e.rack_picker_mode ?? "buttons", t.show_rack_occupancy = e.show_rack_occupancy !== !1), this.config = t;
 	}
 	isOverviewType(e) {
 		return e === "custom:ploc-cellar-card";
@@ -19661,6 +19661,8 @@ var HO = [
     .occupancy-bar { position: relative; height: 20px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
     .occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
+    .diagnostics-section.has-issues { border: 1px solid var(--error-color); border-radius: 10px; padding: 10px; }
+    .diagnostics-section.has-issues > summary { color: var(--error-color); }
     .diagnostics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
     .diagnostic { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; box-sizing: border-box; text-align: left; color: inherit; border: 1px solid var(--divider-color); border-radius: 8px; padding: 10px; min-width: 0; background: transparent; font: inherit; }
     button.diagnostic { cursor: pointer; }
@@ -19955,7 +19957,7 @@ var HO = [
             </section>
           ` : P}
           ${i && u ? N`
-            <details class="section" open>
+            <details class=${`section diagnostics-section ${l.some((e) => e.value > 0) ? "has-issues" : ""}`}>
               <summary class="section-title">${e("inventory_diagnostics")}</summary>
               ${t.stock_reconstruction_complete ? P : N`<div class="warning">${e("reconstruction_incomplete")}</div>`}
               ${l.length ? N`
