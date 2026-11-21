@@ -503,7 +503,7 @@ export class PlocCellarCard extends LitElement {
             </section>
           ` : nothing}
           ${showDiagnostics && hasDiagnostics ? html`
-            <details class=${`section diagnostics-section ${diagnostics.some((item) => item.value > 0) ? "has-issues" : ""}`}>
+            <details class=${`section diagnostics-section ${diagnostics.some((item) => item.value > 0) ? "has-issues" : ""}`} ?open=${this.config?.show_diagnostics_expanded === true}>
               <summary class="section-title">${t("inventory_diagnostics")}</summary>
               ${!data.stock_reconstruction_complete
                 ? html`<div class="warning">${t("reconstruction_incomplete")}</div>`
