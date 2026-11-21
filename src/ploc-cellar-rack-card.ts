@@ -22,6 +22,7 @@ export class PlocCellarRackCard extends LitElement {
   @state() private error?: string;
   @state() private activeTooltip?: { wine?: Wine; color: string };
   private tooltipPosition?: { left: number; top: number };
+  private pendingTouchTapWineId?: string;
   @state() private selectedWine?: Wine;
   @state() private selectedLocation?: { rackId: string; row: number; column: number };
   @state() private cardWidth = 0;
@@ -423,11 +424,17 @@ export class PlocCellarRackCard extends LitElement {
                       role=${wine ? "button" : occupied ? "img" : nothing}
                       aria-haspopup=${wine ? "dialog" : nothing}
                       tabindex=${occupied ? "0" : nothing}
+                      @pointerdown=${wine ? (event: PointerEvent) => {
+                        if (event.pointerType === "touch") return;
+                        this.pendingTouchTapWineId = undefined;
+                      } : nothing}
                       @click=${wine ? (event: MouseEvent) => {
-                        if (mobileCompact && this.activeTooltip?.wine !== wine) {
+                        if (mobileCompact && this.pendingTouchTapWineId !== wine.id) {
+                          this.pendingTouchTapWineId = wine.id;
                           this.showWineTooltip(event as unknown as PointerEvent, wine);
                           return;
                         }
+                        this.pendingTouchTapWineId = undefined;
                         this.hideWineTooltip();
                         this.selectedWine = wine;
                         this.selectedLocation = {
