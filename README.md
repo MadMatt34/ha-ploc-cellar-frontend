@@ -15,6 +15,7 @@ Independent Home Assistant Lovelace frontend for the [Ploc Cellar integration](h
 ## Documentation
 
 - [Documentation index](docs/README.md) / [version française](docs/README.fr.md)
+- [Backend contract](docs/BACKEND_CONTRACT.md) / [français](docs/BACKEND_CONTRACT.fr.md)
 - [Backend/frontend compatibility and release policy](docs/COMPATIBILITY_AND_RELEASES.md) / [français](docs/COMPATIBILITY_AND_RELEASES.fr.md)
 
 ## Cards
