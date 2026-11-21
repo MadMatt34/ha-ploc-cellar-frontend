@@ -378,7 +378,15 @@ describe("Ploc Cellar browser interactions", () => {
       await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
       const tooltip = card.locator(".wine-tooltip");
       await tooltip.waitFor();
-      const closeTooltip = tooltip.locator(".wine-tooltip-close");\n      await closeTooltip.waitFor();\n      assert.equal(await closeTooltip.getAttribute("aria-label"), "Close wine tooltip");\n      await closeTooltip.click();\n      await tooltip.waitFor({ state: "detached" });\n      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);\n      await tooltip.waitFor();\n      await tooltip.locator(".wine-tooltip-close").click();\n      await tooltip.waitFor({ state: "detached" });\n      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "first tap on mobile exposes wine tooltip details");\n      const closeTooltip = tooltip.locator(".wine-tooltip-close");\n      await closeTooltip.waitFor();\n      assert.equal(await closeTooltip.getAttribute("aria-label"), "Close wine tooltip");\n      await closeTooltip.click();\n      await tooltip.waitFor({ state: "detached" });\n      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);\n      await tooltip.waitFor();\n      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "tooltip can be reopened after manual close");
+      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "first tap on mobile exposes wine tooltip details");
+      const closeTooltip = tooltip.locator(".wine-tooltip-close");
+      await closeTooltip.waitFor();
+      assert.equal(await closeTooltip.getAttribute("aria-label"), "Close wine tooltip");
+      await closeTooltip.click();
+      await tooltip.waitFor({ state: "detached" });
+      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
+      await tooltip.waitFor();
+      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "tooltip can be reopened after manual close");
       assert.equal(await card.locator("ploc-cellar-wine-detail").count(), 0, "first tap should show tooltip instead of opening the detail dialog");
 
       const secondSlot = await slots.nth(1).boundingBox();
