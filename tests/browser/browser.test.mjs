@@ -367,11 +367,16 @@ describe("Ploc Cellar browser interactions", () => {
       await page.screenshot({ path: "test-results/mobile-rack-grid.png", fullPage: true });
 
       await slots.first().click();
+      const tooltip = card.locator(".wine-tooltip");
+      await tooltip.waitFor();
+      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /wine/i, "first tap on mobile exposes wine tooltip details");
+      assert.equal(await card.locator("ploc-cellar-wine-detail").count(), 0, "first tap should show tooltip instead of opening the detail dialog");
+      await slots.first().click();
       const detail = card.locator("ploc-cellar-wine-detail");
       await detail.waitFor();
       await detail.locator("ha-dialog").waitFor();
-      assert.equal(await detail.locator(".location-coordinate.selected").count(), 1, "tap on compact slot must select the exact rack coordinate");
-      assert.equal(await card.locator(".wine-tooltip").count(), 0, "hover tooltip is suppressed on compact touch layouts");
+      assert.equal(await detail.locator(".location-coordinate.selected").count(), 1, "second tap on compact slot must select the exact rack coordinate");
+      assert.equal(await card.locator(".wine-tooltip").count(), 0, "tooltip closes when the wine detail is opened");
       await detail.locator("ha-dialog").evaluate((dialog) => {
         dialog.dispatchEvent(new Event("closed", { bubbles: true }));
       });
