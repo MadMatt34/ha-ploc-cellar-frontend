@@ -168,5 +168,15 @@
   "rack_mobile_grid": "Compact mobile rack position map",
   "tooltip_close": "Close wine tooltip",
   "editor_show_rack_header": "Show cellar header",
-  "editor_show_diagnostics_expanded": "Expand diagnostics by default"
+  "editor_show_diagnostics_expanded": "Expand diagnostics by default",
+  "editor_section_general": "General",
+  "editor_section_occupancy": "Rack occupancy",
+  "editor_section_diagnostics": "Diagnostics",
+  "editor_section_statistics": "Statistics",
+  "editor_section_inventory": "Inventory display",
+  "editor_section_rack_selection": "Rack selection",
+  "editor_section_rack_header": "Cellar header",
+  "editor_diagnostics_expanded_helper": "This option is available only when diagnostics are enabled.",
+  "editor_statistics_legends_helper": "This option is available only when statistics are enabled.",
+  "editor_rack_occupancy_helper": "This option is available only while the cellar header is shown."
 }
