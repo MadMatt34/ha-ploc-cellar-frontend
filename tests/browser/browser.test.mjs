@@ -379,6 +379,14 @@ describe("Ploc Cellar browser interactions", () => {
       const tooltip = card.locator(".wine-tooltip");
       await tooltip.waitFor();
       assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "first tap on mobile exposes wine tooltip details");
+      const closeTooltip = tooltip.locator(".wine-tooltip-close");
+      await closeTooltip.waitFor();
+      assert.equal(await closeTooltip.getAttribute("aria-label"), "Close wine tooltip");
+      await closeTooltip.click();
+      await tooltip.waitFor({ state: "detached" });
+      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
+      await tooltip.waitFor();
+      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "tooltip can be reopened after manual close");
       assert.equal(await card.locator("ploc-cellar-wine-detail").count(), 0, "first tap should show tooltip instead of opening the detail dialog");
 
       const secondSlot = await slots.nth(1).boundingBox();
@@ -435,6 +443,35 @@ describe("Ploc Cellar browser interactions", () => {
         dialog.dispatchEvent(new Event("closed", { bubbles: true }));
       });
       await detail.waitFor({ state: "detached" });
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it("keeps desktop wine tooltips anchored to the rack slot instead of following the pointer", async () => {
+    const { context, page, pageErrors } = await openFixture();
+    try {
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));
+      const card = page.locator("ploc-cellar-rack-card");
+      await card.locator(".grid-wrap:not(.mobile-compact)").waitFor();
+      const slot = card.locator(".slot.occupied").first();
+      await slot.waitFor();
+      const bounds = await slot.boundingBox();
+      assert.ok(bounds);
+      // Focus is a reliable desktop activation path in headless Chromium.
+      // Moving the mouse into and across the slot then exercises pointer interaction
+      // without making tooltip visibility depend on a flaky hover initialization.
+      await slot.focus();
+      const tooltip = card.locator(".wine-tooltip");
+      await tooltip.waitFor({ state: "visible" });
+      const initial = await tooltip.boundingBox();
+      assert.ok(initial, "desktop wine tooltip should have a visible bounding box");
+      await page.mouse.move(bounds.x + 5, bounds.y + 5);
+      await page.mouse.move(bounds.x + bounds.width - 5, bounds.y + bounds.height - 5);
+      const moved = await tooltip.boundingBox();
+      assert.deepEqual({ x: moved.x, y: moved.y }, { x: initial.x, y: initial.y }, "tooltip should stay anchored to the hovered rack slot when the pointer moves within it");
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();

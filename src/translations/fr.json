@@ -165,5 +165,6 @@
   "wine_detail_origin": "Origine et identification",
   "wine_detail_tasting": "Dégustation et composition",
   "rack_grid": "Plan des emplacements du casier",
-  "rack_mobile_grid": "Plan compact des emplacements du casier"
+  "rack_mobile_grid": "Plan compact des emplacements du casier",
+  "tooltip_close": "Fermer l’infobulle du vin",  "tooltip_close": "Fermer l’infobulle du vin"
 }
