@@ -60,7 +60,8 @@ export class PlocCellarRackCard extends LitElement {
     .rack-occupancy { position: relative; box-sizing: border-box; width: 100%; height: 20px; margin: 0 0 8px; overflow: hidden; border-radius: 6px; background: var(--secondary-background-color); }
     .rack-occupancy-fill { height: 100%; background: var(--primary-color); transition: width 180ms ease; }
     .rack-occupancy-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 8px; color: var(--primary-text-color); font-size: .9rem; font-weight: 500; line-height: 1; text-align: center; text-shadow: 0 1px 2px var(--card-background-color), 1px 0 2px var(--card-background-color), 0 -1px 2px var(--card-background-color), -1px 0 2px var(--card-background-color); white-space: nowrap; }
-    .color-count { white-space: nowrap; }
+    .color-count { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .color-count-marker { display: inline-block; width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; background: var(--color-count-marker, var(--secondary-text-color)); border: 1px solid var(--divider-color); box-sizing: border-box; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 35px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
     .slot.occupied[role="button"] { cursor: pointer; }
@@ -314,14 +315,26 @@ export class PlocCellarRackCard extends LitElement {
     const items = selectedItems.filter(
       (item) => Number.isSafeInteger(item.row) && Number.isSafeInteger(item.column),
     );
-    const colorCounts = new Map<string, number>();
+    const colorCounts = new Map<string, { count: number; rgb: Wine["color_rgb"] }>();
     for (const item of selectedItems) {
       if (!item.wine_id) continue;
-      const color = winesById.get(item.wine_id)?.color?.trim();
-      if (color) colorCounts.set(color, (colorCounts.get(color) ?? 0) + 1);
+      const wine = winesById.get(item.wine_id);
+      const color = wine?.color?.trim();
+      if (!color) continue;
+      const existing = colorCounts.get(color);
+      colorCounts.set(color, {
+        count: (existing?.count ?? 0) + 1,
+        rgb: existing?.rgb ?? wine.color_rgb,
+      });
     }
     const selectedRackColorCounts = [...colorCounts.entries()]
-      .sort(([left], [right]) => left.localeCompare(right, this.hass?.language));
+      .sort(([left], [right]) => left.localeCompare(right, this.hass?.language))
+      .map(([color, { count, rgb }]) => {
+        const markerColor = rgb && rgb.every((channel) => Number.isFinite(channel) && channel >= 0 && channel <= 255)
+          ? `rgb(${rgb.map((channel) => Math.round(channel)).join(", ")})`
+          : "var(--secondary-text-color)";
+        return { color, count, markerColor };
+      });
     const gridLayout = buildRackGridLayout(
       items.map((item) => ({
         id: item.id,
@@ -377,7 +390,7 @@ export class PlocCellarRackCard extends LitElement {
             : nothing}
           <div class="rack-summary">
             <div class="rack-name">${rack?.name ?? ""}</div>
-            ${selectedRackColorCounts.length ? html`<div class="color-counts">${selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: <span>${count}</span></span>`)}</div>` : nothing}
+            ${selectedRackColorCounts.length ? html`<div class="color-counts">${selectedRackColorCounts.map(({ color, count, markerColor }, index) => html`${index ? " · " : nothing}<span class="color-count"><span class="color-count-marker" style=${`--color-count-marker: ${markerColor};`} aria-hidden="true"></span>${color}: <span>${count}</span></span>`)}</div>` : nothing}
           </div>
           <div class="rack-visualization"
             style=${`width: ${mobileCompact || !items.length ? "100%" : `${gridLayout.columnCount * 104 - 6}px` };`}>
