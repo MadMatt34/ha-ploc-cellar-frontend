@@ -20,7 +20,7 @@ export class PlocCellarRackCard extends LitElement {
   @state() private selectedRackId?: string;
   @state() private loading = false;
   @state() private error?: string;
-  @state() private activeTooltip?: { wine?: Wine; color: string };
+  @state() private activeTooltip?: { wine?: Wine; color: string; rackItemId: string };
   private tooltipPosition?: { left: number; top: number };
   private pendingTouchTapLocation?: string;
   @state() private selectedWine?: Wine;
@@ -63,7 +63,7 @@ export class PlocCellarRackCard extends LitElement {
     .color-count { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
     .color-count-marker { display: inline-block; width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; background: var(--color-count-marker, var(--secondary-text-color)); border: 1px solid var(--divider-color); box-sizing: border-box; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 35px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
-    .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
+    .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }\n    .slot.tooltip-active { border: 2px solid var(--primary-color); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 28%, transparent), 0 0 8px color-mix(in srgb, var(--primary-color) 30%, transparent); }
     .slot.occupied[role="button"] { cursor: pointer; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
     .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 1px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: 10px; pointer-events: none; overflow-wrap: anywhere; }
@@ -267,7 +267,7 @@ export class PlocCellarRackCard extends LitElement {
     return fields;
   }
 
-  private showWineTooltip(event: PointerEvent | FocusEvent, wine?: Wine): void {
+  private showWineTooltip(event: PointerEvent | FocusEvent, wine: Wine | undefined, rackItemId: string): void {
     const target = event.currentTarget;
     if (!(target instanceof HTMLElement)) return;
     const rect = target.getBoundingClientRect();
@@ -275,7 +275,7 @@ export class PlocCellarRackCard extends LitElement {
       left: rect.right + 8,
       top: rect.top,
     };
-    this.activeTooltip = { wine, color: this.wineColor(wine) };
+    this.activeTooltip = { wine, color: this.wineColor(wine), rackItemId };
   }
 
   private applyTooltipPosition(): void {
@@ -419,7 +419,7 @@ export class PlocCellarRackCard extends LitElement {
                   const wine = item.wine_id ? winesById.get(item.wine_id) : undefined;
                   const label = occupied ? this.wineLabel(item, winesById) : t("empty_position");
                   return html`
-                    <div class=${occupied ? "slot occupied" : "slot empty"}
+                    <div class=${occupied ? `slot occupied${this.activeTooltip?.rackItemId === item.id ? " tooltip-active" : ""}` : "slot empty"}
                       style=${`grid-row: ${position.row}; grid-column: ${position.column}; width: ${mobileSlotSize}px; height: ${mobileSlotSize}px; min-width: ${mobileSlotSize}px; min-height: ${mobileSlotSize}px;`}
                       aria-label=${occupied ? `${label}, ${t("row")} ${(item.row as number) + 1}, ${t("column")} ${(item.column as number) + 1}` : label}
                       aria-describedby=${occupied && this.activeTooltip?.wine === wine ? "ploc-cellar-wine-tooltip" : nothing}
@@ -434,7 +434,7 @@ export class PlocCellarRackCard extends LitElement {
                         const touchLocation = `${item.rack_id}:${item.row}:${item.column}`;
                         if (mobileCompact && this.pendingTouchTapLocation !== touchLocation) {
                           this.pendingTouchTapLocation = touchLocation;
-                          this.showWineTooltip(event as unknown as PointerEvent, wine);
+                          this.showWineTooltip(event as unknown as PointerEvent, wine, item.id);
                           return;
                         }
                         this.pendingTouchTapLocation = undefined;
@@ -457,7 +457,7 @@ export class PlocCellarRackCard extends LitElement {
                           };
                         }
                       } : nothing}
-                      @pointerenter=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
+                      @pointerenter=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine, item.id) : nothing}
                       @pointerleave=${occupied ? () => { if (!mobileCompact) this.hideWineTooltip(); } : nothing}
                       @focus=${occupied ? (event: FocusEvent) => this.showWineTooltip(event, wine) : nothing}
                       @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
