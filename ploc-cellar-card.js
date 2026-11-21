@@ -759,7 +759,8 @@ var Be = {
 	rack_grid: "Rack position map",
 	rack_mobile_grid: "Compact mobile rack position map",
 	tooltip_close: "Close wine tooltip",
-	editor_show_rack_header: "Show cellar header"
+	editor_show_rack_header: "Show cellar header",
+	editor_show_diagnostics_expanded: "Expand diagnostics by default"
 }, Ve = {
 	card_title: "Cave Ploc",
 	rack_title: "Rangement de la cave",
@@ -929,7 +930,8 @@ var Be = {
 	rack_grid: "Plan des emplacements du casier",
 	rack_mobile_grid: "Plan compact des emplacements du casier",
 	tooltip_close: "Fermer l’infobulle du vin",
-	editor_show_rack_header: "Afficher l’en-tête de la cave"
+	editor_show_rack_header: "Afficher l’en-tête de la cave",
+	editor_show_diagnostics_expanded: "Déplier les diagnostics par défaut"
 };
 // src/translations.ts
 function I(e, t) {
@@ -2273,6 +2275,7 @@ var mt = class extends je {
 			show_rack_occupancy: "editor_show_rack_occupancy",
 			show_occupancy: "editor_show_occupancy",
 			show_diagnostics: "editor_show_diagnostics",
+			show_diagnostics_expanded: "editor_show_diagnostics_expanded",
 			show_statistics: "editor_show_statistics",
 			show_statistics_legends: "editor_show_statistics_legends"
 		}[e.name]), this.computeHelper = (e) => {
@@ -2305,7 +2308,10 @@ var mt = class extends je {
 		}, {
 			name: "show_diagnostics",
 			selector: { boolean: {} }
-		}, {
+		}, ...this.config?.show_diagnostics === !1 ? [] : [{
+			name: "show_diagnostics_expanded",
+			selector: { boolean: {} }
+		}], {
 			name: "show_statistics",
 			selector: { boolean: {} }
 		}), this.config?.show_statistics !== !1 && e.push({
@@ -2378,7 +2384,7 @@ var mt = class extends je {
 	}
 	setConfig(e) {
 		let t = { ...e };
-		this.isOverviewType(e.type) ? (t.show_occupancy = e.show_occupancy !== !1, t.show_diagnostics = e.show_diagnostics !== !1, t.show_statistics = e.show_statistics !== !1, t.show_statistics_legends = e.show_statistics_legends !== !1) : e.type === "custom:ploc-cellar-inventory-card" ? (t.default_sort = e.default_sort ?? "name-asc", t.page_size = e.page_size ?? 10) : e.type === "custom:ploc-cellar-rack-card" && (t.rack_picker_mode = e.rack_picker_mode ?? "buttons", t.show_rack_header = e.show_rack_header !== !1, t.show_rack_occupancy = e.show_rack_occupancy !== !1), this.config = t;
+		this.isOverviewType(e.type) ? (t.show_occupancy = e.show_occupancy !== !1, t.show_diagnostics = e.show_diagnostics !== !1, t.show_diagnostics_expanded = e.show_diagnostics_expanded === !0, t.show_statistics = e.show_statistics !== !1, t.show_statistics_legends = e.show_statistics_legends !== !1) : e.type === "custom:ploc-cellar-inventory-card" ? (t.default_sort = e.default_sort ?? "name-asc", t.page_size = e.page_size ?? 10) : e.type === "custom:ploc-cellar-rack-card" && (t.rack_picker_mode = e.rack_picker_mode ?? "buttons", t.show_rack_header = e.show_rack_header !== !1, t.show_rack_occupancy = e.show_rack_occupancy !== !1), this.config = t;
 	}
 	isOverviewType(e) {
 		return e === "custom:ploc-cellar-card";
@@ -19965,7 +19971,7 @@ var HO = [
             </section>
           ` : P}
           ${i && u ? N`
-            <details class=${`section diagnostics-section ${l.some((e) => e.value > 0) ? "has-issues" : ""}`}>
+            <details class=${`section diagnostics-section ${l.some((e) => e.value > 0) ? "has-issues" : ""}`} ?open=${this.config?.show_diagnostics_expanded === !0}>
               <summary class="section-title">${e("inventory_diagnostics")}</summary>
               ${t.stock_reconstruction_complete ? P : N`<div class="warning">${e("reconstruction_incomplete")}</div>`}
               ${l.length ? N`
