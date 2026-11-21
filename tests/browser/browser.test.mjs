@@ -127,6 +127,7 @@ describe("Ploc Cellar browser interactions", () => {
         window.__plocFixture.inventory.unlocated_bottles = 1;
         return window.mountPlocCard("ploc-cellar-card", {});
       });
+      await page.evaluate(() => window.waitForInventory(document.querySelector("ploc-cellar-card")));
       const overviewCard = page.locator("ploc-cellar-card");
       await overviewCard.locator(".summary").waitFor();
       const diagnosticsSummary = overviewCard.locator("details.diagnostics-section > summary");
@@ -215,6 +216,7 @@ describe("Ploc Cellar browser interactions", () => {
         window.__plocFixture.inventory.unlocated_bottles = 2;
       });
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+      await page.evaluate(() => window.waitForInventory(document.querySelector("ploc-cellar-card")));
       const card = page.locator("ploc-cellar-card");
       await card.evaluate((element) => { element.style.setProperty("--error-color", "rgb(220, 0, 0)"); });
       await card.locator(".summary").waitFor();
@@ -747,9 +749,11 @@ describe("Ploc Cellar browser interactions", () => {
         }];
       });
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
+      await page.evaluate(() => window.waitForInventory(document.querySelector("ploc-cellar-inventory-card")));
       const inventoryCard = page.locator("ploc-cellar-inventory-card");
       await inventoryCard.locator(".wine").first().waitFor();
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
+      await page.evaluate(() => window.waitForInventory(document.querySelector("ploc-cellar-card")));
       const mainCard = page.locator("ploc-cellar-card");
       await mainCard.locator(".summary").waitFor();
       const mainDiagnostics = mainCard.locator(".diagnostic-value");
