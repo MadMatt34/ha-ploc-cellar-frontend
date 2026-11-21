@@ -263,7 +263,7 @@ describe("Ploc Cellar browser interactions", () => {
       const card = page.locator("ploc-cellar-inventory-card");
       await card.locator(".wine").first().waitFor();
       assert.equal(await card.locator(".wine").count(), 10);
-      assert.equal(await card.locator(".pagination").innerText(), "1–10 of 25\\nPage 1 of 3");
+      assert.equal(await card.locator(".pagination").innerText(), "1–10 of 25\nPage 1 of 3");
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();
