@@ -127,6 +127,7 @@ describe("Ploc Cellar browser interactions", () => {
         return window.mountPlocCard("ploc-cellar-card", {});
       });
       const overviewCard = page.locator("ploc-cellar-card");
+      await overviewCard.locator("details.diagnostics-section > summary").click();
       await overviewCard.locator(".diagnostic").filter({ hasText: "Unlocated bottles" }).click();
       await overviewCard.locator("ha-dialog").waitFor();
       await overviewCard.evaluate((element) => {
@@ -210,13 +211,14 @@ describe("Ploc Cellar browser interactions", () => {
       });
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-card", {}));
       const card = page.locator("ploc-cellar-card");
+      await card.evaluate((element) => { element.style.setProperty("--error-color", "rgb(220, 0, 0)"); });
       const section = card.locator("details.diagnostics-section");
       await section.waitFor();
       assert.equal(await section.getAttribute("open"), null);
       assert.equal(await section.evaluate((element) => element.classList.contains("has-issues")), true);
       assert.equal(
         await section.evaluate((element) => getComputedStyle(element).borderTopColor),
-        await section.evaluate((element) => getComputedStyle(element).getPropertyValue("--error-color").trim()),
+        "rgb(220, 0, 0)",
       );
       await section.locator("summary").click();
       assert.equal(await section.getAttribute("open"), "");
@@ -336,8 +338,8 @@ describe("Ploc Cellar browser interactions", () => {
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", {}));
       const defaultPageCard = page.locator("ploc-cellar-inventory-card");
       await defaultPageCard.locator(".wine").first().waitFor();
-      assert.equal(await defaultPageCard.locator(".wine").count(), 40);
-      assert.equal(await defaultPageCard.locator(".pagination").innerText(), "1–40 of 45\nPage 1 of 2");
+      assert.equal(await defaultPageCard.locator(".wine").count(), 10);
+      assert.equal(await defaultPageCard.locator(".pagination").innerText(), "1–10 of 45\nPage 1 of 5");
       await page.evaluate(() => window.mountPlocCard("ploc-cellar-inventory-card", { page_size: 200 }));
       const maxPageCard = page.locator("ploc-cellar-inventory-card");
       await maxPageCard.locator(".wine").first().waitFor();
@@ -349,7 +351,7 @@ describe("Ploc Cellar browser interactions", () => {
     }
   });
 
-  it("exposes a 10-to-200 page-size editor setting with a default of 40", async () => {
+  it("exposes a 10-to-200 page-size editor setting with a default of 10", async () => {
     const { context, page, pageErrors } = await openFixture();
     try {
       const editor = await page.evaluate(async () => {
@@ -362,7 +364,7 @@ describe("Ploc Cellar browser interactions", () => {
         const field = form.schema.find((item) => item.name === "page_size");
         return { value: form.data.page_size, selector: field.selector.number };
       });
-      assert.equal(editor.value, 40);
+      assert.equal(editor.value, 10);
       assert.deepEqual(editor.selector, { min: 10, max: 200, step: 10, mode: "box" });
       assert.deepEqual(pageErrors, []);
     } finally {
