@@ -77,6 +77,21 @@ after(async () => {
   server?.kill("SIGTERM");
 });
 
+async function waitForDiagnosticsSummary(card, page) {
+  try {
+    await card.locator("details.diagnostics-section > summary").waitFor({ state: "attached", timeout: 5_000 });
+  } catch (error) {
+    const state = await card.evaluate((element) => ({
+      config: element.config,
+      inventory: element.inventory,
+      error: element.error,
+      loading: element.loading,
+      shadowRoot: element.shadowRoot?.innerHTML,
+    }));
+    throw new Error(`Diagnostics summary missing. Runtime state: ${JSON.stringify(state)}. Original error: ${error}`);
+  }
+}
+
 describe("Ploc Cellar browser interactions", () => {
   it("filters unknown values, searches wines and sorts the visible results", async () => {
     const { context, page, pageErrors } = await openFixture();
@@ -131,7 +146,7 @@ describe("Ploc Cellar browser interactions", () => {
       const overviewCard = page.locator("ploc-cellar-card");
       await overviewCard.locator(".summary").waitFor();
       const diagnosticsSummary = overviewCard.locator("details.diagnostics-section > summary");
-      await diagnosticsSummary.waitFor({ state: "attached" });
+      await waitForDiagnosticsSummary(overviewCard, page);
       await diagnosticsSummary.click();
       await overviewCard.locator(".diagnostic").filter({ hasText: "Unlocated bottles" }).click();
       await overviewCard.locator("ha-dialog").waitFor();
@@ -221,7 +236,7 @@ describe("Ploc Cellar browser interactions", () => {
       await card.evaluate((element) => { element.style.setProperty("--error-color", "rgb(220, 0, 0)"); });
       await card.locator(".summary").waitFor();
       const section = card.locator("details.diagnostics-section");
-      await section.waitFor();
+      await waitForDiagnosticsSummary(card, page);
       await page.waitForFunction(() => {
         const section = document.querySelector("ploc-cellar-card")
           ?.shadowRoot?.querySelector("details.diagnostics-section");
@@ -758,7 +773,7 @@ describe("Ploc Cellar browser interactions", () => {
       await mainCard.locator(".summary").waitFor();
       const mainDiagnostics = mainCard.locator(".diagnostic-value");
       const mainDiagnosticsSummary = mainCard.locator("details.diagnostics-section > summary");
-      await mainDiagnosticsSummary.waitFor({ state: "attached" });
+      await waitForDiagnosticsSummary(mainCard, page);
       await mainDiagnosticsSummary.click();
       await mainDiagnostics.first().waitFor();
       assert.equal(await mainDiagnostics.first().evaluate((element) => getComputedStyle(element).color), "rgb(200, 0, 0)");
