@@ -26,16 +26,6 @@ async function waitForServer() {
   throw new Error("Vite did not become ready within 20 seconds");
 }
 
-
-function findSchemaField(schema, name) {
-  for (const field of schema ?? []) {
-    if (field.name === name) return field;
-    const nested = findSchemaField(field.schema, name);
-    if (nested) return nested;
-  }
-  return undefined;
-}
-
 async function openFixture(options = {}) {
   const context = await browser.newContext(options);
   const page = await context.newPage();
@@ -399,7 +389,15 @@ describe("Ploc Cellar browser interactions", () => {
         document.body.append(element);
         await element.updateComplete;
         const form = element.shadowRoot.querySelector("ha-form");
-        const field = findSchemaField(form.schema, "page_size");
+        const findField = (schema, name) => {
+          for (const field of schema ?? []) {
+            if (field.name === name) return field;
+            const nested = findField(field.schema, name);
+            if (nested) return nested;
+          }
+          return undefined;
+        };
+        const field = findField(form.schema, "page_size");
         return { value: form.data.page_size, selector: field.selector.number };
       });
       assert.equal(editor.value, 10);
