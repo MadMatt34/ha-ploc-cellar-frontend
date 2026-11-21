@@ -460,10 +460,11 @@ describe("Ploc Cellar browser interactions", () => {
       await slot.waitFor();
       const bounds = await slot.boundingBox();
       assert.ok(bounds);
-      await page.mouse.move(bounds.x + 10, bounds.y + 10);
+      await slot.hover();
       const tooltip = card.locator(".wine-tooltip");
-      await tooltip.waitFor();
+      await tooltip.waitFor({ state: "visible" });
       const initial = await tooltip.boundingBox();
+      assert.ok(initial, "desktop wine tooltip should have a visible bounding box");
       await page.mouse.move(bounds.x + bounds.width - 5, bounds.y + bounds.height - 5);
       const moved = await tooltip.boundingBox();
       assert.deepEqual({ x: moved.x, y: moved.y }, { x: initial.x, y: initial.y }, "tooltip should stay anchored to the hovered rack slot when the pointer moves within it");
