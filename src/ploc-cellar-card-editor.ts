@@ -10,6 +10,7 @@ type EditorField =
   | "default_sort"
   | "page_size"
   | "rack_picker_mode"
+  | "show_rack_header"
   | "show_rack_occupancy"
   | "show_occupancy"
   | "show_diagnostics"
@@ -103,7 +104,10 @@ export class PlocCellarCardEditor extends LitElement {
             },
           },
         },
-        { name: "show_rack_occupancy", selector: { boolean: {} } },
+        { name: "show_rack_header", selector: { boolean: {} } },
+        ...(this.config?.show_rack_header !== false
+          ? [{ name: "show_rack_occupancy", selector: { boolean: {} } }]
+          : []),
       );
     }
 
@@ -123,6 +127,7 @@ export class PlocCellarCardEditor extends LitElement {
       nextConfig.page_size = config.page_size ?? 40;
     } else if (config.type === "custom:ploc-cellar-rack-card") {
       nextConfig.rack_picker_mode = config.rack_picker_mode ?? "buttons";
+      nextConfig.show_rack_header = config.show_rack_header !== false;
       nextConfig.show_rack_occupancy = config.show_rack_occupancy !== false;
     }
 
@@ -140,6 +145,7 @@ export class PlocCellarCardEditor extends LitElement {
       default_sort: "editor_default_sort",
       page_size: "editor_page_size",
       rack_picker_mode: "editor_rack_picker_mode",
+      show_rack_header: "editor_show_rack_header",
       show_rack_occupancy: "editor_show_rack_occupancy",
       show_occupancy: "editor_show_occupancy",
       show_diagnostics: "editor_show_diagnostics",
