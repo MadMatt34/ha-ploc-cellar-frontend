@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { mkdir } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import { after, before, describe, it } from "node:test";
 import { chromium } from "playwright";
@@ -25,8 +26,8 @@ async function waitForServer() {
   throw new Error("Vite did not become ready within 20 seconds");
 }
 
-async function openFixture() {
-  const context = await browser.newContext();
+async function openFixture(options = {}) {
+  const context = await browser.newContext(options);
   const page = await context.newPage();
   const pageErrors = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
@@ -38,16 +39,21 @@ async function openFixture() {
       window.__objectUrlStats.revoked.push(url);
       originalRevokeObjectURL(url);
     };
+    const NativeResizeObserver = window.ResizeObserver;
     window.ResizeObserver = class {
       constructor(callback) {
-        this.callback = callback;
+        this.observer = new NativeResizeObserver(callback);
       }
-      observe() {
+      observe(element) {
         window.__resizeObserverStats.observed += 1;
+        this.observer.observe(element);
       }
-      unobserve() {}
+      unobserve(element) {
+        this.observer.unobserve(element);
+      }
       disconnect() {
         window.__resizeObserverStats.disconnected += 1;
+        this.observer.disconnect();
       }
     };
   });
@@ -313,6 +319,78 @@ describe("Ploc Cellar browser interactions", () => {
       );
       await card.locator(".search").fill("Château");
       assert.equal(await card.locator(".wine").count(), 1);
+      assert.deepEqual(pageErrors, []);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it("renders a compact, touch-friendly rack map on narrow screens and keeps bottle selection working", async () => {
+    const { context, page, pageErrors } = await openFixture({ hasTouch: true });
+    try {
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.evaluate(() => {
+        const inventory = window.__plocFixture.inventory;
+        inventory.rack_items = Array.from({ length: 24 }, (_, index) => ({
+          id: `mobile-slot-${index}`,
+          rack_id: "rack-a",
+          wine_id: index === 0 ? "wine-a" : index === 1 ? "wine-b" : null,
+          row: Math.floor(index / 8),
+          column: index % 8,
+        }));
+      });
+      await page.evaluate(() => window.mountPlocCard("ploc-cellar-rack-card", {}));
+      const card = page.locator("ploc-cellar-rack-card");
+      const compactGrid = card.locator(".grid-wrap.mobile-compact");
+      await compactGrid.waitFor();
+      const slots = card.locator(".slot");
+      assert.equal(await slots.count(), 24);
+      const dimensions = await slots.first().evaluate((slot) => {
+        const style = getComputedStyle(slot);
+        return { width: slot.getBoundingClientRect().width, height: slot.getBoundingClientRect().height, labelDisplay: style.display };
+      });
+      assert.ok(dimensions.width >= 44 && dimensions.width <= 64, `unexpected compact slot width: ${JSON.stringify(dimensions)}`);
+      assert.equal(dimensions.width, dimensions.height, "compact rack positions must remain square");
+      assert.equal(await slots.first().locator("strong").evaluate((label) => getComputedStyle(label).display), "none");
+      assert.match(await slots.first().getAttribute("aria-label"), /row 1.*col 1/i, "accessible label retains original coordinates in compact mode");
+      const scrollMetrics = await compactGrid.evaluate((wrapper) => ({
+        clientWidth: wrapper.clientWidth,
+        scrollWidth: wrapper.scrollWidth,
+      }));
+      assert.ok(scrollMetrics.scrollWidth > scrollMetrics.clientWidth, "wide rack should scroll inside its compact grid wrapper");
+      const cardDimensions = await card.evaluate((element) => {
+        const surface = element.shadowRoot.querySelector("ha-card");
+        return { width: surface.clientWidth, scrollWidth: surface.scrollWidth };
+      });
+      assert.ok(cardDimensions.scrollWidth <= cardDimensions.width + 1, `rack card itself must not overflow: ${JSON.stringify(cardDimensions)}`);
+      await mkdir("test-results", { recursive: true });
+      await page.screenshot({ path: "test-results/mobile-rack-grid.png", fullPage: true });
+
+      const firstSlot = await slots.first().boundingBox();
+      assert.ok(firstSlot, "first rack slot must have a visible bounding box");
+      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
+      const tooltip = card.locator(".wine-tooltip");
+      await tooltip.waitFor();
+      assert.match(await tooltip.locator(".wine-tooltip-name").textContent(), /Château A/i, "first tap on mobile exposes wine tooltip details");
+      assert.equal(await card.locator("ploc-cellar-wine-detail").count(), 0, "first tap should show tooltip instead of opening the detail dialog");
+      await page.touchscreen.tap(firstSlot.x + firstSlot.width / 2, firstSlot.y + firstSlot.height / 2);
+      const detail = card.locator("ploc-cellar-wine-detail");
+      await detail.waitFor();
+      await detail.locator("ha-dialog").waitFor();
+      assert.equal(await detail.locator(".location-coordinate.selected").count(), 1, "second tap on compact slot must select the exact rack coordinate");
+      assert.equal(await card.locator(".wine-tooltip").count(), 0, "tooltip closes when the wine detail is opened");
+      await detail.locator("ha-dialog").evaluate((dialog) => {
+        dialog.dispatchEvent(new Event("closed", { bubbles: true }));
+      });
+      await detail.waitFor({ state: "detached" });
+      await page.setViewportSize({ width: 1024, height: 768 });
+      await card.locator(".grid-wrap:not(.mobile-compact)").waitFor();
+      assert.equal(await slots.first().evaluate((slot) => slot.getBoundingClientRect().width), 98, "desktop cell size must be restored after widening");
+      assert.notEqual(await slots.first().locator("strong").evaluate((label) => getComputedStyle(label).display), "none");
+      const observerCounts = await page.evaluate(() => ({ observed: window.__resizeObserverStats.observed, disconnected: window.__resizeObserverStats.disconnected }));
+      await page.evaluate(() => document.querySelector("#app").replaceChildren());
+      await page.waitForFunction((before) => window.__resizeObserverStats.disconnected > before, observerCounts.disconnected);
+      assert.ok(observerCounts.observed > observerCounts.disconnected, "rack card should own a resize observer before disconnect");
       assert.deepEqual(pageErrors, []);
     } finally {
       await context.close();

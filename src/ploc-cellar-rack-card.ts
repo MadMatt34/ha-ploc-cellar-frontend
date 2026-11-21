@@ -22,15 +22,19 @@ export class PlocCellarRackCard extends LitElement {
   @state() private error?: string;
   @state() private activeTooltip?: { wine?: Wine; color: string };
   private tooltipPosition?: { left: number; top: number };
+  private pendingTouchTapWineId?: string;
   @state() private selectedWine?: Wine;
   @state() private selectedLocation?: { rackId: string; row: number; column: number };
+  @state() private cardWidth = 0;
+  private cardResizeObserver?: ResizeObserver;
+  private observedCard?: HTMLElement;
   private requestGeneration = 0;
   private refreshPending = false;
   private readonly syncSubscription = new InventorySyncSubscription();
 
   static styles = css`
     :host { display: block; }
-    ha-card { padding: 16px; color: var(--primary-text-color); }
+    ha-card { display: block; padding: 16px; color: var(--primary-text-color); }
     header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     h2 { margin: 0; font-size: 1.2rem; font-weight: 500; }
     button { color: var(--primary-text-color); background: var(--secondary-background-color); border: 1px solid var(--divider-color); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
@@ -41,6 +45,14 @@ export class PlocCellarRackCard extends LitElement {
     .rack-visualization { width: max-content; max-width: 100%; margin: 4px auto 0; }
     .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; width: 100%; box-sizing: border-box; padding: 0; }
     .rack-grid { display: grid; flex: 0 0 auto; gap: 6px; width: max-content; min-width: min-content; }
+    .grid-wrap.mobile-compact .rack-grid { gap: 4px; }
+    .grid-wrap.mobile-compact .slot { border-radius: 8px; padding: 2px; gap: 0; }
+    .grid-wrap.mobile-compact .slot strong,
+    .grid-wrap.mobile-compact .slot small,
+    .grid-wrap.mobile-compact .empty-shelf { display: none; }
+    .grid-wrap.mobile-compact .slot .bottle-marker { width: 26px; height: 26px; flex-basis: 26px; margin: auto; }
+    .grid-wrap.mobile-compact .slot.missing { font-size: .75rem; align-items: center; justify-content: center; }
+    .grid-wrap.mobile-compact .slot.missing strong { display: block; min-height: 0; max-height: none; }
     .rack-summary { color: var(--secondary-text-color); font-size: .85rem; line-height: 1.2; text-align: center; }
     .rack-name { color: var(--primary-text-color); font-size: 1rem; font-weight: 500; }
     .color-counts { color: var(--secondary-text-color); text-align: center; }
@@ -110,6 +122,9 @@ export class PlocCellarRackCard extends LitElement {
 
   disconnectedCallback(): void {
     this.syncSubscription.disconnect();
+    this.cardResizeObserver?.disconnect();
+    this.cardResizeObserver = undefined;
+    this.observedCard = undefined;
     super.disconnectedCallback();
   }
 
@@ -124,10 +139,29 @@ export class PlocCellarRackCard extends LitElement {
 
   protected updated(): void {
     this.ensureSyncSubscription();
+    this.observeCardWidth();
     if (this.hass && this.config && !this.inventory && !this.loading && !this.error) {
       void this.refresh();
     }
     if (this.activeTooltip) this.applyTooltipPosition();
+  }
+
+  private observeCardWidth(): void {
+    const card = this.renderRoot.querySelector<HTMLElement>("ha-card");
+    if (!card || this.observedCard === card) return;
+    this.cardResizeObserver?.disconnect();
+    this.observedCard = card;
+    this.cardResizeObserver = new ResizeObserver((entries) => {
+      const width = card.clientWidth || entries[0]?.contentRect.width || 0;
+      if (width > 0 && width !== this.cardWidth) {
+        this.cardWidth = width;
+      }
+    });
+    this.cardResizeObserver.observe(card);
+    const initialWidth = card.clientWidth;
+    if (initialWidth > 0 && initialWidth !== this.cardWidth) {
+      this.cardWidth = initialWidth;
+    }
   }
 
   private async refresh(): Promise<void> {
@@ -307,6 +341,11 @@ export class PlocCellarRackCard extends LitElement {
     const gridPositionById = new Map(
       gridLayout.positions.map((position) => [position.id, position]),
     );
+    const mobileCompact = this.cardWidth > 0 && this.cardWidth <= 600;
+    const mobileGap = 4;
+    const mobileSlotSize = mobileCompact
+      ? Math.max(44, Math.min(64, Math.floor((this.cardWidth - 32 - mobileGap * (gridLayout.columnCount - 1)) / Math.max(1, gridLayout.columnCount))))
+      : 98;
     const unplaced = selectedItems.filter(
       (item) => !Number.isSafeInteger(item.row) || !Number.isSafeInteger(item.column),
     );
@@ -352,7 +391,7 @@ export class PlocCellarRackCard extends LitElement {
             ${selectedRackColorCounts.length ? html`<div class="color-counts">${selectedRackColorCounts.map(([color, count], index) => html`${index ? " · " : nothing}<span class="color-count">${color}: <span>${count}</span></span>`)}</div>` : nothing}
           </div>
           <div class="rack-visualization"
-            style=${`width: ${items.length ? `${gridLayout.columnCount * 104 - 6}px` : "100%" };`}>
+            style=${`width: ${mobileCompact || !items.length ? "100%" : `${gridLayout.columnCount * 104 - 6}px` };`}>
             ${this.config?.show_rack_occupancy === false ? nothing : html`
               <div class="rack-occupancy"
                 role="progressbar"
@@ -369,8 +408,8 @@ export class PlocCellarRackCard extends LitElement {
             `}
             ${items.length ? html`
               ${gridLayout.compact ? html`<div class="warning">${t("rack_grid_compacted")}</div>` : nothing}
-              <div class="grid-wrap">
-                <div class="rack-grid" style=${`grid-template-columns: repeat(${gridLayout.columnCount}, 98px); grid-template-rows: repeat(${gridLayout.rowCount}, 98px);`}>
+              <div class=${mobileCompact ? "grid-wrap mobile-compact" : "grid-wrap"} role="group" aria-label=${mobileCompact ? t("rack_mobile_grid") : t("rack_grid")}>
+                <div class="rack-grid" style=${`grid-template-columns: repeat(${gridLayout.columnCount}, ${mobileSlotSize}px); grid-template-rows: repeat(${gridLayout.rowCount}, ${mobileSlotSize}px); gap: ${mobileCompact ? mobileGap : 6}px;`}>
                 ${items.map((item) => {
                   const position = gridPositionById.get(item.id);
                   if (!position) return nothing;
@@ -379,13 +418,24 @@ export class PlocCellarRackCard extends LitElement {
                   const label = occupied ? this.wineLabel(item, winesById) : t("empty_position");
                   return html`
                     <div class=${occupied ? "slot occupied" : "slot empty"}
-                      style=${`grid-row: ${position.row}; grid-column: ${position.column};`}
-                      aria-label=${label}
+                      style=${`grid-row: ${position.row}; grid-column: ${position.column}; width: ${mobileSlotSize}px; height: ${mobileSlotSize}px; min-width: ${mobileSlotSize}px; min-height: ${mobileSlotSize}px;`}
+                      aria-label=${occupied ? `${label}, ${t("row")} ${(item.row as number) + 1}, ${t("column")} ${(item.column as number) + 1}` : label}
                       aria-describedby=${occupied && this.activeTooltip?.wine === wine ? "ploc-cellar-wine-tooltip" : nothing}
                       role=${wine ? "button" : occupied ? "img" : nothing}
                       aria-haspopup=${wine ? "dialog" : nothing}
                       tabindex=${occupied ? "0" : nothing}
-                      @click=${wine ? () => {
+                      @pointerdown=${wine ? (event: PointerEvent) => {
+                        if (event.pointerType === "touch") return;
+                        this.pendingTouchTapWineId = undefined;
+                      } : nothing}
+                      @click=${wine ? (event: MouseEvent) => {
+                        if (mobileCompact && this.pendingTouchTapWineId !== wine.id) {
+                          this.pendingTouchTapWineId = wine.id;
+                          this.showWineTooltip(event as unknown as PointerEvent, wine);
+                          return;
+                        }
+                        this.pendingTouchTapWineId = undefined;
+                        this.hideWineTooltip();
                         this.selectedWine = wine;
                         this.selectedLocation = {
                           rackId: item.rack_id,
@@ -417,7 +467,7 @@ export class PlocCellarRackCard extends LitElement {
                 })}
                 ${gridLayout.missingCoordinates.map((position) => html`
                   <div class="slot missing"
-                    style=${`grid-row: ${position.row}; grid-column: ${position.column};`}>
+                    style=${`grid-row: ${position.row}; grid-column: ${position.column}; width: ${mobileSlotSize}px; height: ${mobileSlotSize}px; min-width: ${mobileSlotSize}px; min-height: ${mobileSlotSize}px;`}>
                     <strong>—</strong>
                     <small>${t("not_mapped")}</small>
                   </div>

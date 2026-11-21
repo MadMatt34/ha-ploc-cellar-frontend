@@ -34,6 +34,7 @@ Ce dépôt fournit trois cartes personnalisées :
 - **Inventaire Ploc Cellar** (`custom:ploc-cellar-inventory-card`) : liste des vins avec recherche textuelle, filtres repliables par couleur, région, appellation, millésime et mets, tri, quantités et pagination. Le nombre de références affichées par page est configurable dans l’éditeur, de 10 à 200 par pas de 10 (40 par défaut). Les filtres couleur, région, appellation et millésime proposent aussi l’option **Inconnu** pour retrouver les vins dont la propriété est absente ou vide. La fiche détaillée reste accessible en sélectionnant le nom d'un vin.
 - **Casiers Ploc Cellar** (`custom:ploc-cellar-rack-card`) : sélection du casier et représentation des emplacements selon les coordonnées réelles ligne/colonne de PLOUD. Chaque emplacement occupé est représenté individuellement et reprend la couleur du vin lorsqu'elle est disponible.
   L'éditeur permet de masquer la barre d'occupation du casier ; elle est affichée par défaut et sa largeur suit celle de la représentation des emplacements.
+  Sur les cartes étroites (600 px ou moins), la représentation passe automatiquement en grille compacte adaptée au tactile : les noms des vins et les coordonnées sont masqués, les marqueurs de couleur restent visibles et les cases sont redimensionnées entre 44 et 64 px. Les coordonnées PLOUD ne changent pas ; les casiers larges peuvent défiler à l’intérieur de la grille sans provoquer de débordement de la carte. Sur mobile, un premier toucher affiche l’infobulle du vin ; un second toucher ouvre sa fiche détaillée.
 
  
 

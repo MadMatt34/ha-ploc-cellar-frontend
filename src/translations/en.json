@@ -163,5 +163,7 @@
   "sort_vintage_asc": "Vintage ascending",
   "sort_vintage_desc": "Vintage descending",
   "wine_detail_origin": "Origin and identification",
-  "wine_detail_tasting": "Tasting and composition"
+  "wine_detail_tasting": "Tasting and composition",
+  "rack_grid": "Rack position map",
+  "rack_mobile_grid": "Compact mobile rack position map"
 }
