@@ -46,7 +46,7 @@ export class PlocCellarRackCard extends LitElement {
     .grid-wrap { display: flex; justify-content: safe center; overflow-x: auto; width: 100%; box-sizing: border-box; padding: 0; }
     .rack-grid { display: grid; flex: 0 0 auto; gap: 6px; width: max-content; min-width: min-content; }
     .grid-wrap.mobile-compact .rack-grid { gap: 4px; }
-    .grid-wrap.mobile-compact .slot { border-radius: 20px; padding: 2px; gap: 0; }
+    .grid-wrap.mobile-compact .slot { border-radius: 21px; padding: 2px; gap: 0; }
     .grid-wrap.mobile-compact .slot strong,
     .grid-wrap.mobile-compact .slot small { display: none; }
     .grid-wrap.mobile-compact .slot .bottle-marker { width: 26px; height: 26px; flex-basis: 26px; margin: auto; }
@@ -64,10 +64,10 @@ export class PlocCellarRackCard extends LitElement {
     .color-count-marker { display: inline-block; width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; background: var(--color-count-marker, var(--secondary-text-color)); border: 1px solid var(--divider-color); box-sizing: border-box; }
     .slot { width: 98px; height: 98px; min-width: 98px; min-height: 98px; display: flex; overflow: hidden; flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; text-align: center; padding: 5px 4px; border-radius: 35px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); box-sizing: border-box; }
     .slot.occupied { border-color: var(--primary-color); background: var(--card-background-color); cursor: help; }
-    .slot.tooltip-active { border: 2px solid var(--primary-color); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 28%, transparent), 0 0 8px color-mix(in srgb, var(--primary-color) 30%, transparent); }
+    .slot.tooltip-active { border: 2px solid var(--primary-color); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 28%, transparent), 0 0 8px color-mix(in srgb, var(--primary-color) 30%, transparent); background: color-mix(in srgb, var(--primary-color) 20%, transparent); }
     .slot.occupied[role="button"] { cursor: pointer; }
     .slot.occupied:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
-    .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 1px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: 10px; pointer-events: none; overflow-wrap: anywhere; }
+    .wine-tooltip { position: fixed; z-index: 1000; max-width: min(360px, calc(100vw - 24px)); padding: 5px 8px; border: 1px solid var(--wine-tooltip-border-color, var(--secondary-text-color)); border-radius: 4px; background: color-mix(in srgb, var(--card-background-color) 90%, transparent); color: var(--primary-text-color); box-shadow: 0 2px 8px rgb(0 0 0 / 25%); font-size: 10px; pointer-events: none; overflow-wrap: anywhere; }
     .wine-tooltip-close { display: none; }
     .wine-tooltip.mobile-compact { padding-right: 28px; }
     .wine-tooltip.mobile-compact .wine-tooltip-close { display: inline-flex; position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; align-items: center; justify-content: center; padding: 0; border: 0; border-radius: 50%; background: var(--secondary-background-color); color: var(--primary-text-color); font-size: 16px; line-height: 1; pointer-events: auto; cursor: pointer; }
