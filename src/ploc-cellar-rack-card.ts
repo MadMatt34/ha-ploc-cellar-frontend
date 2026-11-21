@@ -444,7 +444,7 @@ export class PlocCellarRackCard extends LitElement {
                         }
                       } : nothing}
                       @pointerenter=${occupied ? (event: PointerEvent) => this.showWineTooltip(event, wine) : nothing}
-                      @pointerleave=${occupied ? () => this.hideWineTooltip() : nothing}
+                      @pointerleave=${occupied ? () => { if (!mobileCompact) this.hideWineTooltip(); } : nothing}
                       @focus=${occupied ? (event: FocusEvent) => this.showWineTooltip(event, wine) : nothing}
                       @blur=${occupied ? () => this.hideWineTooltip() : nothing}>
                       ${occupied ? html`<span class="bottle-marker" style=${`--bottle-color: ${this.wineColor(wine)};`} aria-hidden="true"></span>` : nothing}
