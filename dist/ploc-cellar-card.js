@@ -1185,10 +1185,10 @@ var nt = class extends je {
       margin: 0;
     }
     .characteristics { display: grid; gap: 0; }
-    .characteristic { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 12px; min-width: 0; padding: 10px 2px; border-bottom: 1px solid var(--divider-color); }
+    .characteristic { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; gap: 10px; min-width: 0; padding: 5px 2px; border-bottom: 1px solid var(--divider-color); }
     .characteristic:last-child { border-bottom: 0; }
     .characteristic ha-icon { --mdc-icon-size: 21px; color: var(--secondary-text-color); }
-    .characteristic-copy { display: grid; grid-template-columns: minmax(100px, .8fr) minmax(0, 1.4fr); align-items: baseline; gap: 12px; min-width: 0; }
+    .characteristic-copy { display: grid; grid-template-columns: minmax(100px, .8fr) minmax(0, 1.4fr); align-items: baseline; gap: 10px; min-width: 0; }
     .characteristic-label { color: var(--secondary-text-color); font-size: .9rem; }
     .characteristic-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
     .characteristic-value.is-error { color: var(--error-color); }
@@ -1226,8 +1226,8 @@ var nt = class extends je {
     .comment { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
     @media (max-width: 560px) {
       .content { gap: 11px; }
-      .characteristic-copy { grid-template-columns: minmax(0, 1fr); gap: 2px; }
-      .characteristic { padding: 10px 2px; }
+      .characteristic-copy { gap: 2px; }
+      .characteristic { padding: 5px 2px; }
       .wine-hero { gap: 9px; }
       .wine-hero-main { grid-template-columns: minmax(0, 1fr) minmax(88px, 34%); gap: 9px; }
       .wine-image-container, .wine-image { max-height: 145px; }
