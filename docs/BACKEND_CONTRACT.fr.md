@@ -1,5 +1,7 @@
 # Contrat backend
 
+[English version](BACKEND_CONTRACT.md)
+
 Ce frontend est un plugin de tableau de bord Home Assistant. Il n'appelle ni PLOUD ni les API PLOC. Toutes les données de la cave sont obtenues auprès de l'intégration Home Assistant via le service de réponse `ploc_cellar.get_inventory`.
 
 L'implémentation backend et l'enregistrement du service sont maintenus dans [MadMatt34/ha-ploc-cellar](https://github.com/MadMatt34/ha-ploc-cellar). Les interfaces TypeScript de [`src/types.ts`](../src/types.ts) décrivent la réponse consommée par ce frontend.
