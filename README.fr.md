@@ -46,9 +46,9 @@ Les mouvements de stock disposent d'une sous-section dédiée permettant d'ident
 
 ## 📋 Prérequis
 
-[x] ==L'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar) doit être installée et configurée dans Home Assistant.==
+- **L'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar) doit être installée et configurée dans Home Assistant**.
 
-[x] Un navigateur pris en charge par l'interface Home Assistant est nécessaire.
+- Un navigateur pris en charge par l'interface Home Assistant est nécessaire.
 
 ---
 
