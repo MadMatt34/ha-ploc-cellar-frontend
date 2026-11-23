@@ -12,7 +12,7 @@
 
 [❗ README in ENGLISH 🇬🇧 ❗](README.md)
 
-Frontend Lovelace indépendant pour Home Assistant, destiné à l'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar).\
+Affichage de tableau de bord Home Assistant (Frontend Lovelace), destiné à l'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar).\
 🍷❤️
 
 ---
@@ -21,25 +21,32 @@ Frontend Lovelace indépendant pour Home Assistant, destiné à l'[intégration 
 
 ### - 📊 Vue d'ensemble (`custom:ploc-cellar-card`)
 
-Synthèse et statistiques de la cave : stock physique et reconstitué, occupation des casiers, diagnostics du stock et graphiques de répartition par couleur, région, appellation, millésime et format de bouteille.\
-Les graphiques couvrent les références de vins connues ; les emplacements occupés dont le vin n'est pas résolu restent inclus dans les totaux physiques globaux et sont signalés séparément.
+**Synthèse, analyses, et statistiques de la cave** : stock physique et reconstitué, occupation des casiers, diagnostics du stock et graphiques de répartition par couleur, région, appellation, millésime et format de bouteille.\
+Les graphiques couvrent les références de vins connues ; les emplacements occupés dont le vin n'est pas résolu restent inclus dans les totaux physiques globaux et sont signalés séparément.\
+La sélection d'un diagnostic en anomalie ouvre la liste des vins concernés.
 
-![Screen card](docs/screenshots/screen.png)
+| Stock | Diagnostics | Statistiques |
+| :--: | :--: | :--: |
+| ![Main card](docs/screenshots/main-card.fr.png) | ![Main card diagnostics](docs/screenshots/main-card-diagnostics.fr.png) | |
 
 ### - 🗃️ Inventaire (`custom:ploc-cellar-inventory-card`)
 
-Liste de vins avec recherche, tri et pagination, filtres par couleur, région, appellation, millésime et accords mets-vins.\
+**Liste de vins** avec recherche, tri et pagination, filtres par couleur, région, appellation, millésime et accords mets-vins.\
 Les filtres couleur, région, appellation et millésime proposent **Inconnu** pour retrouver les fiches incomplètes.\
 La sélection d'un nom de vin ouvre sa fiche détaillée.
 
 ### - 🏷️ Casier (`custom:ploc-cellar-rack-card`)
 
-Sélection du casier et plan des emplacements selon les coordonnées. Chaque emplacement occupé est représenté individuellement et reprend la couleur du vin lorsqu'elle est disponible.\
+Sélection du **casier et plan des emplacements** selon les coordonnées. Chaque emplacement occupé est représenté individuellement et reprend la couleur du vin lorsqu'elle est disponible.\
 Sur les écrans de taille réduite, le plan passe automatiquement en grille compacte adaptée au tactile. Sur mobile, un premier toucher affiche l'infobulle de la bouteille ; un second toucher sur le même emplacement ouvre sa fiche détaillée.
+
+| Grand écran | Mode compact |
+| :--: | :--: |
+| ![Rack card](docs/screenshots/rack-card.fr.png) | ![Rack card compact](docs/screenshots/rack-card-compact.fr.png) |
 
 ### - 🍷 Fiche vin
 
-La fiche détaillée du vin présente des sections pour les caractéristiques, les accords mets-vins, les notes, les emplacements, et le stock.\
+La **fiche détaillée du vin** présente des sections pour les caractéristiques, les accords mets-vins, les notes, les emplacements, et le stock.\
 Les mouvements de stock disposent d'une sous-section dédiée permettant d'identifier les anomalies.
 
 ---
@@ -86,8 +93,6 @@ Choisir l'entrée d'intégration souhaitée, et éventuellement un titre de cart
 ### - 📊 Edition de la carte 'Vue d'ensemble' (`custom:ploc-cellar-card`)
 
 L'éditeur Vue d'ensemble regroupe l'occupation, les diagnostics et les statistiques dans des sections dépliables. Les diagnostics et les statistiques possèdent chacun des options dépendantes, affichées uniquement lorsque la fonctionnalité correspondante est activée.
-
-![Ploc Cellar for Home Assistant](docs/banner.png){ style="max-height: 400px; display: block; margin: 0 auto" }
 
 [<picture>
    <img src='docs/screenshots/main-card-edit.fr.png' alt='Main card edit' style="max-height: 400px; margin: auto;" />
