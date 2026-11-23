@@ -1,90 +1,209 @@
-# Ploc Cellar Cards
+# Ploc Cellar Cards for Home Assistant
 
-![Ploc Cellar](https://raw.githubusercontent.com/MadMatt34/ha-ploc-cellar/main/custom_components/ploc_cellar/brand/logo.png)
+![Ploc Cellar for Home Assistant](docs/banner.png)
 
-Independent Home Assistant Lovelace frontend for the [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar).
-
-[Version française](README.fr.md)
-
-[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Custom%20Dashboard-blue)](https://www.home-assistant.io/dashboards/)
-[![HACS](https://img.shields.io/badge/HACS-Dashboard%20plugin-blue)](https://www.hacs.xyz/)
+[![Latest Release](https://img.shields.io/github/v/release/MadMatt34/ha-ploc-cellar-frontend?color=green)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/releases)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Dashboard-blue)](https://www.home-assistant.io/dashboards/)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Dashboard-blue)](https://www.home-assistant.io/integrations/marketplace/)
+\
 [![Frontend CI](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml)
-[![HACS validation](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml)
+[![Marketplace validation](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-## Documentation
+[❗ README en FRANÇAIS 🇫🇷 ❗](README.fr.md)
 
-- [Documentation index](docs/README.md) / [version française](docs/README.fr.md)
-- [Backend contract](docs/BACKEND_CONTRACT.md) / [français](docs/BACKEND_CONTRACT.fr.md)
-- [Backend/frontend compatibility and release policy](docs/COMPATIBILITY_AND_RELEASES.md) / [français](docs/COMPATIBILITY_AND_RELEASES.fr.md)
+Home Assistant dashboard display (Lovelace frontend) designed for the [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar).\
+🍷❤️
 
-## Cards
+---
 
-This repository provides three custom cards:
+## 📦 Available cards
 
-- **Overview** (`custom:ploc-cellar-card`): cellar overview and statistics, including physical and reconstructed stock, rack occupancy, stock diagnostics, and distribution charts for color, region, appellation, vintage and bottle format. Charts cover known wine references; unresolved occupied positions remain included in global physical totals and are reported separately.
-- **Inventory** (`custom:ploc-cellar-inventory-card`): searchable, sortable and paginated wine list with collapsible filters for color, region, appellation, vintage and food pairings. Unknown values can be selected for color, region, appellation and vintage to find incomplete wine records. Page size is configurable from 10 to 200 references, in steps of 10 (40 by default). Selecting a wine name opens its detail view.
-- **Rack** (`custom:ploc-cellar-rack-card`): rack selector and position map based on actual PLOUD row/column coordinates. Occupied positions are represented individually and use the wine color when available. The occupancy bar can be hidden in the editor. On cards 600 px wide or less, the map switches to a compact touch-friendly grid with fixed 44 px cells; names and coordinate labels are hidden while color markers remain. Wide racks can scroll within the map. On mobile, the first tap shows a bottle tooltip and the second tap on the same position opens the detail dialog.
+### - 📊 Overview (`custom:ploc-cellar-card`)
 
-The overview editor groups title, occupancy, diagnostics and statistics settings into expandable sections. Diagnostics and statistics each have dependent options that are shown only when the corresponding feature is enabled. The rack editor groups general settings, rack selection and header options; the occupancy-bar option is shown only when the rack header is enabled. The inventory editor groups general settings and inventory display options. The filter summary also provides a clear-filters action.
+**Cellar overview, analysis and statistics**: physical and reconstructed stock, rack occupancy, stock diagnostics, and distribution charts by color, region, appellation, vintage and bottle format.\
+Charts cover known wine references; occupied positions whose wine cannot be resolved remain included in the global physical totals and are reported separately.\
+Selecting a diagnostic issue opens the list of wines concerned.
 
-Wine details contain collapsible sections for stock, food pairings, characteristics, locations and notes. Stock movements have their own subsection; grape composition is displayed separately, with proportional bars for explicit percentages and a full bar when no percentage is specified.
+| Stock | Diagnostics | Statistics |
+| :--: | :--: | :--: |
+| ![Main card](docs/screenshots/main-card.png) | ![Main card diagnostics](docs/screenshots/main-card-diagnostics.png)<br />&nbsp;<br/>↧<br/>![Main card diagnostics detail](docs/screenshots/main-card-diagnostics-detail.png) | ![Main card statistics](docs/screenshots/main-card-statistics.png) |
 
-## Requirements
+### - 🗃️ Inventory (`custom:ploc-cellar-inventory-card`)
 
-- Home Assistant with the [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar) installed and configured.
-- A browser supported by the Home Assistant frontend.
+**Wine list** with search, sorting and pagination, filters for color, region, appellation, vintage and food pairings.\
+Color, region, appellation and vintage filters include **Unknown** to find incomplete wine records.\
+Selecting a wine name opens its detailed view.
 
-The card editors use Home Assistant's native configuration-entry selector. Select the Ploc Cellar account whose inventory should be displayed. Each card stores its own selected integration entry.
+| Inventory | Search, filters and sorting |
+| :--: | :--: |
+| ![Inventory card](docs/screenshots/inventory-card.png) | ![Inventory card filters](docs/screenshots/inventory-card-filters.png) |
 
-## Installation
+### - 🏷️ Rack (`custom:ploc-cellar-rack-card`)
 
-1. Install and configure the [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar).
-2. In HACS, open **Custom repositories**, add **MadMatt34/ha-ploc-cellar-frontend**, and select the **Dashboard** category. This is required until the repository is included in the default HACS catalog.
-3. Install **Ploc Cellar Cards** from HACS.
-4. HACS normally registers the dashboard resource automatically. If you manage resources manually (for example, in YAML), add:
+Rack selection and **position map** based on coordinates. Each occupied position is represented individually and uses the wine color when available.\
+On smaller screens, the map automatically switches to a compact touch-friendly grid. On mobile, the first tap displays the bottle tooltip; a second tap on the same position opens its detailed view.
 
-   ~~~yaml
-   url: /hacsfiles/ha-ploc-cellar-frontend/ploc-cellar-card.js
-   type: module
-   ~~~
+| Large screen | Compact mode |
+| :--: | :--: |
+| ![Rack card](docs/screenshots/rack-card.png) | ![Rack card compact](docs/screenshots/rack-card-compact.png) |
 
-5. Add a Ploc Cellar card from the dashboard card picker and select the desired integration entry.
+### - 🍷 Wine details
 
-In a **Sections** view, the overview card defaults to 12 columns without forcing a row height. Enable **Fit height to content** in the **Layout** tab if desired.
+The **detailed wine view** opens when selecting a wine from the inventory, the diagnostics list or a rack position. It provides sections for characteristics, food pairings, notes, locations and stock.
 
-## Automatic updates
+> [!NOTE]
+> Stock movements have a dedicated subsection to help identify anomalies.\
+> Photos are displayed when the integration has a cached image available. The card retrieves them through an authenticated Home Assistant endpoint and does not contact PLOUD directly. The detailed view remains usable without a photo.
 
-Cards load the selected inventory when initialized and refresh after a successful backend synchronization. They subscribe to the entry-scoped `ploc_cellar/subscribe_sync` WebSocket notification and reload inventory using `ploc_cellar.get_inventory`. The notification contains no cellar data; it is only a refresh signal. No polling, manual refresh or entity ID is required. Each card listens only for updates belonging to its selected configuration entry.
+| Details | Characteristics | Food pairing | Locations | Stock |
+| :--: | :--: | :--: | :--: | :--: |
+| ![Wine details](docs/screenshots/wine-details.png) | ![Wine details characteristics](docs/screenshots/wine-details-characteristics.png) | ![Wine details food](docs/screenshots/wine-details-food.png) | ![Wine details locations](docs/screenshots/wine-details-locations.png) | ![Wine details stock](docs/screenshots/wine-details-stock.png) |
 
-The cards communicate with Home Assistant only. They do not connect to PLOUD and do not store PLOC credentials. The public `ploc_cellar_sync_completed` event remains available for administrator automations, but the cards do not subscribe to it.
+---
 
-## Languages and presentation
+## 📋 Requirements
 
-English and French are supported, following the Home Assistant language. Wine names use the bundled Cormorant Garamond typeface; overview values, rack counts and diagnostics use bundled DJB Get Digital. No external font service or runtime font download is required.
+- [x] **The [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar) must be installed and configured in Home Assistant.**
 
-Wine photos are displayed when the backend has a cached image available. The card retrieves images through an authenticated Home Assistant endpoint; it does not contact PLOUD directly. The detail view remains usable when a photo is unavailable.
+- [x] A browser supported by the Home Assistant interface is required.
 
-## Troubleshooting
+---
 
-- **The card type is unavailable:** confirm that Ploc Cellar Cards is installed through HACS and that the `ploc-cellar-card.js` dashboard resource is registered.
+## 🧩 Installation
+
+### Option 1: Installation through Marketplace (📌 recommended)
+
+1. Open the **Ploc Cellar Cards** dashboard plugin in **Marketplace** in Home Assistant\
+    [![Open your Home Assistant instance and open a repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=MadMatt34&repository=ha-ploc-cellar-frontend)
+
+2. Click **Install**, then proceed to the configuration steps.
+
+### Option 2: Manual installation
+
+1. Download `dist/ploc-cellar-card.js` from this repository.
+
+2. Copy this file to `/config/www/community/ha-ploc-cellar-frontend/`.
+
+3. Go to **Settings** → **Dashboards**.\
+   Click the ⋮ menu (top right), then select **Resources**.\
+   [![Open your Home Assistant instance and show your dashboard resources.](https://my.home-assistant.io/badges/lovelace_resources.svg)](https://my.home-assistant.io/redirect/lovelace_resources/)
+
+4. Click **Add resource** (bottom right).
+
+5. Enter the **URL** `/local/community/ha-ploc-cellar-frontend/ploc-cellar-card.js`.\
+   Select **JavaScript module**.\
+   Then click **Create**.
+
+6. Proceed to the configuration steps.
+
+> [!NOTE]
+> When updating, replace the JavaScript file and add or increment the version in the resource URL (for example, `?v=2.0.0`) so that the browser loads the new version.
+
+---
+
+## ⚙️ Card configuration
+
+1. Add a Ploc Cellar card from the dashboard card picker.
+
+2. Select the desired integration entry and, optionally, a card title.
+
+### - 📊 Editing the 'Overview' card (`custom:ploc-cellar-card`)
+
+The Overview editor groups occupancy, diagnostics and statistics into expandable sections. Diagnostics and statistics each have dependent options, displayed only when the corresponding feature is enabled.
+
+[<picture>
+   <img src='docs/screenshots/main-card-edit.png' alt='Main card edit' style="max-height: 400px; margin: auto;" />
+</picture>](docs/screenshots/main-card-edit.png)
+
+### - 🗃️ Editing the 'Inventory' card (`custom:ploc-cellar-inventory-card`)
+
+The Inventory editor groups general and display options.
+
+[<picture>
+   <img src='docs/screenshots/inventory-card-edit.png' alt='Inventory card edit' style="max-height: 400px; margin: auto;" />
+</picture>](docs/screenshots/inventory-card-edit.png)
+
+### - 🏷️ Editing the 'Rack' card (`custom:ploc-cellar-rack-card`)
+
+The Rack editor groups general settings, rack selection format (dropdown or buttons) and header options; the occupancy-bar option is available only when the header is enabled.
+
+[<picture>
+   <img src='docs/screenshots/rack-card-edit.png' alt='Rack card edit' style="max-height: 400px; margin: auto;" />
+</picture>](docs/screenshots/rack-card-edit.png)
+
+---
+
+## 🔄 Automatic refresh
+
+Cards load the inventory when initialized, then refresh after a successful synchronization by the [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar). No polling, manual refresh or entity ID is required. Each card receives only updates from the selected account.
+
+> [!NOTE]
+> Cards communicate only with Home Assistant. They do not connect to PLOUD and do not store any PLOC credentials.
+
+---
+
+## 🛠️ Troubleshooting
+
+- **The card type is unavailable:** check that Ploc Cellar Cards is installed through Marketplace and that the `ploc-cellar-card.js` resource is registered for dashboards.
+
 - **The editor cannot find a cellar:** install and configure the backend integration first, then reload the dashboard editor.
-- **The card displays an error or no inventory:** verify the selected configuration entry and check Home Assistant logs for `ploc_cellar` errors.
-- **The card does not refresh:** check backend/frontend compatibility and confirm that the card and synchronization use the same integration entry. Cards refresh after successful synchronization; they do not poll.
 
-When reporting an issue, include the Home Assistant version, browser, frontend version or commit, card type and relevant browser-console or Home Assistant log messages. Do not include credentials or access tokens.
+- **The card displays an error or no inventory:** check the selected configuration entry and consult Home Assistant logs for `ploc_cellar` errors.\
+[![Open your Home Assistant instance and show your Home Assistant logs.](https://my.home-assistant.io/badges/logs.svg)](https://my.home-assistant.io/redirect/logs/)
 
-## Uninstallation
+- **The card does not refresh:** check backend/frontend compatibility and confirm that the card and synchronization use the same integration entry. Cards refresh after successful synchronization, without polling.
+
+[Open an issue on GitHub](https://github.com/MadMatt34/ha-ploc-cellar-frontend/issues/new):\
+For feature requests, provide as much detail as possible.\
+For bug reports, include the Home Assistant version, browser, frontend version or commit, card type, and relevant browser-console or Home Assistant log messages. Do not attach credentials or access tokens.
+
+---
+
+## 🗑️ Uninstallation
 
 1. Remove Ploc Cellar cards from dashboards.
-2. Uninstall **Ploc Cellar Cards** from HACS.
-3. If the resource was added manually, remove `/hacsfiles/ha-ploc-cellar-frontend/ploc-cellar-card.js` from dashboard resources.
-4. Reload the dashboard as appropriate.
+2. Uninstall **Ploc Cellar Cards** from Marketplace.
+3. If the resource was added manually, remove `/local/community/ha-ploc-cellar-frontend/ploc-cellar-card.js` from dashboard resources, as well as the corresponding folder and file from disk.\
+[![Open your Home Assistant instance and show your dashboard resources.](https://my.home-assistant.io/badges/lovelace_resources.svg)](https://my.home-assistant.io/redirect/lovelace_resources/)
+4. Reload the dashboard if needed.
 
-Uninstalling the cards does not remove the backend integration or its inventory.
+> [!IMPORTANT]
+> Uninstalling the cards does not remove the backend integration or its inventory.
 
-## License and disclaimer
+---
+
+## 📚 Additional documentation
+
+- [Additional documentation index](docs/README.md)
+- [Backend contract](docs/BACKEND_CONTRACT.md)
+- [Frontend development instructions and CI](docs/DEVELOPMENT.md)
+- [Backend/frontend compatibility and release policy](docs/COMPATIBILITY_AND_RELEASES.md)
+
+---
+
+## 🌐 Supported languages
+
+🇬🇧 English • 🇫🇷 Français
+
+---
+
+## ❤️ Support this project
+
+If you find this dashboard useful, give the project a ⭐ on GitHub!
+
+---
+
+## ⚖️ License
 
 This project is distributed under the [MIT License](LICENSE).
 
-Ploc Cellar Cards is an independent Home Assistant frontend. It is not affiliated with, endorsed by or supported by PLOC or PLOUD. The backend integration uses private, undocumented PLOUD interfaces; the cards themselves communicate only with the Home Assistant integration.
+---
+
+## ⚠️ Disclaimer
+
+Ploc Cellar Cards is an independent Home Assistant frontend. It is not affiliated with [PLOC](https://www.ploc.co) or [PLOUD](https://www.ploc.co/sauvegarder-et-synchroniser), nor endorsed or supported by either service.
+
+The backend integration relies on undocumented PLOUD interfaces, whose operation was reconstructed through independent technical research. This is not a public or officially supported API, and these interfaces may change or become incompatible at any time without notice. PLOC has been contacted regarding this work and the possible existence of an official interface, but no response had been received at the time of writing.
+
+The frontend cards communicate only with the Home Assistant backend integration and never contact PLOUD directly.
