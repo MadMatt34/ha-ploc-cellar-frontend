@@ -1,6 +1,6 @@
 # Documentation frontend
 
-Ce répertoire contient la documentation technique et de maintenance de Ploc Cellar Cards. Les README à la racine présentent les fonctionnalités des cartes, leur installation et le dépannage utilisateur.
+Ce répertoire contient la documentation technique et de maintenance de Ploc Cellar Cards. Les README à la racine constituent la documentation destinée aux utilisateurs : fonctionnalités des cartes, captures d'écran, installation, configuration, actualisation automatique, dépannage et désinstallation.
 
 ## Contrat d'exécution
 
@@ -17,7 +17,7 @@ Le frontend est écrit en TypeScript et construit comme un module autonome pour 
 
 ## Règles éditoriales
 
-- Les README racine décrivent l'installation des cartes et les comportements visibles par l'utilisateur.
+- Les README racine constituent la documentation utilisateur : fonctionnalités des cartes, captures d'écran, installation, configuration, actualisation automatique, dépannage et désinstallation.
 - Les détails WebSocket, la sémantique des champs de réponse et les règles de changement inter-dépôts restent dans les contrats backend.
 - Les commandes locales et détails de CI restent dans les documents de développement.
 - Les couples de versions pris en charge et la séquence de publication sont décrits uniquement dans les documents de compatibilité.
