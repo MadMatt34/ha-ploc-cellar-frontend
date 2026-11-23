@@ -136,7 +136,7 @@ The Rack editor groups general settings, rack selection format (dropdown or butt
 
 ## 🔄 Automatic refresh
 
-Cards load the inventory when initialized, then refresh after a successful synchronization by the [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar). No polling, manual refresh or entity ID is required. Each card receives only updates from the selected account.
+Cards load the inventory when initialized, then refresh after a successful synchronization by the [Ploc Cellar integration](https://github.com/MadMatt34/ha-ploc-cellar). No polling, manual refresh or entity ID is required. Each card receives only updates from the selected account. The frontend uses the non-admin `ploc_cellar/subscribe_sync` WebSocket command scoped to the selected configuration entry; the public `ploc_cellar_sync_completed` event remains available for administrator automations.
 
 > [!NOTE]
 > Cards communicate only with Home Assistant. They do not connect to PLOUD and do not store any PLOC credentials.
