@@ -2,7 +2,7 @@
 
 [Version française](README.fr.md)
 
-This directory contains technical and maintenance documentation for Ploc Cellar Cards. The root README files focus on card capabilities, installation and user troubleshooting.
+This directory contains technical and maintenance documentation for Ploc Cellar Cards. The root README files are the user-facing documentation and cover card capabilities, screenshots, installation, configuration, automatic refresh, troubleshooting and uninstallation.
 
 ## Runtime contract
 
@@ -17,7 +17,7 @@ The frontend source is TypeScript and is built as a standalone Home Assistant da
 
 ## Documentation ownership
 
-- Keep card installation and user-visible behavior in the root README files.
+- Keep user-facing card capabilities, screenshots, installation, configuration, automatic refresh, troubleshooting and uninstallation in the root README files.
 - Keep WebSocket details, response field semantics and cross-repository change rules in the backend contract documents.
 - Keep local development commands and CI implementation details in DEVELOPMENT.md.
 - Keep supported version pairs and release sequencing only in COMPATIBILITY_AND_RELEASES.md.
