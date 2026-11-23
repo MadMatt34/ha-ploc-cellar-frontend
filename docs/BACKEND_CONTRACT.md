@@ -1,5 +1,7 @@
 # Backend contract
 
+[Version française](BACKEND_CONTRACT.fr.md)
+
 This frontend is a Home Assistant dashboard plugin. It does not call PLOUD or the PLOC APIs. All cellar data is obtained from the Home Assistant integration through the `ploc_cellar.get_inventory` response service.
 
 The backend implementation and service registration are maintained in [MadMatt34/ha-ploc-cellar](https://github.com/MadMatt34/ha-ploc-cellar). The TypeScript interfaces in [`src/types.ts`](../src/types.ts) describe the response consumed by this frontend.
