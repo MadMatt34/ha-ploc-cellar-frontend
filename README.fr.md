@@ -4,10 +4,10 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/MadMatt34/ha-ploc-cellar-frontend?color=green)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/releases)
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Tableau%20de%20bord-blue)](https://www.home-assistant.io/dashboards/)
-[![Marketplace](https://img.shields.io/badge/Marketplace-Tableau%20de%20bord-blue)](https://www.hacs.xyz/)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Tableau%20de%20bord-blue)](https://www.home-assistant.io/integrations/marketplace/)
 \
 [![Frontend CI](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml)
-[![Validation HACS](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml)
+[![Validation Marketplace](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml)
 ![Licence : MIT](https://img.shields.io/badge/Licence-MIT-green.svg)
 
 [❗ README in ENGLISH 🇬🇧 ❗](README.md)
