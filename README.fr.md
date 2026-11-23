@@ -27,7 +27,7 @@ La sélection d'un diagnostic en anomalie ouvre la liste des vins concernés.
 
 | Stock | Diagnostics | Statistiques |
 | :--: | :--: | :--: |
-| ![Main card](docs/screenshots/main-card.fr.png) | ![Main card diagnostics](docs/screenshots/main-card-diagnostics.fr.png)<br /> <br/>Liste du diagnostic<br/>![Main card diagnostics detail](docs/screenshots/main-card-diagnostics-detail.fr.png) | ![Main card statistics](docs/screenshots/main-card-statistics.fr.png) |
+| ![Main card](docs/screenshots/main-card.fr.png) | ![Main card diagnostics](docs/screenshots/main-card-diagnostics.fr.png)<br />&nbsp;<br/>Liste du diagnostic<br/>![Main card diagnostics detail](docs/screenshots/main-card-diagnostics-detail.fr.png) | ![Main card statistics](docs/screenshots/main-card-statistics.fr.png) |
 
 ### - 🗃️ Inventaire (`custom:ploc-cellar-inventory-card`)
 
@@ -50,8 +50,11 @@ Sur les écrans de taille réduite, le plan passe automatiquement en grille comp
 
 ### - 🍷 Fiche vin
 
-La **fiche détaillée du vin** présente des sections pour les caractéristiques, les accords mets-vins, les notes, les emplacements, et le stock.\
-Les mouvements de stock disposent d'une sous-section dédiée permettant d'identifier les anomalies.
+La **fiche détaillée du vin** est ouverte depuis un click dans l'inventaire, dans la liste des anomalies, ou dans un emplacement de casier. Elle présente des sections pour les caractéristiques, les accords mets-vins, les commentaires, les emplacements, et le stock.
+
+> [!NOTE]
+> Les mouvements de stock disposent d'une sous-section dédiée permettant d'identifier les anomalies.\
+> Les photos sont affichées lorsque l'intégration' dispose d'une image mise en cache. La carte les récupère via une route Home Assistant authentifiée et ne contacte pas directement PLOUD. La fiche détaillée reste utilisable sans photo.
 
 | Fiche | Caractéristiques | Mets-vin | Emplacements | Stock |
 | :--: | :--: | :--: | :--: | :--: |
@@ -73,19 +76,25 @@ Les mouvements de stock disposent d'une sous-section dédiée permettant d'ident
 
 1. Ouvrir le plugin de tableau de bord **Ploc Cellar Cards** dans **Marketplace** dans Home Assistant\
     [![Open your Home Assistant instance and open a repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=MadMatt34&repository=ha-ploc-cellar-frontend)
+
 2. Cliquer sur **Installer**, puis passer aux étapes de configuration.
 
 ### Option 2 : Installation manuelle
 
 1. Télécharger `dist/ploc-cellar-card.js` de ce dépôt.
+
 2. Copier ce fichier dans `/config/community/ha-ploc-cellar-frontend/`.
+
 3. Aller dans **Paramètres** → **Tableaux de bord**.\
    Cliquer sur le menu ⋮ avec trois points (en haut à droite). Puis, choisir **Ressources**.\
    [![Open your Home Assistant instance and show your dashboard resources.](https://my.home-assistant.io/badges/lovelace_resources.svg)](https://my.home-assistant.io/redirect/lovelace_resources/)
+
 4. Cliquer sur le bouton **Ajouter une ressource** (en bas à droite).
+
 5. Saisir l'**URL** `/local/community/ha-ploc-cellar-frontend/ploc-cellar-card.js`.\
    Choisir **Module JavaScript**.\
    Puis cliquer sur **Créer**.
+
 6. Passer aux étapes de configuration.
 
    > [!NOTE]
@@ -95,8 +104,9 @@ Les mouvements de stock disposent d'une sous-section dédiée permettant d'ident
 
 ## ⚙️ Configuration des cartes
 
-Ajouter une carte Ploc Cellar depuis le sélecteur de cartes du tableau de bord.\
-Choisir l'entrée d'intégration souhaitée, et éventuellement un titre de carte.
+1. Ajouter une carte Ploc Cellar depuis le sélecteur de cartes du tableau de bord.
+
+2. Choisir l'entrée d'intégration souhaitée, et éventuellement un titre de carte.
 
 ### - 📊 Edition de la carte 'Vue d'ensemble' (`custom:ploc-cellar-card`)
 
@@ -116,7 +126,7 @@ L'éditeur Inventaire regroupe les options générales et d'affichage.
 
 ### - 🏷️ Edition de la carte 'Casier' (`custom:ploc-cellar-rack-card`)
 
-L'éditeur Casier regroupe les réglages généraux, le format de sélection du casier et les options d'en-tête ; l'option de barre d'occupation n'apparaît que si l'en-tête est activé.
+L'éditeur Casier regroupe les réglages généraux, le format de sélection du casier (liste déroulante ou boutons) et les options d'en-tête ; l'option de barre d'occupation n'apparaît que si l'en-tête est activé.
 
 [<picture>
    <img src='docs/screenshots/rack-card-edit.fr.png' alt='Rack card edit' style="max-height: 400px; margin: auto;" />
@@ -126,45 +136,72 @@ L'éditeur Casier regroupe les réglages généraux, le format de sélection du 
 
 ## 🔄 Actualisation automatique
 
-Les cartes chargent l'inventaire à leur initialisation puis s'actualisent après une synchronisation backend réussie. Elles s'abonnent à la notification WebSocket `ploc_cellar/subscribe_sync`, propre à l'entrée de configuration, puis relisent l'inventaire via `ploc_cellar.get_inventory`. La notification ne contient aucune donnée de cave ; elle sert uniquement de signal d'actualisation. Aucun polling, rafraîchissement manuel ou identifiant d'entité n'est nécessaire. Chaque carte ne reçoit que les notifications de l'entrée sélectionnée.
+Les cartes chargent l'inventaire à leur initialisation puis s'actualisent après une synchronisation réussie par l'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar). Aucun polling, rafraîchissement manuel ou identifiant d'entité n'est nécessaire. Chaque carte ne reçoit que les mises à jour du compte sélectionné.
 
 > [!NOTE]
 > Les cartes communiquent uniquement avec Home Assistant. Elles ne se connectent pas à PLOUD et ne stockent aucun identifiant PLOC.
 
-## 🌐 Langues et présentation
-
-Le français et l'anglais sont pris en charge, selon la langue de Home Assistant. Les noms de vins utilisent la police Cormorant Garamond intégrée ; les valeurs de la vue d'ensemble, les nombres de casiers et les diagnostics utilisent DJB Get Digital. Aucun service de polices externe ni téléchargement à l'exécution n'est nécessaire.
-
-Les photos sont affichées lorsque le backend dispose d'une image mise en cache. La carte les récupère via une route Home Assistant authentifiée et ne contacte pas directement PLOUD. La fiche détaillée reste utilisable sans photo.
+---
 
 ## 🛠️ Dépannage
 
-- **Le type de carte est indisponible :** vérifier que Ploc Cellar Cards est installé via HACS et que la ressource `ploc-cellar-card.js` est enregistrée.
+- **Le type de carte est indisponible :** vérifier que Ploc Cellar Cards est installé via Marketplace et que la ressource `ploc-cellar-card.js` est enregistrée pour les tableaux de bord.
+
 - **L'éditeur ne trouve aucune cave :** installer et configurer d'abord l'intégration backend, puis recharger l'éditeur du tableau de bord.
-- **La carte affiche une erreur ou aucun inventaire :** vérifier l'entrée de configuration sélectionnée et consulter les journaux Home Assistant pour les erreurs de `ploc_cellar`.
+
+- **La carte affiche une erreur ou aucun inventaire :** vérifier l'entrée de configuration sélectionnée et consulter les journaux Home Assistant pour les erreurs de `ploc_cellar`.\
+[![Open your Home Assistant instance and show your Home Assistant logs.](https://my.home-assistant.io/badges/logs.svg)](https://my.home-assistant.io/redirect/logs/)
+
 - **La carte ne s'actualise pas :** vérifier la compatibilité backend/frontend et confirmer que la carte et la synchronisation utilisent la même entrée d'intégration. Les cartes s'actualisent après une synchronisation réussie, sans polling.
 
+[Ouvrir un suivi sur GitHub](https://github.com/MadMatt34/ha-ploc-cellar-frontend/issues/new) :\
+Pour demander des fonctionnalités, indiquez le maximum de précisions.\
 Pour signaler un problème, indiquer la version de Home Assistant, le navigateur, la version ou le commit frontend, le type de carte et les messages pertinents de la console du navigateur ou des journaux Home Assistant. Ne pas joindre d'identifiants ni de jetons d'accès.
+
+---
 
 ## 🗑️ Désinstallation
 
 1. Retirer les cartes Ploc Cellar des tableaux de bord.
-2. Désinstaller **Ploc Cellar Cards** depuis HACS.
-3. Si la ressource a été ajoutée manuellement, supprimer `/hacsfiles/ha-ploc-cellar-frontend/ploc-cellar-card.js` des ressources du tableau de bord.
-4. Recharger le tableau de bord selon le besoin.
+2. Désinstaller **Ploc Cellar Cards** depuis Marketplace.
+3. Si la ressource a été ajoutée manuellement, supprimer `/local/community/ha-ploc-cellar-frontend/ploc-cellar-card.js` des ressources du tableau de bord ; ainsi que le dossier et fichier correspondant sur le disque.\
+[![Open your Home Assistant instance and show your dashboard resources.](https://my.home-assistant.io/badges/lovelace_resources.svg)](https://my.home-assistant.io/redirect/lovelace_resources/)
+4. Recharger le tableau de bord si besoin.
 
-La désinstallation des cartes ne supprime ni l'intégration backend ni son inventaire.
+> [!IMPORTANT]
+> La désinstallation des cartes ne supprime ni l'intégration backend ni son inventaire.
 
-## Documentation complémentaire
+---
 
-- [Index de la documentation](docs/README.fr.md) / [English](docs/README.md)
-- [Contrat backend](docs/BACKEND_CONTRACT.fr.md) / [English](docs/BACKEND_CONTRACT.md)
-- [Compatibilité backend/frontend et politique de publication](docs/COMPATIBILITY_AND_RELEASES.fr.md) / [English](docs/COMPATIBILITY_AND_RELEASES.md)
+## 📚 Documentation complémentaire
+
+- [Index de la documentation complémentaire](docs/README.fr.md)
+- [Contrat backend](docs/BACKEND_CONTRACT.fr.md)
+- [Instructions de développement frontend et CI](docs/DEVELOPMENT.fr.md)
+- [Compatibilité backend/frontend et politique de publication](docs/COMPATIBILITY_AND_RELEASES.fr.md)
+
+---
+
+## 🌐 Langues prises en charge
+
+🇬🇧 English • 🇫🇷 Français
+
+---
+
+## ❤️ Soutenir ce projet
+
+Vous trouvez ce tableau de bord utile ? Ajoutez une ⭐ au projet sur GitHub !
+
+---
 
 ## ⚖️ Licence
 
 Ce projet est distribué sous [licence MIT](LICENSE).
 
-## Avertissement
+---
 
-Ploc Cellar Cards est un frontend indépendant pour Home Assistant. Il n'est ni affilié à PLOC ou PLOUD, ni approuvé ou pris en charge par ces services. L'intégration backend utilise des interfaces PLOUD non documentées ; les cartes elles-mêmes communiquent uniquement avec l'intégration Home Assistant.
+## ⚠️ Avertissement
+
+Ploc Cellar Cards est un frontend indépendant pour Home Assistant. Il n'est ni affilié à [PLOC](https://www.ploc.co) ou [PLOUD](https://www.ploc.co/sauvegarder-et-synchroniser), ni approuvé ou pris en charge par ces services.
+
+L'intégration backend utilise des interfaces PLOUD non documentées ; les cartes elles-mêmes communiquent uniquement avec l'intégration Home Assistant.
