@@ -11,7 +11,7 @@ async function read(path) {
 test("English and French backend contracts document the same critical inventory fields", async () => {
   const [english, french] = await Promise.all([
     read("docs/BACKEND_CONTRACT.md"),
-    read("docs/CONTRAT_BACKEND.fr.md"),
+    read("docs/BACKEND_CONTRACT.fr.md"),
   ]);
 
   for (const field of ["stale", "last_sync", "stocked_wines", "wine_references"]) {
@@ -35,7 +35,7 @@ test("both frontend READMEs link the compatibility and release policy", async ()
 test("both backend contracts document the scoped non-admin sync command", async () => {
   const [english, french, readmeEnglish, readmeFrench] = await Promise.all([
     read("docs/BACKEND_CONTRACT.md"),
-    read("docs/CONTRAT_BACKEND.fr.md"),
+    read("docs/BACKEND_CONTRACT.fr.md"),
     read("README.md"),
     read("README.fr.md"),
   ]);
