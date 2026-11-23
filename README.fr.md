@@ -194,6 +194,10 @@ Vous trouvez ce tableau de bord utile ? Ajoutez une ⭐ au projet sur GitHub !
 
 ---
 
+## 🚀 Evolutions et prochaines versions
+
+---
+
 ## ⚖️ Licence
 
 Ce projet est distribué sous [licence MIT](LICENSE).
@@ -202,8 +206,8 @@ Ce projet est distribué sous [licence MIT](LICENSE).
 
 ## ⚠️ Avertissement
 
-Ploc Cellar Cards est un frontend indépendant pour Home Assistant. Il n'est ni affilié à [PLOC](https://www.ploc.co) ou [PLOUD](https://www.ploc.co/sauvegarder-et-synchroniser), ni approuvé ou pris en charge par ces services.
+*Ploc Cellar Cards est un frontend indépendant pour Home Assistant. Il n'est ni affilié à [PLOC](https://www.ploc.co) ou [PLOUD](https://www.ploc.co/sauvegarder-et-synchroniser), ni approuvé ou pris en charge par ces services.*
 
-L'intégration backend repose sur des interfaces PLOUD non documentées, dont le fonctionnement a été reconstitué par un travail de recherche technique indépendant. Il ne s'agit pas d'une API publique ou officiellement prise en charge, et ces interfaces peuvent évoluer ou devenir incompatibles à tout moment, sans préavis. PLOC a été contacté au sujet de ce travail et de l'existence éventuelle d'une interface officielle, mais aucune réponse n'avait été reçue au moment de la rédaction.
+*L'intégration backend repose sur des interfaces PLOUD non documentées, dont le fonctionnement a été reconstitué par un travail de recherche technique indépendant. Il ne s'agit pas d'une API publique ou officiellement prise en charge, et ces interfaces peuvent évoluer ou devenir incompatibles à tout moment, sans préavis. PLOC a été contacté au sujet de ce travail et de l'existence éventuelle d'une interface officielle, mais aucune réponse n'avait été reçue au moment de la rédaction.*
 
 Les cartes frontend communiquent uniquement avec l'intégration backend Home Assistant et ne contactent jamais directement PLOUD.
