@@ -3,8 +3,8 @@
 ![Ploc Cellar for Home Assistant](docs/banner.png)
 
 [![Latest Release](https://img.shields.io/github/v/release/MadMatt34/ha-ploc-cellar-frontend?color=green)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/releases)
-[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Dashboard-blue)](https://www.home-assistant.io/dashboards/)
-[![Marketplace](https://img.shields.io/badge/Marketplace-Dashboard-blue)](https://www.home-assistant.io/integrations/marketplace/)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Custom%20Dashboard-blue)](https://www.home-assistant.io/dashboards/)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Dashboard%20plugin-blue)](https://www.home-assistant.io/integrations/marketplace/)
 \
 [![Frontend CI](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/frontend-ci.yml)
 [![Marketplace validation](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml/badge.svg)](https://github.com/MadMatt34/ha-ploc-cellar-frontend/actions/workflows/validate.yaml)
