@@ -53,7 +53,7 @@ On smaller screens, the map automatically switches to a compact touch-friendly g
 The **detailed wine view** opens when selecting a wine from the inventory, the diagnostics list or a rack position. It provides sections for characteristics, food pairings, notes, locations and stock.
 
 > [!NOTE]
-> Stock movements have a dedicated subsection to help identify anomalies.\
+> Stock movements have a dedicated subsection to help identify anomalies. A visible indicator appears when an issue is detected.\
 > Photos are displayed when the integration has a cached image available. The card retrieves them through an authenticated Home Assistant endpoint and does not contact PLOUD directly. The detailed view remains usable without a photo.
 
 | Details | Characteristics | Food pairing | Locations | Stock |
@@ -98,7 +98,7 @@ The **detailed wine view** opens when selecting a wine from the inventory, the d
 6. Proceed to the configuration steps.
 
 > [!NOTE]
-> When updating, replace the JavaScript file and add or increment the version in the resource URL (for example, `?v=2.0.0`) so that the browser loads the new version.
+> In case of a manuel installation, when updating, replace the JavaScript file and add or increment the version in the resource URL (for example, `?v=2.0.0`) so that the browser loads the new version.
 
 ---
 

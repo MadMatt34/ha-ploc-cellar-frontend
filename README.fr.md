@@ -53,7 +53,7 @@ Sur les écrans de taille réduite, le plan passe automatiquement en grille comp
 La **fiche détaillée du vin** est ouverte depuis une sélection dans l'inventaire, dans la liste des anomalies, ou dans un emplacement de casier. Elle présente des sections pour les caractéristiques, les accords mets-vins, les commentaires, les emplacements, et le stock.
 
 > [!NOTE]
-> Les mouvements de stock disposent d'une sous-section dédiée permettant d'identifier les anomalies.\
+> Les mouvements de stock disposent d'une sous-section dédiée permettant d'identifier les anomalies. Un indicateur visible apparait en cas d'anomalie identifiée.\
 > Les photos sont affichées lorsque l'intégration dispose d'une image mise en cache. La carte les récupère via une route Home Assistant authentifiée et ne contacte pas directement PLOUD. La fiche détaillée reste utilisable sans photo.
 
 | Fiche | Caractéristiques | Mets-vin | Emplacements | Stock |
@@ -98,7 +98,7 @@ La **fiche détaillée du vin** est ouverte depuis une sélection dans l'inventa
 6. Passer aux étapes de configuration.
 
 > [!NOTE]
-> Lors d'une mise à jour, remplacer le fichier JavaScript et ajouter ou incrémenter la version dans l'URL de la ressource (par exemple `?v=2.0.0`) afin que le navigateur charge la nouvelle version.
+> Dans le cas d'une installation manuelle, lors d'une mise à jour, remplacer le fichier JavaScript et ajouter ou incrémenter la version dans l'URL de la ressource (par exemple `?v=2.0.0`) afin que le navigateur charge la nouvelle version.
 
 ---
 
