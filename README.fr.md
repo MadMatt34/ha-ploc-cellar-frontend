@@ -27,7 +27,7 @@ La sélection d'un diagnostic en anomalie ouvre la liste des vins concernés.
 
 | Stock | Diagnostics | Statistiques |
 | :--: | :--: | :--: |
-| ![Main card](docs/screenshots/main-card.fr.png) | ![Main card diagnostics](docs/screenshots/main-card-diagnostics.fr.png) | ![Main card statistics](docs/screenshots/main-card-statistics.fr.png) |
+| ![Main card](docs/screenshots/main-card.fr.png) | ![Main card diagnostics](docs/screenshots/main-card-diagnostics.fr.png)<br /> <br/>Liste du diagnostic<br/>![Main card diagnostics detail](docs/screenshots/main-card-diagnostics-detail.fr.png) | ![Main card statistics](docs/screenshots/main-card-statistics.fr.png) |
 
 ### - 🗃️ Inventaire (`custom:ploc-cellar-inventory-card`)
 
@@ -52,6 +52,10 @@ Sur les écrans de taille réduite, le plan passe automatiquement en grille comp
 
 La **fiche détaillée du vin** présente des sections pour les caractéristiques, les accords mets-vins, les notes, les emplacements, et le stock.\
 Les mouvements de stock disposent d'une sous-section dédiée permettant d'identifier les anomalies.
+
+| Fiche | Caractéristiques | Mets-vin | Emplacements | Stock |
+| :--: | :--: | :--: | :--: | :--: |
+| ![Wine details](docs/screenshots/wine-details.fr.png) | ![Wine details characteristics](docs/screenshots/wine-details-characteristics.fr.png) | ![Wine details food](docs/screenshots/wine-details-food.fr.png) | ![Wine details locations](docs/screenshots/wine-details-locations.fr.png) | ![Wine details stock](docs/screenshots/wine-details-stock.fr.png) |
 
 ---
 
