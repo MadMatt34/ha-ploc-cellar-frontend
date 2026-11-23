@@ -1,6 +1,6 @@
 # Développement frontend et CI
 
-Ce document s'adresse aux contributeurs. Les instructions d'installation destinées aux utilisateurs figurent dans le [README](../README.md) et le [README français](../README.fr.md). La [version anglaise](DEVELOPMENT.md) contient les mêmes procédures.
+Ce document s'adresse aux contributeurs. Les README à la racine constituent la documentation utilisateur : fonctionnalités des cartes, captures d'écran, installation, configuration, actualisation automatique, dépannage et désinstallation. La [version anglaise](DEVELOPMENT.md) contient les mêmes procédures.
 
 ## Environnement technique
 
@@ -48,7 +48,9 @@ La validation HACS est effectuée par le workflow de validation du dépôt. Les 
 - `tests/browser/` contient les tests d'interaction navigateur et leur fixture.
 - `tests/documentation.test.mjs` vérifie certains invariants documentaires.
 
-Les tests de régression du cycle de vie montent puis déconnectent plusieurs fois les trois cartes, vérifient la libération des abonnements de synchronisation et la révocation des URL Blob des fiches vin. Lorsqu'un comportement visible par l'utilisateur change, mettre à jour les tests unitaires/navigateur concernés et les deux README linguistiques. Lorsqu'une réponse backend ou le protocole de notification change, suivre la procédure coordonnée de [BACKEND_CONTRACT.md](BACKEND_CONTRACT.md) et mettre à jour la politique de compatibilité si une paire de versions prises en charge change.
+Les tests de régression du cycle de vie montent puis déconnectent plusieurs fois les trois cartes, vérifient la libération des abonnements de synchronisation et la révocation des URL Blob des fiches vin.
+
+Lorsqu'une documentation ou un comportement évolue, maintenir les README racine anglais et français alignés pour les fonctionnalités et instructions destinées aux utilisateurs. Mettre à jour les tests unitaires/navigateur concernés lorsqu'un comportement change. Lorsqu'une réponse backend ou le protocole de notification change, mettre à jour les deux versions linguistiques de [BACKEND_CONTRACT.md](BACKEND_CONTRACT.md) et suivre sa procédure coordonnée ; mettre également à jour les deux versions de la politique de compatibilité si une paire de versions prise en charge ou une règle de publication change.
 
 ## Limites de validation
 
