@@ -46,9 +46,9 @@ Les mouvements de stock disposent d'une sous-section dédiée permettant d'ident
 
 ## 📋 Prérequis
 
-- **L'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar) doit être installée et configurée dans Home Assistant**.
+- [x] **L'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar) doit être installée et configurée dans Home Assistant**.
 
-- Un navigateur pris en charge par l'interface Home Assistant est nécessaire.
+- [x] Un navigateur pris en charge par l'interface Home Assistant est nécessaire.
 
 ---
 
@@ -73,8 +73,8 @@ Les mouvements de stock disposent d'une sous-section dédiée permettant d'ident
    Puis cliquer sur **Créer**.
 6. Passer aux étapes de configuration.
 
-> [!NOTE]
-> Lors d'une mise à jour, remplacer le fichiers et ajouter ou incrémenter le numéro de version dans l'URL de la ressource, par exemple `/local/community/ha-ploc-cellar-frontend/ploc-cellar-card.js?v=2.0.0`, afin que les navigateurs chargent les nouveaux fichiers.
+   > [!NOTE]
+   > Avec une installation manuelle, lors d'une mise à jour remplacer le fichiers et ajouter ou incrémenter le numéro de version dans l'URL de la ressource, par exemple `/local/community/ha-ploc-cellar-frontend/ploc-cellar-card.js?v=2.0.0`, afin que les navigateurs chargent les nouveaux fichiers.
 
 ---
 
@@ -88,6 +88,10 @@ Choisir l'entrée d'intégration souhaitée, et éventuellement un titre de cart
 L'éditeur Vue d'ensemble regroupe l'occupation, les diagnostics et les statistiques dans des sections dépliables. Les diagnostics et les statistiques possèdent chacun des options dépendantes, affichées uniquement lorsque la fonctionnalité correspondante est activée.
 
 ![Main card edit](docs/screenshots/main-card-edit.fr.png)
+
+| | |
+| :- | :-: |
+| L'éditeur Vue d'ensemble regroupe l'occupation, les diagnostics et les statistiques dans des sections dépliables. Les diagnostics et les statistiques possèdent chacun des options dépendantes, affichées uniquement lorsque la fonctionnalité correspondante est activée. | ![Main card edit](docs/screenshots/main-card-edit.fr.png) |
 
 ### - 🗃️ Edition de la carte 'Inventaire' (`custom:ploc-cellar-inventory-card`)
 
