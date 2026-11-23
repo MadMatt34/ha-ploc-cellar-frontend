@@ -136,7 +136,7 @@ L'éditeur Casier regroupe les réglages généraux, le format de sélection du 
 
 ## 🔄 Actualisation automatique
 
-Les cartes chargent l'inventaire à leur initialisation puis s'actualisent après une synchronisation réussie par l'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar). Aucun polling, rafraîchissement manuel ou identifiant d'entité n'est nécessaire. Chaque carte ne reçoit que les mises à jour du compte sélectionné.
+Les cartes chargent l'inventaire à leur initialisation puis s'actualisent après une synchronisation réussie par l'[intégration Ploc Cellar](https://github.com/MadMatt34/ha-ploc-cellar). Aucun polling, rafraîchissement manuel ou identifiant d'entité n'est nécessaire. Chaque carte ne reçoit que les mises à jour du compte sélectionné. Le frontend utilise la commande WebSocket `ploc_cellar/subscribe_sync`, accessible aux utilisateurs non administrateurs et limitée à l'entrée de configuration sélectionnée ; l'événement public `ploc_cellar_sync_completed` reste disponible pour les automatisations administrateur.
 
 > [!NOTE]
 > Les cartes communiquent uniquement avec Home Assistant. Elles ne se connectent pas à PLOUD et ne stockent aucun identifiant PLOC.
