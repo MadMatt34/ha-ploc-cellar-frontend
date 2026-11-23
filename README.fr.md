@@ -87,11 +87,9 @@ Choisir l'entrée d'intégration souhaitée, et éventuellement un titre de cart
 
 L'éditeur Vue d'ensemble regroupe l'occupation, les diagnostics et les statistiques dans des sections dépliables. Les diagnostics et les statistiques possèdent chacun des options dépendantes, affichées uniquement lorsque la fonctionnalité correspondante est activée.
 
-![Main card edit](docs/screenshots/main-card-edit.fr.png)
-
-<picture>
-   <img src='docs/screenshots/main-card-edit.fr.png' alt='Main card edit' style="max-height: 400px;" />
-</picture>
+[<picture>
+   <img src='docs/screenshots/main-card-edit.fr.png' alt='Main card edit' style="max-height: 400px; margin: auto;" />
+</picture>](docs/screenshots/main-card-edit.fr.png)
 
 ### - 🗃️ Edition de la carte 'Inventaire' (`custom:ploc-cellar-inventory-card`)
 
