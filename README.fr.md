@@ -27,13 +27,17 @@ La sélection d'un diagnostic en anomalie ouvre la liste des vins concernés.
 
 | Stock | Diagnostics | Statistiques |
 | :--: | :--: | :--: |
-| ![Main card](docs/screenshots/main-card.fr.png) | ![Main card diagnostics](docs/screenshots/main-card-diagnostics.fr.png) | |
+| ![Main card](docs/screenshots/main-card.fr.png) | ![Main card diagnostics](docs/screenshots/main-card-diagnostics.fr.png) | ![Main card statistics](docs/screenshots/main-card-statistics.fr.png) |
 
 ### - 🗃️ Inventaire (`custom:ploc-cellar-inventory-card`)
 
 **Liste de vins** avec recherche, tri et pagination, filtres par couleur, région, appellation, millésime et accords mets-vins.\
 Les filtres couleur, région, appellation et millésime proposent **Inconnu** pour retrouver les fiches incomplètes.\
 La sélection d'un nom de vin ouvre sa fiche détaillée.
+
+| Inventaire | Recherche, Filtres, et Tris |
+| :--: | :--: |
+| ![Inventory card](docs/screenshots/inventory-card.fr.png) | ![Inventory card filters](docs/screenshots/inventory-card-filters.fr.png) |
 
 ### - 🏷️ Casier (`custom:ploc-cellar-rack-card`)
 
