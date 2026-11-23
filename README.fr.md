@@ -87,6 +87,8 @@ Choisir l'entrée d'intégration souhaitée, et éventuellement un titre de cart
 
 L'éditeur Vue d'ensemble regroupe l'occupation, les diagnostics et les statistiques dans des sections dépliables. Les diagnostics et les statistiques possèdent chacun des options dépendantes, affichées uniquement lorsque la fonctionnalité correspondante est activée.
 
+![Ploc Cellar for Home Assistant](docs/banner.png){ style="max-height: 400px; display: block; margin: 0 auto" }
+
 [<picture>
    <img src='docs/screenshots/main-card-edit.fr.png' alt='Main card edit' style="max-height: 400px; margin: auto;" />
 </picture>](docs/screenshots/main-card-edit.fr.png)
@@ -95,13 +97,17 @@ L'éditeur Vue d'ensemble regroupe l'occupation, les diagnostics et les statisti
 
 L'éditeur Inventaire regroupe les options générales et d'affichage.
 
-![Inventory card edit](docs/screenshots/inventory-card-edit.fr.png)
+[<picture>
+   <img src='docs/screenshots/inventory-card-edit.fr.png' alt='Inventory card edit' style="max-height: 400px; margin: auto;" />
+</picture>](docs/screenshots/inventory-card-edit.fr.png)
 
 ### - 🏷️ Edition de la carte 'Casier' (`custom:ploc-cellar-rack-card`)
 
 L'éditeur Casier regroupe les réglages généraux, le format de sélection du casier et les options d'en-tête ; l'option de barre d'occupation n'apparaît que si l'en-tête est activé.
 
-![Rack card edit](docs/screenshots/rack-card-edit.fr.png)
+[<picture>
+   <img src='docs/screenshots/rack-card-edit.fr.png' alt='Rack card edit' style="max-height: 400px; margin: auto;" />
+</picture>](docs/screenshots/rack-card-edit.fr.png)
 
 ---
 
