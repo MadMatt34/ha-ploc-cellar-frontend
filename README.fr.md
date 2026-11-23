@@ -21,13 +21,13 @@ Affichage de tableau de bord Home Assistant (Frontend Lovelace), destiné à l'[
 
 ### - 📊 Vue d'ensemble (`custom:ploc-cellar-card`)
 
-**Synthèse, analyses, et statistiques de la cave** : stock physique et reconstitué, occupation des casiers, diagnostics du stock et graphiques de répartition par couleur, région, appellation, millésime et format de bouteille.\
+**Synthèse, analyses et statistiques de la cave** : stock physique et reconstitué, occupation des casiers, diagnostics du stock et graphiques de répartition par couleur, région, appellation, millésime et format de bouteille.\
 Les graphiques couvrent les références de vins connues ; les emplacements occupés dont le vin n'est pas résolu restent inclus dans les totaux physiques globaux et sont signalés séparément.\
 La sélection d'un diagnostic en anomalie ouvre la liste des vins concernés.
 
 | Stock | Diagnostics | Statistiques |
 | :--: | :--: | :--: |
-| ![Main card](docs/screenshots/main-card.fr.png) | ![Main card diagnostics](docs/screenshots/main-card-diagnostics.fr.png)<br />&nbsp;<br/>Liste du diagnostic<br/>![Main card diagnostics detail](docs/screenshots/main-card-diagnostics-detail.fr.png) | ![Main card statistics](docs/screenshots/main-card-statistics.fr.png) |
+| ![Main card](docs/screenshots/main-card.fr.png) | ![Main card diagnostics](docs/screenshots/main-card-diagnostics.fr.png)<br />&nbsp;<br/>↧<br/>![Main card diagnostics detail](docs/screenshots/main-card-diagnostics-detail.fr.png) | ![Main card statistics](docs/screenshots/main-card-statistics.fr.png) |
 
 ### - 🗃️ Inventaire (`custom:ploc-cellar-inventory-card`)
 
@@ -35,7 +35,7 @@ La sélection d'un diagnostic en anomalie ouvre la liste des vins concernés.
 Les filtres couleur, région, appellation et millésime proposent **Inconnu** pour retrouver les fiches incomplètes.\
 La sélection d'un nom de vin ouvre sa fiche détaillée.
 
-| Inventaire | Recherche, Filtres, et Tris |
+| Inventaire | Recherche, filtres et tris |
 | :--: | :--: |
 | ![Inventory card](docs/screenshots/inventory-card.fr.png) | ![Inventory card filters](docs/screenshots/inventory-card-filters.fr.png) |
 
@@ -50,11 +50,11 @@ Sur les écrans de taille réduite, le plan passe automatiquement en grille comp
 
 ### - 🍷 Fiche vin
 
-La **fiche détaillée du vin** est ouverte depuis un click dans l'inventaire, dans la liste des anomalies, ou dans un emplacement de casier. Elle présente des sections pour les caractéristiques, les accords mets-vins, les commentaires, les emplacements, et le stock.
+La **fiche détaillée du vin** est ouverte depuis une sélection dans l'inventaire, dans la liste des anomalies, ou dans un emplacement de casier. Elle présente des sections pour les caractéristiques, les accords mets-vins, les commentaires, les emplacements, et le stock.
 
 > [!NOTE]
 > Les mouvements de stock disposent d'une sous-section dédiée permettant d'identifier les anomalies.\
-> Les photos sont affichées lorsque l'intégration' dispose d'une image mise en cache. La carte les récupère via une route Home Assistant authentifiée et ne contacte pas directement PLOUD. La fiche détaillée reste utilisable sans photo.
+> Les photos sont affichées lorsque l'intégration dispose d'une image mise en cache. La carte les récupère via une route Home Assistant authentifiée et ne contacte pas directement PLOUD. La fiche détaillée reste utilisable sans photo.
 
 | Fiche | Caractéristiques | Mets-vin | Emplacements | Stock |
 | :--: | :--: | :--: | :--: | :--: |
@@ -83,7 +83,7 @@ La **fiche détaillée du vin** est ouverte depuis un click dans l'inventaire, d
 
 1. Télécharger `dist/ploc-cellar-card.js` de ce dépôt.
 
-2. Copier ce fichier dans `/config/community/ha-ploc-cellar-frontend/`.
+2. Copier ce fichier dans `/config/www/community/ha-ploc-cellar-frontend/`.
 
 3. Aller dans **Paramètres** → **Tableaux de bord**.\
    Cliquer sur le menu ⋮ avec trois points (en haut à droite). Puis, choisir **Ressources**.\
@@ -97,8 +97,8 @@ La **fiche détaillée du vin** est ouverte depuis un click dans l'inventaire, d
 
 6. Passer aux étapes de configuration.
 
-   > [!NOTE]
-   > Avec une installation manuelle, lors d'une mise à jour remplacer le fichiers et ajouter ou incrémenter le numéro de version dans l'URL de la ressource, par exemple `/local/community/ha-ploc-cellar-frontend/ploc-cellar-card.js?v=2.0.0`, afin que les navigateurs chargent les nouveaux fichiers.
+> [!NOTE]
+> Lors d'une mise à jour, remplacer le fichier JavaScript et ajouter ou incrémenter la version dans l'URL de la ressource (par exemple `?v=2.0.0`) afin que le navigateur charge la nouvelle version.
 
 ---
 
@@ -108,7 +108,7 @@ La **fiche détaillée du vin** est ouverte depuis un click dans l'inventaire, d
 
 2. Choisir l'entrée d'intégration souhaitée, et éventuellement un titre de carte.
 
-### - 📊 Edition de la carte 'Vue d'ensemble' (`custom:ploc-cellar-card`)
+### - 📊 Édition de la carte 'Vue d'ensemble' (`custom:ploc-cellar-card`)
 
 L'éditeur Vue d'ensemble regroupe l'occupation, les diagnostics et les statistiques dans des sections dépliables. Les diagnostics et les statistiques possèdent chacun des options dépendantes, affichées uniquement lorsque la fonctionnalité correspondante est activée.
 
@@ -204,4 +204,6 @@ Ce projet est distribué sous [licence MIT](LICENSE).
 
 Ploc Cellar Cards est un frontend indépendant pour Home Assistant. Il n'est ni affilié à [PLOC](https://www.ploc.co) ou [PLOUD](https://www.ploc.co/sauvegarder-et-synchroniser), ni approuvé ou pris en charge par ces services.
 
-L'intégration backend utilise des interfaces PLOUD non documentées ; les cartes elles-mêmes communiquent uniquement avec l'intégration Home Assistant.
+L'intégration backend repose sur des interfaces PLOUD non documentées, dont le fonctionnement a été reconstitué par un travail de recherche technique indépendant. Il ne s'agit pas d'une API publique ou officiellement prise en charge, et ces interfaces peuvent évoluer ou devenir incompatibles à tout moment, sans préavis. PLOC a été contacté au sujet de ce travail et de l'existence éventuelle d'une interface officielle, mais aucune réponse n'avait été reçue au moment de la rédaction.
+
+Les cartes frontend communiquent uniquement avec l'intégration backend Home Assistant et ne contactent jamais directement PLOUD.
